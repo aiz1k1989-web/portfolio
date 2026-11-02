@@ -4,9 +4,82 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager</title>
+  <style>
+    #token-form-container {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #f4f5f7;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 99999;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .token-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .token-card h2 { margin-top: 0; color: #1e293b; font-size: 1.25rem; }
+    .token-card p { color: #64748b; font-size: 0.875rem; line-height: 1.4; margin-bottom: 20px; }
+    .token-card input {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
+      border-radius: 6px; font-size: 0.9rem; margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    .token-card button {
+      width: 100%; padding: 10px; background: #2563eb; color: #fff;
+      border: none; border-radius: 6px; font-weight: 600; cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .token-card button:hover { background: #1d4ed8; }
+  </style>
 </head>
 <body>
-  <!-- Include the script that builds the page and powers Decap CMS -->
+
+  <div id="token-form-container">
+    <div class="token-card">
+      <h2>Decap CMS Login</h2>
+      <p>Вставьте ваш GitHub Personal Access Token (с правами <b>repo</b>):</p>
+      <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxx" />
+      <button onclick="saveTokenAndReload()">Войти в админку</button>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    const STORAGE_KEY = 'decap-cms-user';
+
+    // Проверяем, есть ли уже сохраненный токен
+    const existingData = localStorage.getItem(STORAGE_KEY);
+    if (existingData) {
+      try {
+        const parsed = JSON.parse(existingData);
+        if (parsed && parsed.token) {
+          document.getElementById('token-form-container').style.display = 'none';
+        }
+      } catch(e) {}
+    }
+
+    function saveTokenAndReload() {
+      const token = document.getElementById('pat-input').value.trim();
+      if (!token) {
+        alert('Пожалуйста, введите токен!');
+        return;
+      }
+
+      const userData = {
+        backendName: 'github',
+        token: token,
+        login: 'aiz1k1989-web'
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+      document.getElementById('token-form-container').style.display = 'none';
+      window.location.reload();
+    }
+  </script>
 </body>
 </html>
