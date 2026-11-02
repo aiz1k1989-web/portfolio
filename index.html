@@ -976,6 +976,16 @@ let activeAvatar = 'portfolio my photo.png';
     }
 })();
 
+// Replace outdated About drafts that mention CapCut classes with the current approved bio.
+if (Object.values(aboutText || {}).some(value => /capcut|masterclass|мастер-класс|мастер-клас/i.test(String(value)))) {
+    aboutText = {
+        en: 'I am Korlan, a photographer and videographer drawn to people, quiet moments, and the little details that make a story feel personal.\n\nAvailable for creative projects, brand collaborations, and private photoshoots.\n\nSay hello: @kkkorlan',
+        ru: 'Я Кори, фотограф и видеограф. Люблю живые эмоции, тихие моменты и детали, из которых складывается история.\n\nОткрыта к творческим проектам, сотрудничеству с брендами и индивидуальным фотосессиям.\n\nБуду рада знакомству: @kkkorlan',
+        kz: 'Мен Кори, фотограф және видеографпын. Адамдардың шынайы эмоцияларын, тыныш сәттерді және оқиғаны ерекше ететін ұсақ бөлшектерді жақсы көремін.\n\nШығармашылық жобаларға, брендтермен ынтымақтастыққа және жеке фотосессияларға ашықпын.\n\nХабарласыңыз: @kkkorlan',
+        vi: 'Mình là Korlan, nhiếp ảnh gia và nhà quay phim. Mình yêu những cảm xúc chân thật, khoảnh khắc nhẹ nhàng và các chi tiết nhỏ tạo nên câu chuyện riêng.\n\nMình luôn sẵn sàng cho các dự án sáng tạo, hợp tác cùng thương hiệu và chụp ảnh cá nhân.\n\nRất vui được kết nối: @kkkorlan'
+    };
+}
+
 function mergePortfolioWithDefaults(savedItems) {
     const savedByPath = new Map();
     (Array.isArray(savedItems) ? savedItems : []).forEach(item => {
