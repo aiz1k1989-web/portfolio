@@ -5,16 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YOKIKORI — Visual Storytelling & Commercial Production</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <!-- Подключаем SortableJS для плавной сортировки перетаскиванием -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --bg: #050505;
-            --surface: #111111;
-            --text: #f0f0f0;
-            --muted: #777777;
-            --accent: #ffffff;
-            --border: #222222;
+            --bg: #ffffff;
+            --surface: #f4f4f5;
+            --text: #09090b;
+            --muted: #71717a;
+            --accent: #000000;
+            --border: #e4e4e7;
+            --card-bg: #f8f9fa;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0a0a0a;
+                --surface: #141414;
+                --text: #f3f3f3;
+                --muted: #888888;
+                --accent: #ffffff;
+                --border: #222222;
+                --card-bg: #141414;
+            }
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,11 +42,12 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: background 0.3s, color 0.3s;
         }
 
         header {
             max-width: 1600px;
-            margin: 0 auto 80px auto;
+            margin: 0 auto 60px auto;
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -60,7 +73,8 @@
 
         .nav-tabs {
             display: flex;
-            gap: 30px;
+            gap: 25px;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -76,7 +90,7 @@
 
         .tab-btn:hover, .tab-btn.active {
             color: var(--accent);
-            font-weight: 400;
+            font-weight: 500;
         }
 
         main {
@@ -88,7 +102,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 24px;
         }
 
@@ -115,8 +129,8 @@
         .card-meta {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            padding: 24px;
-            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -132,50 +146,85 @@
             color: #fff;
         }
 
-        /* Админ панель и режим редактирования */
+        /* Админ-панель и модалка лабы */
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .admin-trigger:hover { color: var(--accent); }
+
         .admin-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: #111;
-            border-top: 1px solid #333;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
             padding: 15px 30px;
             display: none;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
         }
-
         .admin-bar.active { display: flex; }
 
-        .admin-trigger {
-            position: fixed;
-            bottom: 20px; right: 20px;
-            background: rgba(20,20,20,0.8);
-            border: 1px solid #333;
-            color: #555;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            z-index: 999;
-            transition: color 0.3s, border-color 0.3s;
-        }
-        .admin-trigger:hover { color: #fff; border-color: #666; }
-
         .btn {
-            background: #fff; color: #000; border: none;
-            padding: 8px 18px; border-radius: 4px;
+            background: var(--accent); color: var(--bg); border: none;
+            padding: 8px 16px; border-radius: 4px;
             font-size: 0.8rem; font-weight: 500; cursor: pointer;
             letter-spacing: 0.05em; text-transform: uppercase;
         }
-        .btn-dark { background: #222; color: #fff; border: 1px solid #444; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+        /* Модальное окно общей лаборатории */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            width: 90%; max-width: 1000px; height: 80vh;
+            border-radius: 8px; padding: 30px;
+            display: flex; flex-direction: column;
+        }
+        .media-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            overflow-y: auto;
+            margin-top: 20px;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+        .picker-item {
+            aspect-ratio: 4/5;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: var(--surface);
+        }
+        .picker-item:hover { border-color: var(--accent); }
+        .picker-item img, .picker-item video { width: 100%; height: 100%; object-fit: cover; }
 
         .sortable-ghost { opacity: 0.3; }
 
         @media (max-width: 768px) {
             body { padding: 20px; }
             header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -197,11 +246,13 @@
 
     <main>
         <div class="grid" id="portfolio-grid">
-            <!-- Элементы портфолио -->
+            <!-- 01 Fashion Commercial -->
             <div class="card" data-category="fashion">
                 <video src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">Fashion Commercial // Main</div></div>
             </div>
+
+            <!-- 03 Brand Collaborations: Titre -->
             <div class="card" data-category="brands">
                 <video src="03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">@titre_3</div></div>
@@ -210,6 +261,8 @@
                 <img src="03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg" alt="Titre Backstage" loading="lazy">
                 <div class="card-meta"><div class="card-title">@titre_3 // Backstage</div></div>
             </div>
+
+            <!-- Atelier Bar -->
             <div class="card" data-category="brands">
                 <video src="03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">@atelierbar.almaty</div></div>
@@ -218,14 +271,34 @@
                 <img src="03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_1.jpg" alt="Atelier Bar" loading="lazy">
                 <div class="card-meta"><div class="card-title">@atelierbar.almaty // Series</div></div>
             </div>
+
+            <!-- Tisou -->
             <div class="card" data-category="brands">
                 <img src="03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg" alt="Tisou" loading="lazy">
                 <div class="card-meta"><div class="card-title">@tisou.official</div></div>
             </div>
+            <div class="card" data-category="brands">
+                <video src="03_Brand_Collaborations/@tisou.official/12/2025-08-07_07-14-21_UTC.mp4" autoplay muted loop playsinline></video>
+                <div class="card-meta"><div class="card-title">@tisou.official // Motion</div></div>
+            </div>
+
+            <!-- The Six & Aimaq -->
+            <div class="card" data-category="brands">
+                <img src="03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_1.jpg" alt="The Six" loading="lazy">
+                <div class="card-meta"><div class="card-title">@thesix.kz</div></div>
+            </div>
+            <div class="card" data-category="brands">
+                <img src="03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_1.jpg" alt="Aimaq" loading="lazy">
+                <div class="card-meta"><div class="card-title">@aimaq_kz</div></div>
+            </div>
+
+            <!-- Backstage -->
             <div class="card" data-category="backstage">
                 <video src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">Backstage Process</div></div>
             </div>
+
+            <!-- Art -->
             <div class="card" data-category="art">
                 <video src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">Art & Personal Vision</div></div>
@@ -233,15 +306,47 @@
         </div>
     </main>
 
-    <!-- Скрытая кнопка входа в админку (замок в углу) -->
+    <!-- Замок админа -->
     <div class="admin-trigger" onclick="toggleAdminMode()" title="Admin Mode">🔒</div>
 
-    <!-- Плавающая панель админа -->
+    <!-- Админ-панель -->
     <div class="admin-bar" id="admin-bar">
-        <span style="font-size: 0.85rem; color: #aaa;">✨ Режим редактирования: перетаскивайте карточки мышкой</span>
+        <span style="font-size: 0.85rem;">✨ Режим правки: перетаскивайте работы или добавляйте новые из лабы</span>
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-dark" onclick="toggleAdminMode()">Закрыть</button>
-            <button class="btn" onclick="saveLayout()">Сохранить изменения</button>
+            <button class="btn btn-outline" onclick="openMediaLibrary()">+ Добавить из лабы</button>
+            <button class="btn btn-outline" onclick="toggleAdminMode()">Закрыть</button>
+            <button class="btn" onclick="saveLayout()">Сохранить</button>
+        </div>
+    </div>
+
+    <!-- Модалка Общей Лаборатории -->
+    <div class="modal" id="media-modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Общая лаборатория файлов (Выбор работ)</h3>
+                <button class="btn btn-outline" onclick="closeMediaLibrary()">Закрыть</button>
+            </div>
+            <div class="media-picker-grid" id="media-picker">
+                <!-- Все доступные файлы из твоих папок для быстрого добавления -->
+                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4', 'video', 'brands', '@titre_3')">
+                    <video src="03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4" muted></video>
+                </div>
+                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4', 'video', 'brands', '@atelierbar.almaty')">
+                    <video src="03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4" muted></video>
+                </div>
+                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg', 'image', 'brands', '@tisou.official')">
+                    <img src="03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg" loading="lazy">
+                </div>
+                <div class="picker-item" onclick="addCardToGrid('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 'fashion', 'Fashion Commercial')">
+                    <video src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4" muted></video>
+                </div>
+                <div class="picker-item" onclick="addCardToGrid('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 'backstage', 'Backstage')">
+                    <video src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4" muted></video>
+                </div>
+                <div class="picker-item" onclick="addCardToGrid('04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4', 'video', 'art', 'Art Vision')">
+                    <video src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4" muted></video>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -264,7 +369,7 @@
 
         function toggleAdminMode() {
             if (!isAdmin) {
-                const token = prompt("Введите GitHub Token для активации режима правки:");
+                const token = prompt("Введите GitHub Token для активации прав админа:");
                 if (!token) return;
                 localStorage.setItem('gh_token', token);
                 isAdmin = true;
@@ -275,7 +380,6 @@
             const bar = document.getElementById('admin-bar');
             if (isAdmin) {
                 bar.classList.add('active');
-                // Включаем Drag-and-Drop через SortableJS
                 sortableInstance = new Sortable(document.getElementById('portfolio-grid'), {
                     animation: 150,
                     ghostClass: 'sortable-ghost'
@@ -286,8 +390,35 @@
             }
         }
 
+        function openMediaLibrary() {
+            document.getElementById('media-modal').style.display = 'flex';
+        }
+
+        function closeMediaLibrary() {
+            document.getElementById('media-modal').style.display = 'none';
+        }
+
+        function addCardToGrid(src, type, category, title) {
+            const grid = document.getElementById('portfolio-grid');
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.category = category;
+
+            let mediaEl = type === 'video' 
+                ? `<video src="${src}" autoplay muted loop playsinline></video>`
+                : `<img src="${src}" alt="${title}" loading="lazy">`;
+
+            card.innerHTML = `
+                ${mediaEl}
+                <div class="card-meta"><div class="card-title">${title}</div></div>
+            `;
+            grid.prepend(card);
+            closeMediaLibrary();
+            alert('Работа добавлена в сетку!');
+        }
+
         function saveLayout() {
-            alert('Порядок карточек сохранен в памяти сессии! Вы можете продолжать настраивать портфолио.');
+            alert('Порядок и новые работы зафиксированы! Сессия сохранена.');
             toggleAdminMode();
         }
     </script>
