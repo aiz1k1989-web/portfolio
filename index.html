@@ -2286,7 +2286,7 @@
                     item.onclick = () => selectFileFromLib(file);
 
                     let thumb = file.type === 'video'
-                        ? `<video src="${file.path}" muted></video>`
+                        ? `<video src="${file.path}" muted preload="none"></video>`
                         : `<img src="${file.path}" loading="lazy">`;
 
                     item.innerHTML = thumb;
@@ -2493,7 +2493,14 @@
 
             try {
                 // Embed the current editor data into the committed HTML so it survives a fresh visit.
-                let updatedCode = document.documentElement.outerHTML;
+                const htmlClone = document.documentElement.cloneNode(true);
+                ['#portfolio-grid', '#blog-feed', '#folder-picker-body'].forEach(selector => {
+                    const element = htmlClone.querySelector(selector);
+                    if (element) element.innerHTML = '';
+                });
+                const postText = htmlClone.querySelector('#post-text');
+                if (postText) postText.textContent = '';
+                let updatedCode = htmlClone.outerHTML;
                 const safeJson = value => JSON.stringify(value).replace(/</g, "\\u003c");
                 updatedCode = updatedCode.replace(/let portfolioItems = [\s\S]*?;\s*let blogPosts = [\s\S]*?;\s*(?=let currentTab)/,
                     `let portfolioItems = ${safeJson(portfolioItems)};\n\n        let blogPosts = ${safeJson(blogPosts)};\n\n        `);
