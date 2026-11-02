@@ -17,7 +17,6 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Защита от выделения текста и файлов */
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
@@ -33,7 +32,6 @@
       padding: 3vw;
     }
 
-    /* Header & Navigation */
     header {
       display: flex;
       justify-content: space-between;
@@ -76,7 +74,6 @@
       color: var(--text);
     }
 
-    /* Portfolio Category Filters */
     .filter-bar {
       display: flex;
       gap: 1.5rem;
@@ -114,7 +111,6 @@
       background-color: var(--text);
     }
 
-    /* Media Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -133,11 +129,10 @@
     }
 
     .grid-item.col-6 { grid-column: span 6; }
-    .grid-item.col-4 { grid-column: span 4; }
     .grid-item.col-12 { grid-column: span 12; }
 
     @media (max-width: 768px) {
-      .grid-item.col-6, .grid-item.col-4 { grid-column: span 12; }
+      .grid-item.col-6 { grid-column: span 12; }
     }
 
     .img-wrap {
@@ -148,7 +143,6 @@
       border-radius: 2px;
     }
 
-    /* Прозрачный оверлей для блокировки сохранения правой кнопкой мыши */
     .img-wrap::after {
       content: "";
       position: absolute;
@@ -165,7 +159,7 @@
       height: auto;
       display: block;
       object-fit: cover;
-      pointer-events: none; /* Запрещает прямое нажатие на медиа */
+      pointer-events: none;
     }
 
     .item-meta {
@@ -176,14 +170,13 @@
       color: var(--muted);
     }
 
-    /* Lightbox Modal (Просмотрщик) */
     .lightbox {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.92);
       display: none;
       justify-content: center;
       align-items: center;
@@ -216,7 +209,6 @@
       cursor: pointer;
     }
 
-    /* Rates Section */
     .rates {
       margin-top: 8vw;
       padding-top: 4vw;
@@ -283,12 +275,11 @@
     }
   </style>
 </head>
-<body oncontextmenu="return false;"> <!-- Глобальный запрет правого клика -->
+<body oncontextmenu="return false;">
 
-  <!-- Header -->
   <header>
     <div class="brand-wrap">
-      <img src="My portfolio/portfolio my photo.png" alt="Korlan" class="profile-avatar" onerror="this.style.display='none'" ondragstart="return false;">
+      <img src="portfolio my photo.png" alt="Korlan" class="profile-avatar" onerror="this.style.display='none'" ondragstart="return false;">
       <a href="#" class="brand">KORLAN</a>
     </div>
     <nav>
@@ -298,7 +289,6 @@
     </nav>
   </header>
 
-  <!-- Category Filter Bar -->
   <section id="portfolio">
     <div class="filter-bar">
       <button class="filter-btn active" data-filter="all">All Works</button>
@@ -308,48 +298,47 @@
       <button class="filter-btn" data-filter="art">04 Art & Personal</button>
     </div>
 
-    <!-- Media Grid -->
     <main class="grid">
       
-      <!-- 01 Fashion Commercial (Фото) -->
-      <div class="grid-item col-6" data-category="fashion" data-type="image" data-src="My portfolio/01_Main_Fashion_Commercial/sample1.jpg">
+      <div class="grid-item col-6" data-category="fashion" data-type="video" data-src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4">
         <div class="img-wrap">
-          <img src="My portfolio/01_Main_Fashion_Commercial/sample1.jpg" alt="Fashion Editorial" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1400&q=80'">
+          <video autoplay loop muted playsinline controlsList="nodownload noremoteplayback" disablepictureinpicture ondragstart="return false;">
+            <source src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4" type="video/mp4">
+          </video>
         </div>
         <div class="item-meta">
           <span>Fashion Commercial</span>
-          <span>Editorial Campaign</span>
+          <span>Editorial Reel</span>
         </div>
       </div>
 
-      <!-- 02 Backstage & Process (Защищенное видео) -->
-      <div class="grid-item col-12" data-category="backstage" data-type="video" data-src="My portfolio/02_Backstage_And_Process/sample_video.mp4">
+      <div class="grid-item col-6" data-category="backstage" data-type="video" data-src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4">
         <div class="img-wrap">
           <video autoplay loop muted playsinline controlsList="nodownload noremoteplayback" disablepictureinpicture ondragstart="return false;">
-            <source src="My portfolio/02_Backstage_And_Process/sample_video.mp4" type="video/mp4">
+            <source src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4" type="video/mp4">
           </video>
         </div>
         <div class="item-meta">
           <span>Backstage & Process</span>
-          <span>Set Reel / Video</span>
+          <span>Set Production Reel</span>
         </div>
       </div>
 
-      <!-- 03 Brand Collaborations -->
-      <div class="grid-item col-6" data-category="brands" data-type="image" data-src="My portfolio/03_Brand_Collaborations/@tisou.official/sample.jpg">
+      <div class="grid-item col-6" data-category="brands" data-type="image" data-src="03_Brand_Collaborations/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg">
         <div class="img-wrap">
-          <img src="My portfolio/03_Brand_Collaborations/@tisou.official/sample.jpg" alt="Brand Collab" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80'">
+          <img src="03_Brand_Collaborations/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg" alt="Brand Collaboration" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80'">
         </div>
         <div class="item-meta">
-          <span>Brand Collab</span>
-          <span>@tisou.official</span>
+          <span>Brand Collaboration</span>
+          <span>@aimaq_kz</span>
         </div>
       </div>
 
-      <!-- 04 Art & Personal -->
-      <div class="grid-item col-6" data-category="art" data-type="image" data-src="My portfolio/04_Art_And_Personal/sample_art.jpg">
+      <div class="grid-item col-6" data-category="art" data-type="video" data-src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4">
         <div class="img-wrap">
-          <img src="My portfolio/04_Art_And_Personal/sample_art.jpg" alt="Personal Project" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1400&q=80'">
+          <video autoplay loop muted playsinline controlsList="nodownload noremoteplayback" disablepictureinpicture ondragstart="return false;">
+            <source src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4" type="video/mp4">
+          </video>
         </div>
         <div class="item-meta">
           <span>Art & Personal</span>
@@ -360,11 +349,10 @@
     </main>
   </section>
 
-  <!-- Rates Section -->
   <section class="rates" id="rates">
     <div class="rate-card">
       <div>
-        <h3 class="rate-title">Single Session</h3>
+        <h3 class="rate-title">Express Session</h3>
         <div class="rate-price">$110</div>
         <ul class="rate-details">
           <li>1 Hour Shoot</li>
@@ -377,7 +365,7 @@
 
     <div class="rate-card">
       <div>
-        <h3 class="rate-title">Turnkey Brand Package</h3>
+        <h3 class="rate-title">Brand Commercial Package</h3>
         <div class="rate-price">$330</div>
         <ul class="rate-details">
           <li><strong>3 &ndash; 4 Hours Full Production</strong></li>
@@ -390,21 +378,17 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer>
     <span>&copy; KORLAN</span>
     <span>Direct Message: <a href="https://ig.me/m/kkkorlan" target="_blank">@kkkorlan</a></span>
   </footer>
 
-  <!-- Lightbox Viewer Modal -->
   <div class="lightbox" id="lightbox">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
     <div class="lightbox-content" id="lightboxContent"></div>
   </div>
 
-  <!-- JavaScript Filter & Protection Logic -->
   <script>
-    // Filtering Logic
     const filterBtns = document.querySelectorAll('.filter-btn');
     const gridItems = document.querySelectorAll('.grid-item');
 
@@ -425,11 +409,11 @@
       });
     });
 
-    // Lightbox & Media Viewer Logic
     const lightbox = document.getElementById('lightbox');
     const lightboxContent = document.getElementById('lightboxContent');
     const lightboxClose = document.getElementById('lightboxClose');
 
+    gridItems.forceEach = function() {};
     gridItems.forEach(item => {
       item.addEventListener('click', () => {
         const type = item.getAttribute('data-type');
