@@ -140,6 +140,10 @@
         padding: 14px; border-radius: 8px; font-family: inherit; font-size: 0.9rem;
         resize: vertical; min-height: 80px; line-height: 1.5;
     }
+    .category-checkboxes { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px 10px; border:1px solid var(--border); border-radius:6px; }
+    .category-checkboxes label { display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:var(--text); cursor:pointer; white-space:nowrap; }
+    .category-checkboxes input { accent-color:#64b5f6; }
+
     .creator-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .btn {
         background: #fff; color: #000; border: none; padding: 10px 20px;
@@ -490,12 +494,12 @@
                 📎 drag & drop file(s) here or click to pick from media library
             </div>
             <div class="creator-controls">
-                <select id="post-category" class="btn secondary">
-                    <option value="fashion" data-i18n="tab_fashion">fashion</option>
-                    <option value="event" data-i18n="tab_event">event</option>
-                    <option value="brands" data-i18n="tab_brands">brands</option>
-                    <option value="art" data-i18n="tab_art">art &amp; personal</option>
-                </select>
+                <div id="post-categories" class="category-checkboxes" aria-label="media sections">
+                    <label><input type="checkbox" value="fashion" checked> fashion</label>
+                    <label><input type="checkbox" value="event"> event</label>
+                    <label><input type="checkbox" value="brands"> brands</label>
+                    <label><input type="checkbox" value="art"> art &amp; personal</label>
+                </div>
                 <input id="post-album" data-i18n="placeholder_album" placeholder="album (optional)">
                 <button class="btn" onclick="publishPost()" data-i18n="btn_add">+ add</button>
             </div>
@@ -819,29 +823,46 @@ const FAV_PHOTOS = new Set([
     '03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_1.jpg'
 ]);
 
-const DEFAULT_PORTFOLIO = [];
+const REPO_MEDIA_FILES = [{"path":"01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4","type":"video","category":"art","categories":["art","fashion"],"album":"main commercial"},{"path":"02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4","type":"video","category":"art","categories":["art","event"],"album":"backstage & process"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-02_13-06-37_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-05_14-14-49_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-04-20_14-53-23_UTC.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@aimaq_kz"},{"path":"03_Brand_Collaborations/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@aqqu.cafe"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_14.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_15.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_16.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_17.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_18.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_19.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 1"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_14.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_15.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_16.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_17.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_18.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_19.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_20.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@atelierbar.almaty / 2"},{"path":"03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@atelierbar.almaty"},{"path":"03_Brand_Collaborations/@chocolatebeautysalon /2026-09-14_15-39-20_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@chocolatebeautysalon "},{"path":"03_Brand_Collaborations/@offbeatkz/2026-07-04_06-33-31_UTC.mp4","type":"video","category":"art","categories":["art","brands"],"album":"@offbeatkz"},{"path":"03_Brand_Collaborations/@offbeatkz/2026-07-17_13-27-40_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@offbeatkz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_14.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@thesix.kz"},{"path":"03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 1"},{"path":"03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 1"},{"path":"03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 1"},{"path":"03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 1"},{"path":"03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 1"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 10"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 11"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-07_07-14-21_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-07_09-19-56_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-07_13-17-00_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/12/2025-08-08_12-16-27_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 12"},{"path":"03_Brand_Collaborations/@tisou.official/13/2025-07-31_10-10-00_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 13"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 14"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 15"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 16"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 2"},{"path":"03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 3"},{"path":"03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 3"},{"path":"03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 3"},{"path":"03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 3"},{"path":"03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 3"},{"path":"03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 4"},{"path":"03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 4"},{"path":"03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 4"},{"path":"03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 4"},{"path":"03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 5"},{"path":"03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 5"},{"path":"03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 5"},{"path":"03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 5"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 6"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_5.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 7"},{"path":"03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 8"},{"path":"03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 8"},{"path":"03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@tisou.official / 8"},{"path":"03_Brand_Collaborations/@tisou.official/9/2025-08-04_12-57-48_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@tisou.official / 9"},{"path":"03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@titre_3"},{"path":"03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@titre_3"},{"path":"03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4","type":"video","category":"brands","categories":["brands"],"album":"@titre_3"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_10.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_11.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_12.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_13.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_14.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_15.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_16.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_17.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_2.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_3.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_4.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_5.mp4","type":"video","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_6.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_7.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_8.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_9.jpg","type":"image","category":"brands","categories":["brands"],"album":"@titre_3 / Titre backstage"},{"path":"04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4","type":"video","category":"art","categories":["art"],"album":"personal"}];
+
+const DEFAULT_META_BY_PATH = new Map();
 PORTFOLIO_MODULES.forEach(mod => {
-    mod.folders.forEach(def => {
-        def.files.forEach(f => {
-            const item = { 
-                path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: [],
-                scale: 1, x: 0, y: 0
-            };
-            if (ART_OVERRIDES.has(item.path)) {
-                item.category = 'art';
-                item.album = 'personal';
-                item.stars = 5;
-            }
-            if (FAV_PHOTOS.has(item.path)) item.stars = 5;
-            
-            if (item.category === 'art') item.hashtags.push('#art');
-            if (item.category === 'brands') item.hashtags.push('#brands');
-            if (item.category === 'fashion') item.hashtags.push('#fashion');
-            if (item.category === 'event') item.hashtags.push('#event');
-            
-            DEFAULT_PORTFOLIO.push(item);
-        });
-    });
+    mod.folders.forEach(def => def.files.forEach(f => {
+        DEFAULT_META_BY_PATH.set(f.p, { stars: f.s || 2, hashtags: [] });
+    }));
+});
+
+function getItemCategories(item) {
+    const values = Array.isArray(item && item.categories) ? item.categories : [];
+    if (item && item.category && !values.includes(item.category)) values.unshift(item.category);
+    return [...new Set(values.filter(v => ['fashion','event','brands','art'].includes(v)))];
+}
+function itemHasCategory(item, section) {
+    return getItemCategories(item).includes(section);
+}
+function getDefaultAlbumForPath(path) {
+    const def = REPO_MEDIA_FILES.find(x => x.path === path);
+    if (def) return def.album;
+    if (!path || path.indexOf('data:') === 0) return 'uploads';
+    const parts = path.split('/');
+    return parts.length > 1 ? parts.slice(0,-1).join(' / ') : 'uploads';
+}
+function categoryHashtag(category) {
+    return '#' + category;
+}
+
+const DEFAULT_PORTFOLIO = REPO_MEDIA_FILES.map(def => {
+    const meta = DEFAULT_META_BY_PATH.get(def.path) || {};
+    const categories = def.categories.slice();
+    const item = {
+        path: def.path, type: def.type, category: def.category, categories,
+        album: def.album, stars: meta.stars || 2, hashtags: [...new Set(categories.map(categoryHashtag))],
+        scale: 1, x: 0, y: 0
+    };
+    if (ART_OVERRIDES.has(item.path)) item.stars = 5;
+    if (FAV_PHOTOS.has(item.path)) item.stars = 5;
+    if (meta.hashtags && meta.hashtags.length) item.hashtags = [...new Set(item.hashtags.concat(meta.hashtags))];
+    return item;
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -911,10 +932,46 @@ let activeAvatar = 'portfolio my photo.png';
     }
 })();
 
+function mergePortfolioWithDefaults(savedItems) {
+    const savedByPath = new Map();
+    (Array.isArray(savedItems) ? savedItems : []).forEach(item => {
+        if (!item || !item.path) return;
+        const old = savedByPath.get(item.path);
+        if (!old) savedByPath.set(item.path, item);
+        else {
+            const categories = [...new Set(getItemCategories(old).concat(getItemCategories(item)))];
+            savedByPath.set(item.path, { ...old, ...item, categories, category: item.category || old.category });
+        }
+    });
+    const merged = DEFAULT_PORTFOLIO.map(def => {
+        const saved = savedByPath.get(def.path);
+        if (!saved) return { ...def, categories: def.categories.slice(), hashtags: def.hashtags.slice() };
+        savedByPath.delete(def.path);
+        const categories = [...new Set(getItemCategories(def).concat(getItemCategories(saved)))];
+        return {
+            ...def, ...saved,
+            category: saved.category && categories.includes(saved.category) ? saved.category : def.category,
+            categories,
+            album: def.album,
+            hashtags: [...new Set((def.hashtags || []).concat(saved.hashtags || [], categories.map(categoryHashtag)))]
+        };
+    });
+    savedByPath.forEach(item => {
+        const categories = getItemCategories(item);
+        merged.push({ ...item, categories, category: item.category || categories[0] || 'art', album: item.album || getDefaultAlbumForPath(item.path) });
+    });
+    return merged;
+}
+portfolioItems = mergePortfolioWithDefaults(portfolioItems);
+
 portfolioItems.forEach(it => {
     if (typeof it.stars === 'string') it.stars = (it.stars.match(/★/g) || []).length || 2;
     if (typeof it.stars !== 'number' || it.stars < 1) it.stars = 2;
+    it.categories = getItemCategories(it);
+    if (!it.categories.length) it.categories = [it.category || 'art'];
+    if (!it.category || !it.categories.includes(it.category)) it.category = it.categories[0];
     if (!Array.isArray(it.hashtags)) it.hashtags = [];
+    it.categories.forEach(c => { const tag = categoryHashtag(c); if (!it.hashtags.includes(tag)) it.hashtags.push(tag); });
     if (it.scale === undefined) it.scale = 1;
     if (it.x === undefined) it.x = 0;
     if (it.y === undefined) it.y = 0;
@@ -1055,41 +1112,107 @@ function renderPortfolio(tab) {
 }
 
 function renderSectionWithAlbums(container, section) {
-    const items = portfolioItems.filter(i => i.category === section);
-
+    const items = portfolioItems.filter(i => itemHasCategory(i, section));
+    const makeGrid = list => {
+        const grid = document.createElement('div');
+        grid.className = 'portfolio-grid';
+        list.forEach(item => {
+            const idx = renderedItems.length;
+            renderedItems.push(item);
+            grid.appendChild(makeCard(item, idx));
+        });
+        return grid;
+    };
+    if (section === 'brands') {
+        const brands = new Map();
+        items.forEach(item => {
+            const parts = (item.album || 'other').split(' / ');
+            const brand = parts.shift() || 'other';
+            const subAlbum = parts.join(' / ');
+            if (!brands.has(brand)) brands.set(brand, new Map());
+            const albums = brands.get(brand);
+            const key = subAlbum || '';
+            if (!albums.has(key)) albums.set(key, []);
+            albums.get(key).push(item);
+        });
+        customAlbums.filter(a => a.section === section).forEach(a => {
+            const parts = (a.name || 'other').split(' / ');
+            const brand = parts.shift() || 'other';
+            const sub = parts.join(' / ');
+            if (!brands.has(brand)) brands.set(brand, new Map());
+            if (!brands.get(brand).has(sub)) brands.get(brand).set(sub, []);
+        });
+        if (!brands.size) {
+            const msg = document.createElement('p');
+            msg.style.cssText = 'color:var(--muted);text-align:center;padding:60px 20px;font-size:0.85rem;';
+            msg.textContent = i18n[currentLang].empty_section;
+            container.appendChild(msg);
+            return;
+        }
+        brands.forEach((albums, brand) => {
+            const brandSection = document.createElement('div');
+            brandSection.className = 'album-section';
+            const brandTitle = document.createElement('div');
+            brandTitle.className = 'album-title';
+            const brandText = document.createElement('span');
+            brandText.textContent = brand;
+            brandTitle.appendChild(brandText);
+            brandSection.appendChild(brandTitle);
+            const hasSubAlbums = [...albums.keys()].some(k => k !== '');
+            albums.forEach((list, albumName) => {
+                if (albumName) {
+                    const subTitle = document.createElement('div');
+                    subTitle.className = 'album-title';
+                    subTitle.style.marginLeft = '14px';
+                    subTitle.style.letterSpacing = '0.08em';
+                    const subText = document.createElement('span');
+                    subText.textContent = albumName;
+                    subTitle.appendChild(subText);
+                    if (document.body.classList.contains('admin-mode')) {
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'album-del-btn';
+                        delBtn.textContent = '✕ ' + i18n[currentLang].btn_delete_album;
+                        delBtn.onclick = () => deleteAlbum(section, brand + ' / ' + albumName);
+                        subTitle.appendChild(delBtn);
+                    }
+                    brandSection.appendChild(subTitle);
+                }
+                if (list.length) brandSection.appendChild(makeGrid(list));
+                else if (document.body.classList.contains('admin-mode') && !hasSubAlbums) {
+                    const empty = document.createElement('div');
+                    empty.style.cssText = 'color:var(--muted);font-size:0.75rem;padding:8px 0 18px;';
+                    empty.textContent = 'empty album';
+                    brandSection.appendChild(empty);
+                }
+            });
+            container.appendChild(brandSection);
+        });
+        return;
+    }
     const albums = {};
     items.forEach(it => {
         const key = it.album || 'other';
         (albums[key] = albums[key] || []).push(it);
     });
-
     customAlbums.filter(a => a.section === section).forEach(a => {
         if (!albums[a.name]) albums[a.name] = [];
     });
-
     const albumNames = Object.keys(albums);
     if (!albumNames.length) {
         const msg = document.createElement('p');
-        msg.style.color = 'var(--muted)';
-        msg.style.textAlign = 'center';
-        msg.style.padding = '60px 20px';
-        msg.style.fontSize = '0.85rem';
+        msg.style.cssText = 'color:var(--muted);text-align:center;padding:60px 20px;font-size:0.85rem;';
         msg.textContent = i18n[currentLang].empty_section;
         container.appendChild(msg);
         return;
     }
-
     albumNames.forEach(name => {
-        const list = albums[name];
         const sectionEl = document.createElement('div');
         sectionEl.className = 'album-section';
-
         const title = document.createElement('div');
         title.className = 'album-title';
         const titleText = document.createElement('span');
         titleText.textContent = name;
         title.appendChild(titleText);
-
         if (document.body.classList.contains('admin-mode')) {
             const delBtn = document.createElement('button');
             delBtn.className = 'album-del-btn';
@@ -1098,15 +1221,7 @@ function renderSectionWithAlbums(container, section) {
             title.appendChild(delBtn);
         }
         sectionEl.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.className = 'portfolio-grid';
-        list.forEach(item => {
-            const idx = renderedItems.length;
-            renderedItems.push(item);
-            grid.appendChild(makeCard(item, idx));
-        });
-        sectionEl.appendChild(grid);
+        if (albums[name].length) sectionEl.appendChild(makeGrid(albums[name]));
         container.appendChild(sectionEl);
     });
 }
@@ -1181,7 +1296,10 @@ function openLightbox(idx) {
     const item = renderedItems[idx];
     if (!item) return;
     
-    lbSeries = portfolioItems.filter(i => i.category === item.category && i.album === item.album);
+    lbSeries = currentTab === 'all'
+        ? buildAllFeed(portfolioItems)
+        : portfolioItems.filter(i => itemHasCategory(i, currentTab) && i.album === item.album);
+    if (!lbSeries.some(i => i.path === item.path)) lbSeries.unshift(item);
     lbIndex = lbSeries.findIndex(i => i.path === item.path);
     
     renderLightbox();
@@ -1392,53 +1510,58 @@ function renderMediaPickerFolders() {
     const container = document.getElementById('folder-picker-body');
     container.innerHTML = '';
     currentPickerFiles = [];
-
-    const allFolders = [];
-    PORTFOLIO_MODULES.forEach(mod => allFolders.push(...mod.folders));
-
-    allFolders.forEach(def => {
-        const visibleFiles = def.files.filter(f => mediaPickerMode !== 'about' || f.t === 'image');
-        if (!visibleFiles.length) return;
-
+    const groups = new Map();
+    portfolioItems.forEach(item => {
+        if (mediaPickerMode === 'about' && item.type !== 'image') return;
+        const path = item.path || '';
+        const folder = path.indexOf('data:') === 0 ? 'uploads' : (path.split('/').slice(0,-1).join('/') || 'uploads');
+        if (!groups.has(folder)) groups.set(folder, []);
+        groups.get(folder).push(item);
+    });
+    [...groups.keys()].sort((a,b)=>a.localeCompare(b)).forEach(folder => {
         const group = document.createElement('div');
         group.className = 'folder-group';
-
         const title = document.createElement('h4');
-        title.textContent = '📁 ' + def.name;
+        title.textContent = '📁 ' + folder;
         group.appendChild(title);
-
-        const g = document.createElement('div');
-        g.className = 'folder-grid';
-
-        visibleFiles.forEach(f => {
+        const grid = document.createElement('div');
+        grid.className = 'folder-grid';
+        groups.get(folder).forEach(file => {
             const currentIdx = currentPickerFiles.length;
-            currentPickerFiles.push({
-                path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: []
-            });
-
+            currentPickerFiles.push({ ...file, categories: getItemCategories(file) });
             const item = document.createElement('div');
             item.className = 'picker-item';
             item.dataset.idx = currentIdx;
-            
-            const isSelected = pickerSelection.some(s => s.path === f.p);
-            if (isSelected) item.classList.add('selected');
-
-            item.onclick = (e) => handlePickerClick(e, currentIdx);
-
-            if (f.t === 'video') {
-                item.innerHTML = `<video src="${f.p}#t=0.5" muted preload="metadata"></video>`;
+            if (pickerSelection.some(selected => selected.path === file.path)) item.classList.add('selected');
+            item.onclick = e => handlePickerClick(e, currentIdx);
+            if (file.type === 'video') {
+                const video = document.createElement('video');
+                video.dataset.src = file.path + '#t=0.5';
+                video.muted = true;
+                video.preload = 'none';
+                item.appendChild(video);
             } else {
                 const img = document.createElement('img');
                 img.loading = 'lazy';
-                img.src = f.p;
+                img.src = file.path;
                 item.appendChild(img);
             }
-            g.appendChild(item);
+            grid.appendChild(item);
         });
-
-        group.appendChild(g);
+        group.appendChild(grid);
         container.appendChild(group);
     });
+    const videos = container.querySelectorAll('video[data-src]');
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const video = entry.target;
+                if (!video.src) video.src = video.dataset.src;
+                observer.unobserve(video);
+            }
+        }), { rootMargin: '150px' });
+        videos.forEach(video => observer.observe(video));
+    }
 }
 
 function handlePickerClick(e, idx) {
@@ -1486,6 +1609,10 @@ function updatePickerFooter() {
     }
 }
 
+function getSelectedCategories() {
+    return [...document.querySelectorAll('#post-categories input[type="checkbox"]:checked')].map(input => input.value);
+}
+
 function confirmPickerSelection() {
     if (!pickerSelection.length) return;
 
@@ -1502,19 +1629,24 @@ function confirmPickerSelection() {
         return;
     }
 
-    const category = document.getElementById('post-category').value;
-    const album = document.getElementById('post-album').value.trim() || 'imported';
+    const selectedCategories = getSelectedCategories();
+    if (!selectedCategories.length) return alert('select at least one section');
 
     pickerSelection.forEach(file => {
-        portfolioItems.unshift({
-            path: file.path,
-            type: file.type,
-            category: category,
-            album: album,
-            stars: 2,
-            hashtags: ['#' + category],
-            scale: 1, x: 0, y: 0
-        });
+        const existing = portfolioItems.find(item => item.path === file.path);
+        if (existing) {
+            existing.categories = [...new Set(getItemCategories(existing).concat(selectedCategories))];
+            existing.category = existing.category || existing.categories[0];
+            existing.hashtags = [...new Set((existing.hashtags || []).concat(selectedCategories.map(categoryHashtag)))];
+        } else {
+            const categories = [...new Set(getItemCategories(file).concat(selectedCategories))];
+            portfolioItems.unshift({
+                path: file.path, type: file.type, category: categories[0], categories,
+                album: file.album || getDefaultAlbumForPath(file.path), stars: file.stars || 2,
+                hashtags: [...new Set((file.hashtags || []).concat(categories.map(categoryHashtag)))],
+                scale: file.scale || 1, x: file.x || 0, y: file.y || 0
+            });
+        }
     });
 
     saveLocal();
@@ -1542,7 +1674,9 @@ function handleDrop(e) {
     const files = e.dataTransfer.files;
     if (!files.length) return;
 
-    const category = document.getElementById('post-category').value;
+    const categories = getSelectedCategories();
+    if (!categories.length) return alert('select at least one section');
+    const category = categories[0];
     const album = document.getElementById('post-album').value.trim() || 'uploads';
 
     for (let i = 0; i < files.length; i++) {
@@ -1553,9 +1687,10 @@ function handleDrop(e) {
                 path: evt.target.result,
                 type: file.type.indexOf('video') === 0 ? 'video' : 'image',
                 category: category,
+                categories: categories.slice(),
                 album: album,
                 stars: 2,
-                hashtags: ['#' + category],
+                hashtags: categories.map(categoryHashtag),
                 scale: 1, x: 0, y: 0
             });
             if (i === files.length - 1) {
