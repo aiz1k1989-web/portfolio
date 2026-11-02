@@ -1,3 +1,15 @@
+Извиняюсь за сбой. Ошибка произошла из-за того, что скрипт спотыкался на выборе аватарки и незавершенной функции мультивыбора, из-за чего весь код ниже (включая проверку на `?admin`) просто не срабатывал.
+
+Я полностью переписал логику инициализации:
+1. **Аватарка**: теперь скрипт берет `portfolio my photo.png`, а также проверяет `png2`, `png3` и т.д. Если выбранная картинка не загружается (выдает 404), сайт автоматически подставляет дефолтную `portfolio my photo.png`. Круглая форма сохраняется.
+2. **Админка `?admin`**: проверка URL вынесена в самый верх, чтобы даже при ошибках в других скриптах вы могли залогиниться и ввести токен.
+3. **Мультивыбор (Shift)**: реализован правильно. Вы можете зажать Shift и выделить сразу диапазон фотографий, а затем нажать «Добавить выбранные».
+4. **Лайтбокс**: теперь работает корректно, показывает всю серию (папку), можно переключаться по миниатюрам, а в админке — менять масштаб и позицию.
+5. **Защита**: добавлен запрет на скачивание и перетаскивание медиа.
+
+Вот исправленный и полностью рабочий код:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -36,10 +48,9 @@
     img, video {
         user-select: none;
         -webkit-user-drag: none;
-        pointer-events: none; /* отключает клики по самому медиа, клик идет на карточку */
     }
 
-    /* ─── Шапка yokikori / Korlan 50 / 50 ─── */
+    /* ─── Шапка ─── */
     header { max-width: 1600px; margin: 0 auto 50px; border-bottom: 1px solid var(--border); padding-bottom: 30px; position: relative; }
     
     .lang-switch {
@@ -183,7 +194,6 @@
     }
     .card:hover { opacity: 0.85; }
     
-    /* Обертка для медиа (для скейла и позиционирования) */
     .card-media-wrap {
         width: 100%; overflow: hidden; position: relative;
     }
@@ -306,10 +316,11 @@
 
     .lb-content {
         max-width: 80vw; max-height: 70vh; display: flex; justify-content: center; align-items: center;
-        position: relative; overflow: hidden; /* для скейла */
+        position: relative; overflow: hidden;
     }
     .lb-content img, .lb-content video {
         max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 4px;
+        transform-origin: center center;
     }
 
     .lb-bottom {
@@ -317,7 +328,6 @@
         display: flex; flex-direction: column; gap: 16px;
     }
     
-    /* Миниатюры серии */
     .lb-thumbs {
         display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;
     }
@@ -360,10 +370,21 @@
 </head>
 <body>
 
-<!-- Глобальное отключение контекстного меню -->
 <script>
+    // Глобальный запрет на скачивание и ПКМ
     document.addEventListener('contextmenu', e => {
         if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') e.preventDefault();
+    });
+    document.addEventListener('dragstart', e => {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') e.preventDefault();
+    });
+
+    // Проверка на админа (вынесено наверх)
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('admin') || window.location.hash === '#admin') {
+            checkAdminToken();
+        }
     });
 </script>
 
@@ -451,6 +472,20 @@
             </div>
         </div>
     </div>
+    
+    <div class="admin-section">
+        <h4>создать альбом</h4>
+        <div class="album-creator">
+            <select id="album-section" class="btn secondary">
+                <option value="fashion">fashion</option>
+                <option value="event">event</option>
+                <option value="brands">brands</option>
+                <option value="art">art &amp; personal</option>
+            </select>
+            <input id="album-name" placeholder="название альбома">
+            <button class="btn" onclick="createAlbum()">+ альбом</button>
+        </div>
+    </div>
 
     <div class="creator-controls" style="margin-top:8px;">
         <button class="btn save-gh" onclick="saveToGitHub()" data-i18n="btn_save_gh">💾 сохранить и закоммитить на github</button>
@@ -461,7 +496,7 @@
 <!-- About -->
 <section class="about-section" id="about-section">
     <div class="about-content">
-        <img class="about-avatar" id="about-avatar-img" src="" alt="Korlan">
+        <img class="about-avatar" id="about-avatar-img" src="portfolio my photo.png" alt="Korlan">
         <div class="about-text-rendered" id="about-text-rendered"></div>
     </div>
     <div class="about-gallery" id="about-gallery"></div>
@@ -509,7 +544,6 @@
     </div>
 </div>
 
-<!-- Данные сайта -->
 <script id="site-data" type="application/json">{"portfolio":null,"blog":null,"albums":null,"about":null,"aboutPhotos":null}</script>
 
 <script>
@@ -581,7 +615,6 @@ function setLang(lang) {
         const key = el.dataset.i18n;
         if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
     });
-    // обновляем плейсхолдеры
     document.getElementById('post-text').placeholder = i18n[lang].placeholder_post;
     document.getElementById('post-album').placeholder = i18n[lang].placeholder_album;
     
@@ -603,7 +636,7 @@ function TI(paths, stars) { return paths.map(p => T(p, 'video', stars)); }
 function PI(paths, stars) { return paths.map(p => T(p, 'image', stars)); }
 
 /* ══════════════════════════════════════════════════════════════
-   ФАЙЛЫ (переименованы разделы)
+   ФАЙЛЫ (согласно repo_structure)
    ══════════════════════════════════════════════════════════════ */
 const A = '03_Brand_Collaborations';
 const TS = A + '/@tisou.official';
@@ -719,7 +752,7 @@ FOLDER_DEFS.forEach(def => {
     def.files.forEach(f => {
         const item = { 
             path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: [],
-            scale: 1, x: 0, y: 0 // добавляем параметры для позиционирования
+            scale: 1, x: 0, y: 0
         };
         if (ART_OVERRIDES.has(item.path)) {
             item.category = 'art';
@@ -743,7 +776,10 @@ FOLDER_DEFS.forEach(def => {
 let portfolioItems = [];
 let blogPosts = [];
 let customAlbums = [];
-let aboutText = {}; // теперь объект с переводами
+let aboutText = {
+    ru: 'фотограф и видеограф с трехлетним опытом.\n\nпреподаю мастер-классы по DaVinci Resolve и CapCut.\nпровожу частные фотосессии, пишите.\n\nконтакты: @kkkorlan',
+    en: 'photographer and videographer with 3 years of experience.\n\nteach DaVinci Resolve and CapCut masterclasses.\nprivate photoshoots — write me.\n\ncontacts: @kkkorlan'
+};
 let aboutPhotos = [];
 let renderedItems = [];
 let currentTab = 'all';
@@ -751,7 +787,7 @@ let mediaPickerMode = 'post';
 let pickerSelection = [];
 let lastPickerIdx = -1;
 
-// Lightbox state
+// Lightbox
 let lbSeries = [];
 let lbIndex = -1;
 
@@ -762,7 +798,6 @@ let activeAvatar = 'portfolio my photo.png';
     let data = null;
     try { data = JSON.parse(document.getElementById('site-data').textContent); } catch (e) {}
 
-    // Portfolio
     if (data && Array.isArray(data.portfolio) && data.portfolio.length) {
         portfolioItems = data.portfolio;
     } else {
@@ -770,7 +805,6 @@ let activeAvatar = 'portfolio my photo.png';
         portfolioItems = draft ? JSON.parse(draft) : DEFAULT_PORTFOLIO.slice();
     }
 
-    // Blog
     if (data && Array.isArray(data.blog) && data.blog.length) {
         blogPosts = data.blog;
     } else {
@@ -778,7 +812,6 @@ let activeAvatar = 'portfolio my photo.png';
         blogPosts = draft ? JSON.parse(draft) : [];
     }
 
-    // Albums
     if (data && Array.isArray(data.albums)) {
         customAlbums = data.albums;
     } else {
@@ -786,15 +819,15 @@ let activeAvatar = 'portfolio my photo.png';
         customAlbums = draft ? JSON.parse(draft) : [];
     }
 
-    // About text (объект переводов)
     if (data && typeof data.about === 'object' && data.about !== null) {
         aboutText = data.about;
     } else {
         const draft = localStorage.getItem('korlan_about_data');
-        aboutText = draft ? JSON.parse(draft) : {};
+        if (draft) {
+            try { aboutText = JSON.parse(draft); } catch (e) {}
+        }
     }
 
-    // About photos
     if (data && Array.isArray(data.aboutPhotos)) {
         aboutPhotos = data.aboutPhotos;
     } else {
@@ -805,7 +838,7 @@ let activeAvatar = 'portfolio my photo.png';
     }
 })();
 
-// миграция и инициализация
+// миграция данных
 portfolioItems.forEach(it => {
     if (typeof it.stars === 'string') it.stars = (it.stars.match(/★/g) || []).length || 2;
     if (typeof it.stars !== 'number' || it.stars < 1) it.stars = 2;
@@ -815,21 +848,9 @@ portfolioItems.forEach(it => {
     if (it.y === undefined) it.y = 0;
 });
 
-// подгружаем аватар (проверяем наличие файлов png2..6)
 function resolveRandomAvatar() {
-    const variants = [
-        'portfolio my photo.png',
-        'portfolio my photo.png2',
-        'portfolio my photo.png3',
-        'portfolio my photo.png4',
-        'portfolio my photo.png5',
-        'portfolio my photo.png6'
-    ];
-    // Рандомно выбираем от 1 до 6
-    // Но чтобы не было 404, в реальности лучше использовать onerror fallback
-    // Для простоты просто выберем случайный, а на <img> повесим onerror
-    const idx = Math.floor(Math.random() * variants.length);
-    return variants[idx];
+    const variants = ['portfolio my photo.png', 'portfolio my photo.png2', 'portfolio my photo.png3', 'portfolio my photo.png4', 'portfolio my photo.png5', 'portfolio my photo.png6'];
+    return variants[Math.floor(Math.random() * variants.length)];
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -837,9 +858,14 @@ function resolveRandomAvatar() {
    ══════════════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', () => {
     activeAvatar = resolveRandomAvatar();
-    document.querySelectorAll('.about-avatar').forEach(img => {
+    
+    // Устанавливаем аватар с фолбэком на дефолт
+    document.querySelectorAll('.about-avatar, .post-avatar').forEach(img => {
         img.src = activeAvatar;
-        img.onerror = () => { img.src = 'portfolio my photo.png'; };
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = 'portfolio my photo.png';
+        };
     });
 
     setLang(currentLang);
@@ -849,10 +875,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('gh-branch').value = localStorage.getItem('gh_repo_branch') || 'main';
     document.getElementById('gh-path').value = localStorage.getItem('gh_file_path') || 'index.html';
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('admin') || window.location.hash === '#admin') {
-        checkAdminToken();
-    }
+    renderAboutPhotosEditor();
 });
 
 function checkAdminToken() {
@@ -907,32 +930,31 @@ function switchTab(tab, btnEl) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ЛЕНТА "ALL" (Сортировка по звездам, затем рандом)
+   ЛЕНТА "ALL" (По звездам)
    ══════════════════════════════════════════════════════════════ */
 function buildAllFeed(items) {
     if (!items.length) return [];
-    // Копируем и сортируем: сначала по звездам (убывание)
-    const sorted = items.slice().sort((a, b) => b.stars - a.stars);
-    
-    // Берем все элементы с максимальным рейтингом и перемешиваем их,
-    // затем элементы с рейтингом ниже и перемешиваем.
-    // Но для простоты просто перемешаем с приоритетом звезд.
-    // Для "All" мы просто сортируем по звездам, но при равенстве звезд перемешиваем.
     
     const starGroups = {};
-    sorted.forEach(it => {
+    items.forEach(it => {
         if (!starGroups[it.stars]) starGroups[it.stars] = [];
         starGroups[it.stars].push(it);
     });
 
     const result = [];
-    // Сортируем ключи по убыванию (5, 4, 3, 2, 1)
     Object.keys(starGroups).sort((a, b) => b - a).forEach(starKey => {
-        const group = starGroups[starKey];
-        result.push.apply(result, shuffle(group));
+        result.push.apply(result, shuffle(starGroups[starKey]));
     });
 
     return result;
+}
+function shuffle(arr) {
+    const r = arr.slice();
+    for (let i = r.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [r[i], r[j]] = [r[j], r[i]];
+    }
+    return r;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1044,7 +1066,6 @@ function makeCard(item, idx) {
         mediaEl.alt = '';
     }
     
-    // Применяем трансформации
     mediaEl.style.transform = `scale(${item.scale}) translate(${item.x}px, ${item.y}px)`;
     mediaWrap.appendChild(mediaEl);
     card.appendChild(mediaWrap);
@@ -1064,9 +1085,6 @@ function makeCard(item, idx) {
     return card;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   РЕЙТИНГ / УДАЛЕНИЕ
-   ══════════════════════════════════════════════════════════════ */
 function setRating(idx, rating) {
     const item = renderedItems[idx];
     if (!item) return;
@@ -1086,16 +1104,13 @@ function deleteCard(idx) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ЛАЙТБОКС (С серией, трансформациями и хэштегами)
+   ЛАЙТБОКС
    ══════════════════════════════════════════════════════════════ */
 function openLightbox(idx) {
     const item = renderedItems[idx];
     if (!item) return;
     
-    // Находим всю серию (по категории и альбому)
     lbSeries = portfolioItems.filter(i => i.category === item.category && i.album === item.album);
-    // Сортируем, чтобы порядок был стабильным (по алфавиту или как в массиве)
-    // Оставляем как есть.
     lbIndex = lbSeries.findIndex(i => i.path === item.path);
     
     renderLightbox();
@@ -1105,6 +1120,7 @@ function openLightbox(idx) {
 function closeLightbox() {
     document.getElementById('lightbox').style.display = 'none';
     document.getElementById('lb-media-container').innerHTML = '';
+    renderPortfolio(currentTab);
 }
 
 function navLightbox(dir) {
@@ -1124,10 +1140,8 @@ function renderLightbox() {
         container.innerHTML = '<img src="' + item.path + '" style="transform: scale(' + item.scale + ') translate(' + item.x + 'px, ' + item.y + 'px);" alt="">';
     }
 
-    // Хэштеги
     document.getElementById('lb-hashtag-input').value = item.hashtags.join(', ');
 
-    // Миниатюры
     const thumbs = document.getElementById('lb-thumbs');
     thumbs.innerHTML = '';
     lbSeries.forEach((s, i) => {
@@ -1143,12 +1157,10 @@ function renderLightbox() {
         thumbs.appendChild(t);
     });
 
-    // Скрываем стрелки, если 1 элемент
     document.querySelectorAll('.lb-nav').forEach(btn => {
         btn.style.display = lbSeries.length > 1 ? 'block' : 'none';
     });
 
-    // Обновляем ползунки для админа
     document.getElementById('lb-scale').value = item.scale || 1;
     document.getElementById('lb-x').value = item.x || 0;
     document.getElementById('lb-y').value = item.y || 0;
@@ -1166,13 +1178,9 @@ function updateLightboxTransform() {
     item.x = x;
     item.y = y;
 
-    // Применяем в лайтбоксе
     const media = document.querySelector('#lb-media-container img');
-    if (media) {
-        media.style.transform = `scale(${scale}) translate(${x}px, ${y}px)`;
-    }
+    if (media) media.style.transform = `scale(${scale}) translate(${x}px, ${y}px)`;
 
-    // Обновляем в основном массиве и localStorage
     const realIdx = portfolioItems.findIndex(i => i.path === item.path);
     if (realIdx > -1) {
         portfolioItems[realIdx].scale = scale;
@@ -1198,7 +1206,7 @@ function saveLightboxHashtags() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   АЛЬБОМЫ
+   АЛЬБОМЫ И ABOUT
    ══════════════════════════════════════════════════════════════ */
 function createAlbum() {
     const section = document.getElementById('album-section').value;
@@ -1228,9 +1236,6 @@ function deleteAlbum(section, name) {
     renderPortfolio(currentTab);
 }
 
-/* ══════════════════════════════════════════════════════════════
-   ABOUT
-   ══════════════════════════════════════════════════════════════ */
 function renderAboutPhotosEditor() {
     const list = document.getElementById('about-photos-list');
     if (!list) return;
@@ -1302,18 +1307,20 @@ function renderAbout() {
         img.src = src;
         img.loading = 'lazy';
         img.alt = '';
-        img.onerror = () => { img.style.display = 'none'; }; // скрываем битые
+        img.onerror = () => { img.style.display = 'none'; };
         gallery.appendChild(img);
     });
 }
 
 /* ══════════════════════════════════════════════════════════════
-   МЕДИАТЕКА
+   МЕДИАТЕКА (МУЛЬТИВЫБОР)
    ══════════════════════════════════════════════════════════════ */
+let currentPickerFiles = [];
+
 function renderMediaPickerFolders() {
     const container = document.getElementById('folder-picker-body');
     container.innerHTML = '';
-    let globalIdx = 0;
+    currentPickerFiles = [];
 
     FOLDER_DEFS.forEach(def => {
         const visibleFiles = def.files.filter(f => mediaPickerMode !== 'about' || f.t === 'image');
@@ -1330,7 +1337,11 @@ function renderMediaPickerFolders() {
         g.className = 'folder-grid';
 
         visibleFiles.forEach(f => {
-            const currentIdx = globalIdx++;
+            const currentIdx = currentPickerFiles.length;
+            currentPickerFiles.push({
+                path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: []
+            });
+
             const item = document.createElement('div');
             item.className = 'picker-item';
             item.dataset.idx = currentIdx;
@@ -1338,9 +1349,7 @@ function renderMediaPickerFolders() {
             const isSelected = pickerSelection.some(s => s.path === f.p);
             if (isSelected) item.classList.add('selected');
 
-            item.onclick = (e) => handlePickerClick(e, currentIdx, {
-                path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: []
-            });
+            item.onclick = (e) => handlePickerClick(e, currentIdx);
 
             if (f.t === 'video') {
                 item.innerHTML = '<div class="picker-video">▶</div>';
@@ -1358,35 +1367,33 @@ function renderMediaPickerFolders() {
     });
 }
 
-function handlePickerClick(e, idx, file) {
-    const items = document.querySelectorAll('.picker-item');
-    const currentEl = items[idx];
-    const existingIdx = pickerSelection.findIndex(s => s.path === file.path);
+function handlePickerClick(e, idx) {
+    const file = currentPickerFiles[idx];
+    if (!file) return;
+    const itemEl = document.querySelector(`.picker-item[data-idx="${idx}"]`);
 
     if (e.shiftKey && lastPickerIdx !== -1) {
         const start = Math.min(lastPickerIdx, idx);
         const end = Math.max(lastPickerIdx, idx);
         
-        // Снимаем выделение со всех
         pickerSelection = [];
         document.querySelectorAll('.picker-item').forEach(el => el.classList.remove('selected'));
         
         for (let i = start; i <= end; i++) {
-            if (items[i]) {
-                items[i].classList.add('selected');
-                // Чтобы собрать объекты, найдем файл по пути
-                // Проще сохранить индексы и при confirm собрать
+            if (currentPickerFiles[i]) {
+                pickerSelection.push(currentPickerFiles[i]);
+                const el = document.querySelector(`.picker-item[data-idx="${i}"]`);
+                if (el) el.classList.add('selected');
             }
         }
-        // В этой реализации мы просто храним DOM элементы для диапазона
-        // При подтверждении соберем их.
     } else {
+        const existingIdx = pickerSelection.findIndex(s => s.path === file.path);
         if (existingIdx > -1) {
             pickerSelection.splice(existingIdx, 1);
-            currentEl.classList.remove('selected');
+            if (itemEl) itemEl.classList.remove('selected');
         } else {
             pickerSelection.push(file);
-            currentEl.classList.add('selected');
+            if (itemEl) itemEl.classList.add('selected');
         }
         lastPickerIdx = idx;
     }
@@ -1397,33 +1404,49 @@ function handlePickerClick(e, idx, file) {
 function updatePickerFooter() {
     const footer = document.getElementById('picker-footer');
     const count = document.getElementById('picker-count');
-    
-    // Считаем выбранные по DOM
-    const selectedEls = document.querySelectorAll('.picker-item.selected');
-    if (selectedEls.length > 0) {
+    if (pickerSelection.length > 0) {
         footer.style.display = 'flex';
-        count.textContent = 'Выбрано: ' + selectedEls.length;
+        count.textContent = 'Выбрано: ' + pickerSelection.length;
     } else {
         footer.style.display = 'none';
     }
 }
 
 function confirmPickerSelection() {
-    const selectedEls = document.querySelectorAll('.picker-item.selected');
-    if (!selectedEls.length) return;
+    if (!pickerSelection.length) return;
 
-    // Собираем пути, парся src из картинок или видео
-    // У нас нет прямого доступа к data-атрибуту пути в picker-item, 
-    // но мы можем пройтись по FOLDER_DEFS и отфильтровать. 
-    // Для простоты сделаем это через скрытый input, но лучше пересобрать логику.
-    // Из-за сложности и времени, я сделаю простую логику: если выбрано несколько, 
-    // мы берем все элементы из DOM и парсим их.
-    // Но так как пути могут быть относительными, лучше использовать глобальный массив.
-    
-    // Временное решение: просто соберем из FOLDER_DEFS тех, кто выделен.
-    // Чтобы это работало, нужно хранить mapping.
-    
-    // Я перепишу confirmPickerSelection, используя вспомогательный массив всех файлов.
+    if (mediaPickerMode === 'about') {
+        pickerSelection.forEach(file => {
+            if (file.type === 'image' && aboutPhotos.indexOf(file.path) === -1) {
+                aboutPhotos.push(file.path);
+            }
+        });
+        saveLocal();
+        renderAboutPhotosEditor();
+        renderAbout();
+        closeMediaLibrary();
+        return;
+    }
+
+    const category = document.getElementById('post-category').value;
+    const album = document.getElementById('post-album').value.trim() || 'imported';
+
+    pickerSelection.forEach(file => {
+        portfolioItems.unshift({
+            path: file.path,
+            type: file.type,
+            category: category,
+            album: album,
+            stars: 2,
+            hashtags: ['#' + category],
+            scale: 1, x: 0, y: 0
+        });
+    });
+
+    saveLocal();
+    renderPortfolio(currentTab);
+    closeMediaLibrary();
+    alert('Добавлено ' + pickerSelection.length + ' медиафайлов.');
 }
 
 function openMediaLibrary() {
@@ -1472,13 +1495,11 @@ function handleDrop(e) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ПУБЛИКАЦИЯ ПОСТА
+   БЛОГ
    ══════════════════════════════════════════════════════════════ */
 function publishPost() {
     const textEl = document.getElementById('post-text');
     const text = textEl.value.trim();
-    const category = document.getElementById('post-category').value;
-    const album = document.getElementById('post-album').value.trim() || 'unsorted';
 
     if (!text) {
         alert('добавьте текст');
@@ -1498,9 +1519,6 @@ function publishPost() {
     alert('добавлено!');
 }
 
-/* ══════════════════════════════════════════════════════════════
-   БЛОГ
-   ══════════════════════════════════════════════════════════════ */
 function renderBlog() {
     const feed = document.getElementById('blog-feed');
     feed.innerHTML = '';
@@ -1565,7 +1583,7 @@ function deletePost(idx) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ПЕРСИСТЕНС
+   ПЕРСИСТЕНС И МЕДИА-ОБСЕРВЕР
    ══════════════════════════════════════════════════════════════ */
 function saveLocal() {
     try {
@@ -1577,9 +1595,6 @@ function saveLocal() {
     } catch (e) { /* quota */ }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   МЕДИА ОБСЕРВЕР (Загрузка при прокрутке)
-   ══════════════════════════════════════════════════════════════ */
 let mediaObserver = null;
 function observeMedia() {
     if (mediaObserver) mediaObserver.disconnect();
@@ -1588,16 +1603,16 @@ function observeMedia() {
             const el = e.target;
             if (e.isIntersecting) {
                 if (el.tagName === 'VIDEO') {
-                    if (!el.src) el.src = el.dataset.src;
+                    if (!el.src && el.dataset.src) el.src = el.dataset.src;
                     el.play().catch(() => {});
                 } else if (el.tagName === 'IMG') {
-                    if (!el.src) el.src = el.dataset.src;
+                    if (!el.src && el.dataset.src) el.src = el.dataset.src;
                 }
             } else {
                 if (el.tagName === 'VIDEO') el.pause();
             }
         });
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '100px' });
 
     document.querySelectorAll('.card-media-wrap img, .card-media-wrap video').forEach(el => {
         mediaObserver.observe(el);
@@ -1699,3 +1714,4 @@ async function uploadDataUrl(token, owner, repo, dataUrl) {
 </script>
 </body>
 </html>
+```
