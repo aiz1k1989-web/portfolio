@@ -33,8 +33,16 @@
 
     /* ─── Шапка yokikori / Korlan 50 / 50 ─── */
     header { max-width: 1600px; margin: 0 auto 50px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
-    .brand-split { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 38px; }
+    .brand-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        position: relative;
+        margin-bottom: 38px;
+        align-items: center;
+    }
     .brand-half { text-align: center; min-width: 0; }
+    .brand-half:first-child { padding-right: 20px; }
+    .brand-half:last-child { padding-left: 20px; }
     .brand-half h1 {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: clamp(1.5rem, 4vw, 2.4rem);
@@ -45,8 +53,19 @@
         display: block; margin-top: 9px; font-size: 0.68rem;
         letter-spacing: 0.14em; color: var(--muted); text-transform: lowercase;
     }
-    .brand-sep { color: var(--muted); opacity: .55; font-size: 1.1rem; padding: 0 22px; user-select: none; }
-    @media (max-width: 620px) { .brand-sep { padding: 0 10px; } .brand-half span { display: none; } }
+    .brand-sep {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--muted); opacity: .55;
+        font-size: 1.1rem; user-select: none;
+        pointer-events: none;
+    }
+    @media (max-width: 620px) {
+        .brand-half:first-child { padding-right: 8px; }
+        .brand-half:last-child  { padding-left: 8px; }
+        .brand-half span { display: none; }
+    }
 
     /* ─── Навигация ─── */
     .nav-tabs { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -89,13 +108,14 @@
     .btn.save-gh { background: #2e7d32; color: #fff; }
     .btn.danger { background: #d32f2f; color: #fff; }
     .btn.secondary { background: #222; color: #fff; border: 1px solid #444; }
-    .album-creator { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .album-creator input {
+    
+    .input-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .input-group input, .album-creator input, #post-album {
         background: #181818; border: 1px solid #444; color: #fff;
         padding: 10px 16px; border-radius: 6px; font-family: inherit;
         font-size: 0.85rem; min-width: 200px;
     }
-    .album-creator input:focus { outline: none; border-color: var(--accent); }
+    .input-group input:focus, #post-album:focus { outline: none; border-color: var(--accent); }
 
     .dropzone {
         border: 2px dashed #444; padding: 24px; text-align: center;
@@ -103,6 +123,28 @@
         background: #141414; transition: 0.2s; font-size: 0.85rem;
     }
     .dropzone.dragover { border-color: #fff; background: #222; color: #fff; }
+
+    /* ─── About photos editor ─── */
+    .about-photos-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+        padding: 10px;
+        background: #0f0f0f;
+        border: 1px solid #222;
+        border-radius: 8px;
+        min-height: 40px;
+    }
+    .about-photo-item { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid #222; }
+    .about-photo-item img { width: 100%; height: 80px; object-fit: cover; display: block; }
+    .remove-about-photo {
+        position: absolute; top: 4px; right: 4px;
+        background: rgba(0,0,0,0.8); color: #e57373; border: none;
+        width: 22px; height: 22px; border-radius: 50%;
+        cursor: pointer; font-size: 0.7rem; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .remove-about-photo:hover { background: #d32f2f; color: #fff; }
 
     /* ─── Сетка ─── */
     .portfolio-grid { columns: 3 360px; column-gap: 32px; }
@@ -135,7 +177,7 @@
         padding: 4px 10px; border-radius: 4px; letter-spacing: 0.4px; text-transform: lowercase;
     }
 
-    /* ─── Звёзды: только в админке ─── */
+    /* Звёзды — только в админке */
     .card-stars { display: none; gap: 1px; font-size: 0.9rem; user-select: none; }
     body.admin-mode .card-stars { display: inline-flex; }
     .card-stars .star { cursor: pointer; color: #2a2a2a; transition: color 0.15s; }
@@ -165,6 +207,19 @@
     .about-text-rendered {
         flex: 1; min-width: 200px; white-space: pre-wrap;
         line-height: 1.75; color: var(--muted); font-size: 0.95rem;
+    }
+    .about-gallery {
+        display: none;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+    }
+    .about-gallery img {
+        width: 100%; height: auto; object-fit: contain;
+        border-radius: 8px; border: 1px solid var(--border);
+        display: block;
     }
 
     /* ─── Blog / Feed ─── */
@@ -268,9 +323,31 @@
 <div class="admin-panel" id="admin-panel">
     <h3>⚡ администратор — прямой коммит в github</h3>
 
+    <!-- НОВЫЙ БЛОК: НАСТРОЙКИ GITHUB -->
     <div class="admin-section">
-        <h4>about me</h4>
+        <h4>настройки github (для коммита)</h4>
+        <div class="input-group">
+            <input id="gh-user" placeholder="username (например: kkkorlan)">
+            <input id="gh-repo" placeholder="репозиторий (например: yokikori)">
+            <input id="gh-branch" placeholder="ветка (main или master)" value="main">
+            <input id="gh-path" placeholder="путь к файлу" value="index.html">
+        </div>
+        <p style="color:var(--muted);font-size:0.72rem;">* если выдает ошибку Not Found, проверьте эти поля и сохраните их.</p>
+    </div>
+
+    <div class="admin-section">
+        <h4>about me — текст</h4>
         <textarea id="admin-about" rows="3" oninput="aboutText = this.value; renderAbout();"></textarea>
+    </div>
+
+    <div class="admin-section">
+        <h4>about me — фотографии</h4>
+        <div id="about-photos-list" class="about-photos-list"></div>
+        <div class="creator-controls">
+            <button class="btn secondary" onclick="document.getElementById('about-photo-input').click()">📎 загрузить фото</button>
+            <button class="btn secondary" onclick="openMediaLibraryForAbout()">📁 выбрать из медиатеки</button>
+            <input type="file" id="about-photo-input" accept="image/*" multiple style="display:none" onchange="handleAboutPhotoUpload(event)">
+        </div>
     </div>
 
     <div class="admin-section">
@@ -281,7 +358,7 @@
                  ondragover="handleDragOver(event)"
                  ondragleave="handleDragLeave(event)"
                  ondrop="handleDrop(event)"
-                 onclick="openMediaLibrary()">
+                 onclick="openMediaLibraryForPost()">
                 📎 перетащите файл сюда или нажмите, чтобы выбрать из медиатеки
             </div>
             <div class="creator-controls">
@@ -291,7 +368,7 @@
                     <option value="fashion">fashion</option>
                     <option value="backstage">backstage</option>
                 </select>
-                <input id="post-album" placeholder="альбом (опционально)" style="background:#181818;border:1px solid #444;color:#fff;padding:10px 16px;border-radius:6px;font-family:inherit;font-size:0.85rem;min-width:160px;">
+                <input id="post-album" placeholder="альбом (опционально)">
                 <button class="btn" onclick="publishPost()">+ добавить</button>
             </div>
         </div>
@@ -320,11 +397,10 @@
 <!-- About -->
 <section class="about-section" id="about-section">
     <div class="about-content">
-        <img class="about-avatar"
-             src="03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg"
-             alt="" loading="lazy">
+        <img class="about-avatar" src="portfolio my photo.png" alt="Korlan">
         <div class="about-text-rendered" id="about-text-rendered"></div>
     </div>
+    <div class="about-gallery" id="about-gallery"></div>
 </section>
 
 <!-- Контейнер портфолио -->
@@ -345,29 +421,27 @@
 </div>
 
 <!-- Данные сайта (перезаписываются при коммите) -->
-<script id="site-data" type="application/json">{"portfolio":null,"blog":null,"albums":null,"about":null}</script>
+<script id="site-data" type="application/json">{"portfolio":null,"blog":null,"albums":null,"about":null,"aboutPhotos":null}</script>
 
 <script>
 /* ══════════════════════════════════════════════════════════════
-   ХЕЛПЕРЫ ДЛЯ ГЕНЕРАЦИИ СЕРИЙ ФАЙЛОВ
+   ХЕЛПЕРЫ
    ══════════════════════════════════════════════════════════════ */
 function J(dir, base, from, to) {
     const out = [];
     for (let i = from; i <= to; i++) out.push(dir + '/' + base + '_' + i + '.jpg');
     return out;
 }
-function M(dir, names) { return names.map(n => dir + '/' + n + '.mp4'); }
 function T(path, type, stars) { return { p: path, t: type, s: stars || 2 }; }
 function TI(paths, stars) { return paths.map(p => T(p, 'video', stars)); }
 function PI(paths, stars) { return paths.map(p => T(p, 'image', stars)); }
 
 /* ══════════════════════════════════════════════════════════════
-   ВСЕ ПАПКИ РЕПОЗИТОРИЯ (242 файла)
+   ФАЙЛЫ
    ══════════════════════════════════════════════════════════════ */
 const A = '03_Brand_Collaborations';
 const TS = A + '/@tisou.official';
 
-/* Titre backstage: _1.._18, где _5 — .mp4 */
 const TITRE_BACKSTAGE_FILES = (() => {
     const dir = A + '/@titre_3/Titre backstage';
     const out = [];
@@ -380,123 +454,83 @@ const TITRE_BACKSTAGE_FILES = (() => {
 })();
 
 const FOLDER_DEFS = [
-    {
-        name: '01 · main fashion & commercial',
-        section: 'fashion', album: 'main commercial',
-        files: [ T('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 5) ]
-    },
-    {
-        name: '02 · backstage & process',
-        section: 'backstage', album: 'process',
-        files: [ T('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 5) ]
-    },
-    {
-        name: '03 · @titre_3',
-        section: 'fashion', album: '@titre_3',
-        files: TI([
-            A + '/@titre_3/2026-05-10_13-06-23_UTC.mp4',
-            A + '/@titre_3/2026-05-10_16-19-22_UTC.mp4',
-            A + '/@titre_3/2026-08-13_10-48-24_UTC.mp4'
-        ], 5)
-    },
-    {
-        name: '03 · @titre_3 / backstage',
-        section: 'backstage', album: 'titre backstage',
-        files: TITRE_BACKSTAGE_FILES
-    },
-    {
-        name: '03 · @atelierbar.almaty',
-        section: 'brands', album: '@atelierbar.almaty',
-        files: [].concat(
-            TI([A + '/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4'], 3),
-            PI(J(A + '/@atelierbar.almaty/1', '2026-05-06_17-20-41_UTC', 1, 19), 2),
-            PI(J(A + '/@atelierbar.almaty/2', '2026-05-09_12-03-59_UTC', 1, 20), 2)
-        )
-    },
-    {
-        name: '03 · @chocolatebeautysalon',
-        section: 'brands', album: '@chocolatebeautysalon',
-        files: TI([A + '/@chocolatebeautysalon/2026-09-14_15-39-20_UTC.mp4'], 2)
-    },
-    {
-        name: '03 · @tisou.official',
-        section: 'brands', album: '@tisou.official',
-        files: [].concat(
-            PI(J(TS + '/1',  '2024-12-16_12-57-14_UTC', 1, 5), 2),
-            PI(J(TS + '/2',  '2025-01-22_12-58-33_UTC', 1, 6), 2),
-            PI(J(TS + '/3',  '2025-01-23_06-06-39_UTC', 1, 5), 2),
-            PI(J(TS + '/4',  '2025-02-04_05-20-55_UTC', 1, 4), 2),
-            PI(J(TS + '/5',  '2025-03-27_11-28-38_UTC', 1, 4), 2),
-            PI(J(TS + '/6',  '2025-03-06_11-44-50_UTC', 1, 6), 2),
-            PI(J(TS + '/7',  '2025-06-16_07-53-33_UTC', 1, 7), 2),
-            PI(J(TS + '/8',  '2025-06-19_12-08-08_UTC', 1, 3), 2),
-            TI([TS + '/9/2025-08-04_12-57-48_UTC.mp4'], 2),
-            PI(J(TS + '/10', '2025-07-13_12-19-07_UTC', 1, 9), 2),
-            PI(J(TS + '/11', '2025-07-15_05-27-27_UTC', 1, 10), 2),
-            TI([
-                TS + '/12/2025-08-07_07-14-21_UTC.mp4',
-                TS + '/12/2025-08-07_09-19-56_UTC.mp4',
-                TS + '/12/2025-08-07_13-17-00_UTC.mp4',
-                TS + '/12/2025-08-08_12-16-27_UTC.mp4'
-            ], 2),
-            PI(J(TS + '/12', '2025-08-08_08-00-00_UTC', 1, 5), 2),
-            TI([TS + '/13/2025-07-31_10-10-00_UTC.mp4'], 2),
-            PI(J(TS + '/14', '2025-12-01_07-57-43_UTC', 1, 7), 2),
-            PI(J(TS + '/14', '2025-12-03_06-57-53_UTC', 1, 5), 2),
-            PI(J(TS + '/14', '2025-12-04_10-31-03_UTC', 1, 10), 2),
-            PI(J(TS + '/14', '2025-12-22_17-12-46_UTC', 1, 13),
-               /* фаворит-фото № 2: даём 5 звёзд конкретному файлу ниже через override */ 2),
-            PI(J(TS + '/15', '2026-01-07_10-00-00_UTC', 1, 8), 2),
-            PI(J(TS + '/15', '2026-01-08_04-58-07_UTC', 1, 8), 2),
-            PI(J(TS + '/15', '2026-01-09_05-00-08_UTC', 1, 3), 2),
-            PI(J(TS + '/16', '2026-02-13_12-45-58_UTC', 1, 7), 2)
-        )
-    },
-    {
-        name: '03 · @aqqu.cafe',
-        section: 'brands', album: '@aqqu.cafe',
-        files: TI([A + '/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4'], 2)
-    },
-    {
-        name: '03 · @offbeatkz',
-        section: 'art', album: '@offbeatkz',
-        files: TI([
-            A + '/@offbeatkz/2026-07-04_06-33-31_UTC.mp4',
-            A + '/@offbeatkz/2026-07-17_13-27-40_UTC.mp4'
-        ], 5)
-    },
-    {
-        name: '03 · @thesix.kz',
-        section: 'brands', album: '@thesix.kz',
-        files: [].concat(
-            PI(J(A + '/@thesix.kz', '2026-05-10_11-49-47_UTC', 1, 14), 2),
-            PI(J(A + '/@thesix.kz', '2026-05-11_12-19-45_UTC', 1, 13), 2)
-        )
-    },
-    {
-        name: '03 · @aimaq_kz',
-        section: 'brands', album: '@aimaq_kz',
-        files: [].concat(
-            PI([A + '/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg'], 2),
-            TI([A + '/@aimaq_kz/2026-03-02_13-06-37_UTC.mp4'], 2),
-            PI(J(A + '/@aimaq_kz', '2026-03-04_14-32-18_UTC', 1, 4), 2),
-            TI([A + '/@aimaq_kz/2026-03-05_14-14-49_UTC.mp4'], 2),
-            PI(J(A + '/@aimaq_kz', '2026-03-28_13-00-25_UTC', 1, 3), 2),
-            PI([A + '/@aimaq_kz/2026-04-20_14-53-23_UTC.jpg'], 2),
-            PI(J(A + '/@aimaq_kz', '2026-04-23_14-23-56_UTC', 1, 3), 2),
-            PI(J(A + '/@aimaq_kz', '2026-07-14_15-50-26_UTC', 1, 2), 2)
-        )
-    },
-    {
-        name: '04 · art & personal',
-        section: 'art', album: 'personal',
-        files: TI(['04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4'], 3)
-    }
+    { name: '01 · main fashion & commercial', section: 'fashion', album: 'main commercial',
+      files: [ T('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 5) ] },
+    { name: '02 · backstage & process', section: 'backstage', album: 'process',
+      files: [ T('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 5) ] },
+    { name: '03 · @titre_3', section: 'fashion', album: '@titre_3',
+      files: TI([
+          A + '/@titre_3/2026-05-10_13-06-23_UTC.mp4',
+          A + '/@titre_3/2026-05-10_16-19-22_UTC.mp4',
+          A + '/@titre_3/2026-08-13_10-48-24_UTC.mp4'
+      ], 5) },
+    { name: '03 · @titre_3 / backstage', section: 'backstage', album: 'titre backstage',
+      files: TITRE_BACKSTAGE_FILES },
+    { name: '03 · @atelierbar.almaty', section: 'brands', album: '@atelierbar.almaty',
+      files: [].concat(
+          TI([A + '/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4'], 3),
+          PI(J(A + '/@atelierbar.almaty/1', '2026-05-06_17-20-41_UTC', 1, 19), 2),
+          PI(J(A + '/@atelierbar.almaty/2', '2026-05-09_12-03-59_UTC', 1, 20), 2)
+      ) },
+    { name: '03 · @chocolatebeautysalon', section: 'brands', album: '@chocolatebeautysalon',
+      files: TI([A + '/@chocolatebeautysalon/2026-09-14_15-39-20_UTC.mp4'], 2) },
+    { name: '03 · @tisou.official', section: 'brands', album: '@tisou.official',
+      files: [].concat(
+          PI(J(TS + '/1',  '2024-12-16_12-57-14_UTC', 1, 5), 2),
+          PI(J(TS + '/2',  '2025-01-22_12-58-33_UTC', 1, 6), 2),
+          PI(J(TS + '/3',  '2025-01-23_06-06-39_UTC', 1, 5), 2),
+          PI(J(TS + '/4',  '2025-02-04_05-20-55_UTC', 1, 4), 2),
+          PI(J(TS + '/5',  '2025-03-27_11-28-38_UTC', 1, 4), 2),
+          PI(J(TS + '/6',  '2025-03-06_11-44-50_UTC', 1, 6), 2),
+          PI(J(TS + '/7',  '2025-06-16_07-53-33_UTC', 1, 7), 2),
+          PI(J(TS + '/8',  '2025-06-19_12-08-08_UTC', 1, 3), 2),
+          TI([TS + '/9/2025-08-04_12-57-48_UTC.mp4'], 2),
+          PI(J(TS + '/10', '2025-07-13_12-19-07_UTC', 1, 9), 2),
+          PI(J(TS + '/11', '2025-07-15_05-27-27_UTC', 1, 10), 2),
+          TI([
+              TS + '/12/2025-08-07_07-14-21_UTC.mp4',
+              TS + '/12/2025-08-07_09-19-56_UTC.mp4',
+              TS + '/12/2025-08-07_13-17-00_UTC.mp4',
+              TS + '/12/2025-08-08_12-16-27_UTC.mp4'
+          ], 2),
+          PI(J(TS + '/12', '2025-08-08_08-00-00_UTC', 1, 5), 2),
+          TI([TS + '/13/2025-07-31_10-10-00_UTC.mp4'], 2),
+          PI(J(TS + '/14', '2025-12-01_07-57-43_UTC', 1, 7), 2),
+          PI(J(TS + '/14', '2025-12-03_06-57-53_UTC', 1, 5), 2),
+          PI(J(TS + '/14', '2025-12-04_10-31-03_UTC', 1, 10), 2),
+          PI(J(TS + '/14', '2025-12-22_17-12-46_UTC', 1, 13), 2),
+          PI(J(TS + '/15', '2026-01-07_10-00-00_UTC', 1, 8), 2),
+          PI(J(TS + '/15', '2026-01-08_04-58-07_UTC', 1, 8), 2),
+          PI(J(TS + '/15', '2026-01-09_05-00-08_UTC', 1, 3), 2),
+          PI(J(TS + '/16', '2026-02-13_12-45-58_UTC', 1, 7), 2)
+      ) },
+    { name: '03 · @aqqu.cafe', section: 'brands', album: '@aqqu.cafe',
+      files: TI([A + '/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4'], 2) },
+    { name: '03 · @offbeatkz', section: 'art', album: '@offbeatkz',
+      files: TI([
+          A + '/@offbeatkz/2026-07-04_06-33-31_UTC.mp4',
+          A + '/@offbeatkz/2026-07-17_13-27-40_UTC.mp4'
+      ], 5) },
+    { name: '03 · @thesix.kz', section: 'brands', album: '@thesix.kz',
+      files: [].concat(
+          PI(J(A + '/@thesix.kz', '2026-05-10_11-49-47_UTC', 1, 14), 2),
+          PI(J(A + '/@thesix.kz', '2026-05-11_12-19-45_UTC', 1, 13), 2)
+      ) },
+    { name: '03 · @aimaq_kz', section: 'brands', album: '@aimaq_kz',
+      files: [].concat(
+          PI([A + '/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg'], 2),
+          TI([A + '/@aimaq_kz/2026-03-02_13-06-37_UTC.mp4'], 2),
+          PI(J(A + '/@aimaq_kz', '2026-03-04_14-32-18_UTC', 1, 4), 2),
+          TI([A + '/@aimaq_kz/2026-03-05_14-14-49_UTC.mp4'], 2),
+          PI(J(A + '/@aimaq_kz', '2026-03-28_13-00-25_UTC', 1, 3), 2),
+          PI([A + '/@aimaq_kz/2026-04-20_14-53-23_UTC.jpg'], 2),
+          PI(J(A + '/@aimaq_kz', '2026-04-23_14-23-56_UTC', 1, 3), 2),
+          PI(J(A + '/@aimaq_kz', '2026-07-14_15-50-26_UTC', 1, 2), 2)
+      ) },
+    { name: '04 · art & personal', section: 'art', album: 'personal',
+      files: TI(['04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4'], 3) }
 ];
 
-/* ══════════════════════════════════════════════════════════════
-   ФАВОРИТЫ / OVERRIDES
-   ══════════════════════════════════════════════════════════════ */
 const ART_OVERRIDES = new Set([
     '01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4',
     '02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4',
@@ -507,35 +541,22 @@ const FAV_PHOTOS = new Set([
     '03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_1.jpg'
 ]);
 
-/* Собираем DEFAULT_PORTFOLIO из FOLDER_DEFS */
 const DEFAULT_PORTFOLIO = [];
 FOLDER_DEFS.forEach(def => {
     def.files.forEach(f => {
-        const item = {
-            path: f.p,
-            type: f.t,
-            category: def.section,
-            album: def.album,
-            stars: f.s || 2
-        };
-        /* override: art-фавориты */
+        const item = { path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2 };
         if (ART_OVERRIDES.has(item.path)) {
             item.category = 'art';
             item.album = 'personal';
             item.stars = 5;
         }
-        /* override: фото-фавориты */
         if (FAV_PHOTOS.has(item.path)) item.stars = 5;
         DEFAULT_PORTFOLIO.push(item);
     });
 });
 
 const DEFAULT_BLOG = [
-    {
-        text: 'первый пост — новая серия проектов. #fashion #art #brands',
-        media: '',
-        date: '2026'
-    }
+    { text: 'первый пост — новая серия проектов. #fashion #art #brands', media: '', date: '2026' }
 ];
 
 const DEFAULT_ABOUT =
@@ -547,11 +568,13 @@ const DEFAULT_ABOUT =
    ══════════════════════════════════════════════════════════════ */
 let portfolioItems = [];
 let blogPosts = [];
-let customAlbums = [];      // [{ section, name }]
+let customAlbums = [];
 let aboutText = DEFAULT_ABOUT;
+let aboutPhotos = [];
 let renderedItems = [];
 let currentTab = 'all';
 let selectedFileForPost = null;
+let mediaPickerMode = 'post';
 
 (function loadSiteData() {
     let data = null;
@@ -584,9 +607,17 @@ let selectedFileForPost = null;
         const draft = localStorage.getItem('korlan_about_data');
         if (draft) aboutText = draft;
     }
+
+    if (data && Array.isArray(data.aboutPhotos)) {
+        aboutPhotos = data.aboutPhotos;
+    } else {
+        const draft = localStorage.getItem('korlan_about_photos');
+        if (draft) {
+            try { aboutPhotos = JSON.parse(draft); } catch (e) { aboutPhotos = []; }
+        }
+    }
 })();
 
-/* нормализация: stars строка → число */
 portfolioItems.forEach(it => {
     if (typeof it.stars === 'string') it.stars = (it.stars.match(/★/g) || []).length || 2;
     if (typeof it.stars !== 'number' || it.stars < 1) it.stars = 2;
@@ -615,7 +646,14 @@ window.addEventListener('DOMContentLoaded', () => {
     renderPortfolio('all');
     renderBlog();
     renderAbout();
+    renderAboutPhotosEditor();
     document.getElementById('admin-about').value = aboutText;
+
+    // загружаем сохраненные настройки github
+    document.getElementById('gh-user').value = localStorage.getItem('gh_repo_owner') || '';
+    document.getElementById('gh-repo').value = localStorage.getItem('gh_repo_name') || '';
+    document.getElementById('gh-branch').value = localStorage.getItem('gh_repo_branch') || 'main';
+    document.getElementById('gh-path').value = localStorage.getItem('gh_file_path') || 'index.html';
 
     const params = new URLSearchParams(window.location.search);
     if (params.has('admin') || window.location.hash === '#admin') {
@@ -675,7 +713,7 @@ function switchTab(tab, btnEl) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ЛЕНТА "ALL" — топ-6 по звёздам + случайные блоки по альбомам
+   ЛЕНТА "ALL"
    ══════════════════════════════════════════════════════════════ */
 function buildAllFeed(items) {
     if (items.length <= 6) return items.slice();
@@ -685,7 +723,6 @@ function buildAllFeed(items) {
     const topSet = new Set(top.map(i => i.path));
     const rest = items.filter(i => !topSet.has(i.path));
 
-    /* группируем остаток по альбомам */
     const groups = {};
     rest.forEach(it => {
         const key = (it.category || 'other') + '::' + (it.album || 'other');
@@ -705,7 +742,6 @@ function buildAllFeed(items) {
 
     const mixed = [];
     shuffle(chunks).forEach(c => mixed.push.apply(mixed, c));
-
     return top.concat(mixed);
 }
 
@@ -732,21 +768,18 @@ function renderPortfolio(tab) {
     } else {
         renderSectionWithAlbums(main, tab);
     }
-
     observeVideos();
 }
 
 function renderSectionWithAlbums(container, section) {
     const items = portfolioItems.filter(i => i.category === section);
 
-    /* группировка по альбомам */
     const albums = {};
     items.forEach(it => {
         const key = it.album || 'other';
         (albums[key] = albums[key] || []).push(it);
     });
 
-    /* пустые кастомные альбомы этой секции */
     customAlbums.filter(a => a.section === section).forEach(a => {
         if (!albums[a.name]) albums[a.name] = [];
     });
@@ -765,7 +798,6 @@ function renderSectionWithAlbums(container, section) {
 
     albumNames.forEach(name => {
         const list = albums[name];
-
         const sectionEl = document.createElement('div');
         sectionEl.className = 'album-section';
 
@@ -819,12 +851,11 @@ function makeCard(item, idx) {
             '<span class="tag-badge">#' + escapeHtml(item.category) + '</span>' +
             starsHtml +
         '</div>';
-
     return card;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   РЕЙТИНГ И УДАЛЕНИЕ КАРТОЧЕК
+   РЕЙТИНГ / УДАЛЕНИЕ
    ══════════════════════════════════════════════════════════════ */
 function setRating(idx, rating) {
     const item = renderedItems[idx];
@@ -834,7 +865,6 @@ function setRating(idx, rating) {
     saveLocal();
     renderPortfolio(currentTab);
 }
-
 function deleteCard(idx) {
     const item = renderedItems[idx];
     if (!item) return;
@@ -861,13 +891,11 @@ function createAlbum() {
     renderPortfolio(currentTab);
     alert('альбом «' + name + '» создан в разделе ' + section);
 }
-
 function deleteAlbum(section, name) {
     const items = portfolioItems.filter(i => i.category === section && i.album === name);
     const msg = 'удалить альбом «' + name + '»' +
                 (items.length ? ' и все ' + items.length + ' медиа внутри?' : '?');
     if (!confirm(msg)) return;
-
     portfolioItems = portfolioItems.filter(
         i => !(i.category === section && i.album === name)
     );
@@ -876,6 +904,59 @@ function deleteAlbum(section, name) {
     );
     saveLocal();
     renderPortfolio(currentTab);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ABOUT — ФОТО
+   ══════════════════════════════════════════════════════════════ */
+function renderAboutPhotosEditor() {
+    const list = document.getElementById('about-photos-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    if (!aboutPhotos.length) {
+        const p = document.createElement('p');
+        p.style.color = 'var(--muted)';
+        p.style.fontSize = '0.78rem';
+        p.style.padding = '6px 4px';
+        p.textContent = '— пока нет фото —';
+        list.appendChild(p);
+        return;
+    }
+
+    aboutPhotos.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.className = 'about-photo-item';
+        item.innerHTML =
+            '<img src="' + src + '" alt="" loading="lazy">' +
+            '<button class="remove-about-photo" onclick="removeAboutPhoto(' + i + ')">✕</button>';
+        list.appendChild(item);
+    });
+}
+
+function handleAboutPhotoUpload(event) {
+    const files = event.target.files;
+    if (!files || !files.length) return;
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.indexOf('image') !== 0) continue;
+        const reader = new FileReader();
+        reader.onload = evt => {
+            aboutPhotos.push(evt.target.result);
+            saveLocal();
+            renderAboutPhotosEditor();
+            renderAbout();
+        };
+        reader.readAsDataURL(file);
+    }
+    event.target.value = '';
+}
+
+function removeAboutPhoto(i) {
+    aboutPhotos.splice(i, 1);
+    saveLocal();
+    renderAboutPhotosEditor();
+    renderAbout();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -897,6 +978,8 @@ function renderMediaPickerFolders() {
         g.className = 'folder-grid';
 
         def.files.forEach(f => {
+            if (mediaPickerMode === 'about' && f.t !== 'image') return;
+
             const item = document.createElement('div');
             item.className = 'picker-item';
             item.title = f.p.split('/').pop();
@@ -928,10 +1011,22 @@ function openMediaLibrary() {
     renderMediaPickerFolders();
     document.getElementById('media-modal').style.display = 'flex';
 }
-function closeMediaLibrary() {
-    document.getElementById('media-modal').style.display = 'none';
-}
+function openMediaLibraryForPost() { mediaPickerMode = 'post'; openMediaLibrary(); }
+function openMediaLibraryForAbout() { mediaPickerMode = 'about'; openMediaLibrary(); }
+function closeMediaLibrary() { document.getElementById('media-modal').style.display = 'none'; }
+
 function selectFileFromLib(file) {
+    if (mediaPickerMode === 'about') {
+        if (file.type !== 'image') { alert('выберите фото'); return; }
+        if (aboutPhotos.indexOf(file.path) === -1) {
+            aboutPhotos.push(file.path);
+            saveLocal();
+            renderAboutPhotosEditor();
+            renderAbout();
+        }
+        closeMediaLibrary();
+        return;
+    }
     selectedFileForPost = file;
     const dz = document.getElementById('dropzone');
     dz.innerText = '✅ выбран файл: ' + file.path.split('/').pop();
@@ -951,7 +1046,7 @@ function handleDrop(e) {
     const reader = new FileReader();
     reader.onload = evt => {
         selectedFileForPost = {
-            path: evt.target.result,   /* data URL — работает локально, при коммите загрузится в репо */
+            path: evt.target.result,
             type: file.type.indexOf('video') === 0 ? 'video' : 'image',
             category: document.getElementById('post-category').value,
             album: document.getElementById('post-album').value.trim() || 'uploads',
@@ -988,7 +1083,6 @@ function publishPost() {
             stars: 2
         });
     }
-
     if (text) {
         blogPosts.unshift({
             text: text,
@@ -1012,12 +1106,28 @@ function publishPost() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ABOUT
+   ABOUT — РЕНДЕР
    ══════════════════════════════════════════════════════════════ */
 function renderAbout() {
     const el = document.getElementById('about-text-rendered');
-    if (!el) return;
-    el.textContent = aboutText;
+    if (el) el.textContent = aboutText;
+
+    const gallery = document.getElementById('about-gallery');
+    if (!gallery) return;
+    gallery.innerHTML = '';
+
+    if (!aboutPhotos.length) {
+        gallery.style.display = 'none';
+        return;
+    }
+    gallery.style.display = 'grid';
+    aboutPhotos.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.loading = 'lazy';
+        img.alt = '';
+        gallery.appendChild(img);
+    });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1027,28 +1137,25 @@ function renderBlog() {
     const feed = document.getElementById('blog-feed');
     feed.innerHTML = '';
 
-    const avatarSrc = '03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg';
-
     blogPosts.forEach((p, idx) => {
         const escaped = escapeHtml(p.text);
         const txt = escaped.replace(/(#[\wа-яё]+)/gi,
             '<span class="hashtag" onclick="tagClick(\'$1\')">$1</span>');
 
-        const div = document.createElement('div');
-        div.className = 'blog-post';
-
         let mediaHtml = '';
         if (p.media) {
-            if (/\.mp4$/i.test(p.media) || p.media.startsWith('data:video')) {
+            if (/\.mp4$/i.test(p.media) || p.media.indexOf('data:video') === 0) {
                 mediaHtml = '<video class="post-media" src="' + p.media + '" muted loop playsinline controls></video>';
             } else {
                 mediaHtml = '<img class="post-media" src="' + p.media + '" loading="lazy" alt="">';
             }
         }
 
+        const div = document.createElement('div');
+        div.className = 'blog-post';
         div.innerHTML =
             '<div class="post-header">' +
-                '<img class="post-avatar" src="' + avatarSrc + '" alt="">' +
+                '<img class="post-avatar" src="portfolio my photo.png" alt="">' +
                 '<span class="post-name">Korlan</span>' +
                 '<span class="post-date">' + escapeHtml(p.date || '') + '</span>' +
             '</div>' +
@@ -1058,7 +1165,6 @@ function renderBlog() {
                 '<button onclick="editPost(' + idx + ')">редактировать</button>' +
                 '<button class="del" onclick="deletePost(' + idx + ')">удалить</button>' +
             '</div>';
-
         feed.appendChild(div);
     });
 }
@@ -1070,7 +1176,6 @@ function tagClick(tag) {
     if (map[t]) switchTab(map[t]);
     else switchTab('all');
 }
-
 function editPost(idx) {
     const post = blogPosts[idx];
     if (!post) return;
@@ -1081,7 +1186,6 @@ function editPost(idx) {
         renderBlog();
     }
 }
-
 function deletePost(idx) {
     if (!confirm('удалить пост?')) return;
     blogPosts.splice(idx, 1);
@@ -1098,11 +1202,12 @@ function saveLocal() {
         localStorage.setItem('korlan_blog_data', JSON.stringify(blogPosts));
         localStorage.setItem('korlan_albums_data', JSON.stringify(customAlbums));
         localStorage.setItem('korlan_about_data', aboutText);
-    } catch (e) { /* quota — игнорируем */ }
+        localStorage.setItem('korlan_about_photos', JSON.stringify(aboutPhotos));
+    } catch (e) { /* quota */ }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   VIDEO OBSERVER (перформанс для 242+ видео)
+   VIDEO OBSERVER
    ══════════════════════════════════════════════════════════════ */
 let videoObserver = null;
 function observeVideos() {
@@ -1123,7 +1228,7 @@ function observeVideos() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GITHUB SAVE
+   GITHUB SAVE (ИСПРАВЛЕННЫЙ)
    ══════════════════════════════════════════════════════════════ */
 async function saveToGitHub() {
     const token = localStorage.getItem('gh_pat_token');
@@ -1132,74 +1237,108 @@ async function saveToGitHub() {
         return;
     }
 
-    let repoOwner = localStorage.getItem('gh_repo_owner');
-    let repoName  = localStorage.getItem('gh_repo_name');
+    // Читаем настройки из полей ввода (а не через prompt)
+    const owner = document.getElementById('gh-user').value.trim();
+    const repo = document.getElementById('gh-repo').value.trim();
+    const branch = document.getElementById('gh-branch').value.trim() || 'main';
+    const path = document.getElementById('gh-path').value.trim() || 'index.html';
 
-    if (!repoOwner) {
-        repoOwner = prompt('github username:');
-        if (repoOwner) localStorage.setItem('gh_repo_owner', repoOwner.trim());
+    if (!owner || !repo) {
+        alert('заполните поля username и репозиторий в настройках github.');
+        return;
     }
-    if (!repoName) {
-        repoName = prompt('имя репозитория (repository name):');
-        if (repoName) localStorage.setItem('gh_repo_name', repoName.trim());
-    }
-    if (!repoOwner || !repoName) return;
 
-    /* загрузка data-url медиа в репозиторий */
-    await uploadPendingMedia(token, repoOwner, repoName);
+    // Сохраняем настройки в localStorage
+    localStorage.setItem('gh_repo_owner', owner);
+    localStorage.setItem('gh_repo_name', repo);
+    localStorage.setItem('gh_repo_branch', branch);
+    localStorage.setItem('gh_file_path', path);
 
-    /* вписываем актуальные данные в site-data */
+    // Загружаем отложенные медиафайлы
+    await uploadPendingMedia(token, owner, repo);
+
+    // Обновляем JSON-данные
     document.getElementById('site-data').textContent = JSON.stringify({
         portfolio: portfolioItems,
         blog: blogPosts,
         albums: customAlbums,
-        about: aboutText
+        about: aboutText,
+        aboutPhotos: aboutPhotos
     });
 
     const updatedCode = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    const apiUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/index.html';
+    
+    // Кодируем путь к файлу (если он в папке)
+    const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+    const apiUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + encodedPath;
 
     try {
-        const getRes = await fetch(apiUrl, { headers: { 'Authorization': 'token ' + token } });
-        if (!getRes.ok) {
-            const e = await getRes.json();
-            alert('ошибка github: ' + (e.message || getRes.status));
+        // 1. Получаем SHA текущего файла
+        const getRes = await fetch(apiUrl + '?ref=' + branch, {
+            headers: { 'Authorization': 'token ' + token }
+        });
+
+        if (getRes.status === 404) {
+            alert('Ошибка 404: Репозиторий или файл не найден.\n\nПроверьте:\n1. Имя пользователя и репозитория\n2. Существует ли файл по указанному пути\n3. Правильно ли указана ветка (main или master)');
             return;
         }
+        if (getRes.status === 401 || getRes.status === 403) {
+            alert('Ошибка доступа. Проверьте, что токен действителен и имеет права на запись (scope repo).');
+            return;
+        }
+        if (!getRes.ok) {
+            const e = await getRes.json();
+            alert('Ошибка GitHub: ' + (e.message || getRes.status));
+            return;
+        }
+        
         const fileData = await getRes.json();
 
+        // 2. Отправляем новый файл
         const putRes = await fetch(apiUrl, {
             method: 'PUT',
-            headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': 'token ' + token,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 message: 'Korlan Portfolio — update content',
                 content: btoa(unescape(encodeURIComponent(updatedCode))),
-                sha: fileData.sha
+                sha: fileData.sha,
+                branch: branch
             })
         });
 
         if (putRes.ok) {
             alert('🚀 закоммичено на github! изменения применятся на сайте через минуту.');
+        } else if (putRes.status === 409) {
+            alert('Ошибка 409: Конфликт версий. Кто-то другой обновил файл. Перезагрузите страницу и попробуйте снова.');
         } else {
             const err = await putRes.json();
-            alert('ошибка github: ' + err.message);
+            alert('Ошибка GitHub: ' + err.message);
         }
     } catch (e) {
-        alert('ошибка соединения: ' + e.message);
+        alert('Ошибка соединения: ' + e.message);
     }
 }
 
 async function uploadPendingMedia(token, owner, repo) {
-    const pending = [];
-    portfolioItems.forEach(it => { if (it.path.startsWith('data:')) pending.push(it); });
-    blogPosts.forEach(p => { if (p.media && p.media.startsWith('data:')) pending.push(p); });
-
-    for (const entry of pending) {
-        const dataUrl = entry.path || entry.media;
-        const uploaded = await uploadDataUrl(token, owner, repo, dataUrl);
-        if (uploaded) {
-            if (entry.path) entry.path = uploaded;
-            if (entry.media) entry.media = uploaded;
+    for (const it of portfolioItems) {
+        if (it.path && it.path.indexOf('data:') === 0) {
+            const uploaded = await uploadDataUrl(token, owner, repo, it.path);
+            if (uploaded) it.path = uploaded;
+        }
+    }
+    for (const p of blogPosts) {
+        if (p.media && p.media.indexOf('data:') === 0) {
+            const uploaded = await uploadDataUrl(token, owner, repo, p.media);
+            if (uploaded) p.media = uploaded;
+        }
+    }
+    for (let i = 0; i < aboutPhotos.length; i++) {
+        if (aboutPhotos[i].indexOf('data:') === 0) {
+            const uploaded = await uploadDataUrl(token, owner, repo, aboutPhotos[i]);
+            if (uploaded) aboutPhotos[i] = uploaded;
         }
     }
 }
