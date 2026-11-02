@@ -1974,7 +1974,19 @@ async function saveToGitHub() {
         aboutPhotos: aboutPhotos
     });
 
-    const updatedCode = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const savedDoc = document.documentElement.cloneNode(true);
+    ['portfolio-main', 'blog-feed', 'folder-picker-body'].forEach(id => {
+        const node = savedDoc.querySelector('#' + id);
+        if (node) node.innerHTML = '';
+    });
+    const savedSiteData = savedDoc.querySelector('#site-data');
+    if (savedSiteData) {
+        savedSiteData.textContent = JSON.stringify({
+            portfolio: portfolioItems, blog: blogPosts, albums: customAlbums,
+            about: aboutText, aboutPhotos: aboutPhotos
+        });
+    }
+    const updatedCode = '<!DOCTYPE html>\\n' + savedDoc.outerHTML;
     const encodedPath = path.split('/').map(encodeURIComponent).join('/');
     const apiUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + encodedPath;
 
@@ -2057,6 +2069,7 @@ window.openSplat = async function() {
       initialCameraPosition: [0, 0, 5],
       initialCameraLookAt: [0, 0, 0],
       sharedMemoryForWorkers: false,
+      ignoreDevicePixelRatio: window.innerWidth < 768,
       useBuiltInControls: true,
       gpuAcceleratedSort: true,
       sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant
@@ -2064,6 +2077,7 @@ window.openSplat = async function() {
     await splatViewer.addSplatScene(splatFileUrl, {
       format: GaussianSplats3D.SceneFormat.Ply,
       splatAlphaRemovalThreshold: 5,
+      progressiveLoad: true,
       showLoadingUI: true
     });
     splatViewer.start();
