@@ -673,9 +673,9 @@
                 // Embed the current editor data into the committed HTML so it survives a fresh visit.
                 let updatedCode = document.documentElement.outerHTML;
                 const safeJson = value => JSON.stringify(value).replace(/</g, "\\u003c");
-                updatedCode = updatedCode.replace(/let portfolioItems = [\\s\\S]*?;\\s*let blogPosts = [\\s\\S]*?;/,
-                    `let portfolioItems = ${safeJson(portfolioItems)};\\n\\n        let blogPosts = ${safeJson(blogPosts)};`);
-                updatedCode = "<!DOCTYPE html>\\n" + updatedCode;
+                updatedCode = updatedCode.replace(/let portfolioItems = [\s\S]*?;\s*let blogPosts = [\s\S]*?;/,
+                    `let portfolioItems = ${safeJson(portfolioItems)};\n\n        let blogPosts = ${safeJson(blogPosts)};`);
+                updatedCode = "<!DOCTYPE html>\n" + updatedCode;
 
                 const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
                 const currentResponse = await fetch(fileUrl, { headers: apiHeaders });
@@ -698,7 +698,7 @@
 
                 alert("Изменения сохранены в репозитории. GitHub Pages может обновиться через несколько минут.");
             } catch (error) {
-                alert("Не удалось сохранить: " + error.message + "\\nПроверьте срок действия токена и права Contents: Read and write для репозитория portfolio.");
+                alert("Не удалось сохранить: " + error.message + "\nПроверьте срок действия токена и права Contents: Read and write для репозитория portfolio.");
             }
         }
     </script>
