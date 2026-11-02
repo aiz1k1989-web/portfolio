@@ -2460,7 +2460,7 @@
             if (tagButton) {
                 event.preventDefault();
                 activeBlogTag = tagButton.dataset.tag;
-                switchTab('blog', document.querySelector('[onclick="switchTab(\'blog\', this)"]'));
+                switchTab('blog', [...document.querySelectorAll('.tab-btn')].find(button => button.textContent.trim() === 'Feed'));
                 renderBlog();
             }
         });
@@ -2495,8 +2495,8 @@
                 // Embed the current editor data into the committed HTML so it survives a fresh visit.
                 let updatedCode = document.documentElement.outerHTML;
                 const safeJson = value => JSON.stringify(value).replace(/</g, "\\u003c");
-                updatedCode = updatedCode.replace(/let portfolioItems = [\s\S]*?;\s*let blogPosts = [\s\S]*?;/,
-                    `let portfolioItems = ${safeJson(portfolioItems)};\n\n        let blogPosts = ${safeJson(blogPosts)};`);
+                updatedCode = updatedCode.replace(/let portfolioItems = [\s\S]*?;\s*let blogPosts = [\s\S]*?;\s*(?=let currentTab)/,
+                    `let portfolioItems = ${safeJson(portfolioItems)};\n\n        let blogPosts = ${safeJson(blogPosts)};\n\n        `);
                 updatedCode = "<!DOCTYPE html>\n" + updatedCode;
 
                 const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
