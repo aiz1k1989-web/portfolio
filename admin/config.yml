@@ -1,0 +1,44 @@
+backend:
+  name: github
+  repo: aiz1k1989-web/portfolio
+  branch: main
+
+media_folder: "03_Brand_Collaborations"
+public_folder: "03_Brand_Collaborations"
+
+collections:
+  - name: "fashion"
+    label: "01 Fashion Commercial"
+    folder: "01_Main_Fashion_Commercial"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Media File", name: "media", widget: "file"}
+
+  - name: "backstage"
+    label: "02 Backstage & Process"
+    folder: "02_Backstage_And_Process"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Media File", name: "media", widget: "file"}
+
+  - name: "brands"
+    label: "03 Brand Collaborations"
+    folder: "03_Brand_Collaborations"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Brand Name", name: "brand", widget: "string"}
+      - {label: "Media File", name: "media", widget: "file"}
+
+  - name: "art"
+    label: "04 Art & Personal"
+    folder: "04_Art_And_Personal"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Media File", name: "media", widget: "file"}
