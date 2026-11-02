@@ -14,7 +14,7 @@
             --muted: #71717a;
             --accent: #000000;
             --border: #e4e4e7;
-            --card-bg: #f8f9fa;
+            --danger: #ef4444;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -25,7 +25,6 @@
                 --muted: #888888;
                 --accent: #ffffff;
                 --border: #222222;
-                --card-bg: #141414;
             }
         }
 
@@ -51,9 +50,23 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             border-bottom: 1px solid var(--border);
             padding-bottom: 30px;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border);
         }
 
         .brand h1 {
@@ -61,7 +74,7 @@
             font-weight: 500;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .brand p {
@@ -75,6 +88,7 @@
             display: flex;
             gap: 25px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .tab-btn {
@@ -86,11 +100,25 @@
             cursor: pointer;
             text-transform: uppercase;
             transition: color 0.3s;
+            position: relative;
         }
 
         .tab-btn:hover, .tab-btn.active {
             color: var(--accent);
             font-weight: 500;
+        }
+
+        .del-section-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 0.7rem;
+            margin-left: 4px;
+            cursor: pointer;
+        }
+        body.admin-mode .tab-btn.custom-tab .del-section-btn {
+            display: inline;
         }
 
         main {
@@ -146,21 +174,24 @@
             color: #fff;
         }
 
-        /* Админ-панель и модалка лабы */
-        .admin-trigger {
-            position: fixed;
-            bottom: 20px; right: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            width: 40px; height: 40px;
+        .del-card-btn {
+            display: none;
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+            border: none;
+            width: 28px; height: 28px;
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
             cursor: pointer;
-            z-index: 999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
         }
-        .admin-trigger:hover { color: var(--accent); }
+        body.admin-mode .del-card-btn {
+            display: flex;
+        }
 
         .admin-bar {
             position: fixed;
@@ -172,8 +203,9 @@
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
         }
-        .admin-bar.active { display: flex; }
+        body.admin-mode .admin-bar { display: flex; }
 
         .btn {
             background: var(--accent); color: var(--bg); border: none;
@@ -183,7 +215,6 @@
         }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 
-        /* Модальное окно общей лаборатории */
         .modal {
             display: none;
             position: fixed;
@@ -207,7 +238,6 @@
             overflow-y: auto;
             margin-top: 20px;
             flex-grow: 1;
-            padding-right: 10px;
         }
         .picker-item {
             aspect-ratio: 4/5;
@@ -216,6 +246,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             background: var(--surface);
+            position: relative;
         }
         .picker-item:hover { border-color: var(--accent); }
         .picker-item img, .picker-item video { width: 100%; height: 100%; object-fit: cover; }
@@ -231,120 +262,101 @@
 <body>
 
     <header>
-        <div class="brand">
-            <h1>YOKIKORI</h1>
-            <p>Visual Storytelling & Commercial Production</p>
+        <div class="brand-container">
+            <img src="portfolio my photo.png" alt="Ayzat Tanibergen" class="avatar">
+            <div class="brand">
+                <h1>YOKIKORI</h1>
+                <p>Visual Storytelling & Commercial Production</p>
+            </div>
         </div>
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="filterCategory('all')">All</button>
-            <button class="tab-btn" onclick="filterCategory('fashion')">Fashion</button>
-            <button class="tab-btn" onclick="filterCategory('brands')">Brands</button>
-            <button class="tab-btn" onclick="filterCategory('backstage')">Backstage</button>
-            <button class="tab-btn" onclick="filterCategory('art')">Art</button>
+        <div class="nav-tabs" id="nav-tabs">
+            <button class="tab-btn active" onclick="filterCategory('all', this)">All</button>
+            <button class="tab-btn" onclick="filterCategory('fashion', this)">Fashion</button>
+            <button class="tab-btn" onclick="filterCategory('brands', this)">Brands</button>
+            <button class="tab-btn" onclick="filterCategory('backstage', this)">Backstage</button>
+            <button class="tab-btn" onclick="filterCategory('art', this)">Art</button>
         </div>
     </header>
 
     <main>
         <div class="grid" id="portfolio-grid">
-            <!-- 01 Fashion Commercial -->
+            <div class="card" data-category="art">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
+                <img src="portfolio my photo.png" alt="Ayzat Tanibergen" loading="lazy">
+                <div class="card-meta"><div class="card-title">Ayzat Tanibergen // Portrait</div></div>
+            </div>
             <div class="card" data-category="fashion">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <video src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">Fashion Commercial // Main</div></div>
             </div>
-
-            <!-- 03 Brand Collaborations: Titre -->
             <div class="card" data-category="brands">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <video src="03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">@titre_3</div></div>
             </div>
             <div class="card" data-category="brands">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <img src="03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg" alt="Titre Backstage" loading="lazy">
                 <div class="card-meta"><div class="card-title">@titre_3 // Backstage</div></div>
             </div>
-
-            <!-- Atelier Bar -->
             <div class="card" data-category="brands">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <video src="03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">@atelierbar.almaty</div></div>
             </div>
             <div class="card" data-category="brands">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <img src="03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_1.jpg" alt="Atelier Bar" loading="lazy">
                 <div class="card-meta"><div class="card-title">@atelierbar.almaty // Series</div></div>
             </div>
-
-            <!-- Tisou -->
             <div class="card" data-category="brands">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <img src="03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg" alt="Tisou" loading="lazy">
                 <div class="card-meta"><div class="card-title">@tisou.official</div></div>
             </div>
-            <div class="card" data-category="brands">
-                <video src="03_Brand_Collaborations/@tisou.official/12/2025-08-07_07-14-21_UTC.mp4" autoplay muted loop playsinline></video>
-                <div class="card-meta"><div class="card-title">@tisou.official // Motion</div></div>
-            </div>
-
-            <!-- The Six & Aimaq -->
-            <div class="card" data-category="brands">
-                <img src="03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_1.jpg" alt="The Six" loading="lazy">
-                <div class="card-meta"><div class="card-title">@thesix.kz</div></div>
-            </div>
-            <div class="card" data-category="brands">
-                <img src="03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_1.jpg" alt="Aimaq" loading="lazy">
-                <div class="card-meta"><div class="card-title">@aimaq_kz</div></div>
-            </div>
-
-            <!-- Backstage -->
             <div class="card" data-category="backstage">
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 <video src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4" autoplay muted loop playsinline></video>
                 <div class="card-meta"><div class="card-title">Backstage Process</div></div>
-            </div>
-
-            <!-- Art -->
-            <div class="card" data-category="art">
-                <video src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4" autoplay muted loop playsinline></video>
-                <div class="card-meta"><div class="card-title">Art & Personal Vision</div></div>
             </div>
         </div>
     </main>
 
-    <!-- Замок админа -->
-    <div class="admin-trigger" onclick="toggleAdminMode()" title="Admin Mode">🔒</div>
-
-    <!-- Админ-панель -->
     <div class="admin-bar" id="admin-bar">
-        <span style="font-size: 0.85rem;">✨ Режим правки: перетаскивайте работы или добавляйте новые из лабы</span>
+        <span style="font-size: 0.85rem;">✨ Режим управления активен</span>
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-outline" onclick="openMediaLibrary()">+ Добавить из лабы</button>
-            <button class="btn btn-outline" onclick="toggleAdminMode()">Закрыть</button>
+            <button class="btn btn-outline" onclick="createNewSection()">+ Новый раздел</button>
+            <button class="btn btn-outline" onclick="openMediaLibrary()">📁 Выбрать файлы из лабы</button>
+            <button class="btn btn-outline" onclick="exitAdmin()">Выйти</button>
             <button class="btn" onclick="saveLayout()">Сохранить</button>
         </div>
     </div>
 
-    <!-- Модалка Общей Лаборатории -->
     <div class="modal" id="media-modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Общая лаборатория файлов (Выбор работ)</h3>
+                <h3>Общая лаборатория файлов</h3>
                 <button class="btn btn-outline" onclick="closeMediaLibrary()">Закрыть</button>
             </div>
             <div class="media-picker-grid" id="media-picker">
-                <!-- Все доступные файлы из твоих папок для быстрого добавления -->
-                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4', 'video', 'brands', '@titre_3')">
+                <div class="picker-item" onclick="addSelectedMedia('portfolio my photo.png', 'image', 'Ayzat Tanibergen Portrait')">
+                    <img src="portfolio my photo.png" loading="lazy">
+                </div>
+                <div class="picker-item" onclick="addSelectedMedia('03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4', 'video', '@titre_3 Video')">
                     <video src="03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4" muted></video>
                 </div>
-                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4', 'video', 'brands', '@atelierbar.almaty')">
+                <div class="picker-item" onclick="addSelectedMedia('03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4', 'video', 'Atelier Bar Video')">
                     <video src="03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4" muted></video>
                 </div>
-                <div class="picker-item" onclick="addCardToGrid('03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg', 'image', 'brands', '@tisou.official')">
+                <div class="picker-item" onclick="addSelectedMedia('03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg', 'image', 'Tisou Look')">
                     <img src="03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg" loading="lazy">
                 </div>
-                <div class="picker-item" onclick="addCardToGrid('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 'fashion', 'Fashion Commercial')">
+                <div class="picker-item" onclick="addSelectedMedia('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 'Fashion Main')">
                     <video src="01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4" muted></video>
                 </div>
-                <div class="picker-item" onclick="addCardToGrid('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 'backstage', 'Backstage')">
+                <div class="picker-item" onclick="addSelectedMedia('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 'Backstage Video')">
                     <video src="02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4" muted></video>
-                </div>
-                <div class="picker-item" onclick="addCardToGrid('04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4', 'video', 'art', 'Art Vision')">
-                    <video src="04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4" muted></video>
                 </div>
             </div>
         </div>
@@ -352,11 +364,54 @@
 
     <script>
         let sortableInstance = null;
-        let isAdmin = false;
+        let activeCategory = 'all';
 
-        function filterCategory(cat) {
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('admin') || window.location.hash === '#admin') {
+                let token = localStorage.getItem('gh_token');
+                if (!token) {
+                    token = prompt("Введите GitHub Token:");
+                    if (token) localStorage.setItem('gh_token', token);
+                }
+                if (token) {
+                    document.body.classList.add('admin-mode');
+                    sortableInstance = new Sortable(document.getElementById('portfolio-grid'), {
+                        animation: 150,
+                        ghostClass: 'sortable-ghost'
+                    });
+                }
+            }
+        });
+
+        function exitAdmin() {
+            window.location.href = window.location.pathname;
+        }
+
+        function createNewSection() {
+            const name = prompt("Название нового раздела:");
+            if (!name) return;
+            const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+            const tabsContainer = document.getElementById('nav-tabs');
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn custom-tab';
+            btn.setAttribute('onclick', `filterCategory('${slug}', this)`);
+            btn.innerHTML = `${name} <button class="del-section-btn" onclick="event.stopPropagation(); removeSection('${slug}', this)">[x]</button>`;
+            tabsContainer.appendChild(btn);
+        }
+
+        function removeSection(slug, btnEl) {
+            if (!confirm("Удалить раздел?")) return;
+            document.querySelectorAll(`.card[data-category="${slug}"]`).forEach(c => c.remove());
+            btnEl.closest('.tab-btn').remove();
+            filterCategory('all', document.querySelector('.tab-btn'));
+        }
+
+        function filterCategory(cat, el) {
+            activeCategory = cat;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            if (el) el.classList.add('active');
 
             document.querySelectorAll('.card').forEach(card => {
                 if (cat === 'all' || card.dataset.category === cat) {
@@ -367,29 +422,6 @@
             });
         }
 
-        function toggleAdminMode() {
-            if (!isAdmin) {
-                const token = prompt("Введите GitHub Token для активации прав админа:");
-                if (!token) return;
-                localStorage.setItem('gh_token', token);
-                isAdmin = true;
-            } else {
-                isAdmin = false;
-            }
-
-            const bar = document.getElementById('admin-bar');
-            if (isAdmin) {
-                bar.classList.add('active');
-                sortableInstance = new Sortable(document.getElementById('portfolio-grid'), {
-                    animation: 150,
-                    ghostClass: 'sortable-ghost'
-                });
-            } else {
-                bar.classList.remove('active');
-                if (sortableInstance) sortableInstance.destroy();
-            }
-        }
-
         function openMediaLibrary() {
             document.getElementById('media-modal').style.display = 'flex';
         }
@@ -398,28 +430,28 @@
             document.getElementById('media-modal').style.display = 'none';
         }
 
-        function addCardToGrid(src, type, category, title) {
+        function addSelectedMedia(src, type, title) {
+            const targetCat = activeCategory === 'all' ? 'fashion' : activeCategory;
             const grid = document.getElementById('portfolio-grid');
             const card = document.createElement('div');
             card.className = 'card';
-            card.dataset.category = category;
+            card.dataset.category = targetCat;
 
             let mediaEl = type === 'video' 
                 ? `<video src="${src}" autoplay muted loop playsinline></video>`
                 : `<img src="${src}" alt="${title}" loading="lazy">`;
 
             card.innerHTML = `
+                <button class="del-card-btn" onclick="this.closest('.card').remove()">✕</button>
                 ${mediaEl}
                 <div class="card-meta"><div class="card-title">${title}</div></div>
             `;
             grid.prepend(card);
             closeMediaLibrary();
-            alert('Работа добавлена в сетку!');
         }
 
         function saveLayout() {
-            alert('Порядок и новые работы зафиксированы! Сессия сохранена.');
-            toggleAdminMode();
+            alert('Изменения сохранены в сессии!');
         }
     </script>
 </body>
