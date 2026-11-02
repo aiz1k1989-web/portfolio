@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KORLAN</title>
+  <title>KORLAN — Portfolio</title>
   <style>
     :root {
       --bg: #FFFFFF;
       --text: #111111;
       --muted: #888888;
+      --border: #EEEEEE;
       --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
@@ -16,6 +17,12 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      /* Защита от выделения текста и файлов */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
     }
 
     body {
@@ -26,17 +33,32 @@
       padding: 3vw;
     }
 
-    /* Header */
+    /* Header & Navigation */
     header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 4vw;
+      align-items: center;
+      margin-bottom: 3vw;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .profile-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: #F4F4F4;
+      pointer-events: none;
     }
 
     .brand {
       font-size: 1.2rem;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: -0.02em;
       text-decoration: none;
       color: var(--text);
@@ -54,42 +76,151 @@
       color: var(--text);
     }
 
-    /* Clean Photo Grid */
+    /* Portfolio Category Filters */
+    .filter-bar {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 3vw;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      overflow-x: auto;
+    }
+
+    .filter-btn {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      padding-bottom: 0.5rem;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .filter-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1rem;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--text);
+    }
+
+    /* Media Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 3vw 2vw;
+      gap: 2vw;
     }
 
     .grid-item {
       position: relative;
+      display: block;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .grid-item.hidden {
+      display: none;
     }
 
     .grid-item.col-6 { grid-column: span 6; }
+    .grid-item.col-4 { grid-column: span 4; }
     .grid-item.col-12 { grid-column: span 12; }
 
     @media (max-width: 768px) {
-      .grid-item.col-6 { grid-column: span 12; }
+      .grid-item.col-6, .grid-item.col-4 { grid-column: span 12; }
     }
 
     .img-wrap {
+      position: relative;
       width: 100%;
       background-color: #F4F4F4;
       overflow: hidden;
+      border-radius: 2px;
     }
 
-    .img-wrap img {
+    /* Прозрачный оверлей для блокировки сохранения правой кнопкой мыши */
+    .img-wrap::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0);
+      z-index: 2;
+    }
+
+    .img-wrap img, .img-wrap video {
       width: 100%;
       height: auto;
       display: block;
       object-fit: cover;
+      pointer-events: none; /* Запрещает прямое нажатие на медиа */
     }
 
-    /* Minimal Rates */
+    .item-meta {
+      margin-top: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Lightbox Modal (Просмотрщик) */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+    }
+
+    .lightbox-content img, .lightbox-content video {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: #FFFFFF;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    /* Rates Section */
     .rates {
-      margin-top: 10vw;
+      margin-top: 8vw;
       padding-top: 4vw;
-      border-top: 1px solid #EEEEEE;
+      border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 4vw;
@@ -137,11 +268,13 @@
     }
 
     footer {
-      margin-top: 10vw;
+      margin-top: 8vw;
       font-size: 0.8rem;
       color: var(--muted);
       display: flex;
       justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 2vw;
     }
 
     footer a {
@@ -150,53 +283,85 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;"> <!-- Глобальный запрет правого клика -->
 
-  <!-- Minimal Header -->
+  <!-- Header -->
   <header>
-    <a href="#" class="brand">KORLAN</a>
+    <div class="brand-wrap">
+      <img src="My portfolio/portfolio my photo.png" alt="Korlan" class="profile-avatar" onerror="this.style.display='none'" ondragstart="return false;">
+      <a href="#" class="brand">KORLAN</a>
+    </div>
     <nav>
+      <a href="#portfolio">Work</a>
       <a href="#rates">Rates</a>
       <a href="https://www.instagram.com/kkkorlan/" target="_blank">Instagram</a>
     </nav>
   </header>
 
-  <!-- Clean Grid (Your Stills & Reels Portfolio) -->
-  <main class="grid">
-    
-    <!-- Photo 1: Black & White Editorial Portrait -->
-    <div class="grid-item col-6">
-      <div class="img-wrap">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1400&q=80" alt="Noir Portrait">
-      </div>
+  <!-- Category Filter Bar -->
+  <section id="portfolio">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All Works</button>
+      <button class="filter-btn" data-filter="fashion">01 Fashion Commercial</button>
+      <button class="filter-btn" data-filter="backstage">02 Backstage & Process</button>
+      <button class="filter-btn" data-filter="brands">03 Brand Collaborations</button>
+      <button class="filter-btn" data-filter="art">04 Art & Personal</button>
     </div>
 
-    <!-- Photo 2: Sky Blue Lookbook -->
-    <div class="grid-item col-6">
-      <div class="img-wrap">
-        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1400&q=80" alt="Sky Blue Lookbook">
+    <!-- Media Grid -->
+    <main class="grid">
+      
+      <!-- 01 Fashion Commercial (Фото) -->
+      <div class="grid-item col-6" data-category="fashion" data-type="image" data-src="My portfolio/01_Main_Fashion_Commercial/sample1.jpg">
+        <div class="img-wrap">
+          <img src="My portfolio/01_Main_Fashion_Commercial/sample1.jpg" alt="Fashion Editorial" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1400&q=80'">
+        </div>
+        <div class="item-meta">
+          <span>Fashion Commercial</span>
+          <span>Editorial Campaign</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Photo 3: Titre Trois Backstage Reel -->
-    <div class="grid-item col-12">
-      <div class="img-wrap">
-        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=2000&q=80" alt="Titre Trois Backstage">
+      <!-- 02 Backstage & Process (Защищенное видео) -->
+      <div class="grid-item col-12" data-category="backstage" data-type="video" data-src="My portfolio/02_Backstage_And_Process/sample_video.mp4">
+        <div class="img-wrap">
+          <video autoplay loop muted playsinline controlsList="nodownload noremoteplayback" disablepictureinpicture ondragstart="return false;">
+            <source src="My portfolio/02_Backstage_And_Process/sample_video.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="item-meta">
+          <span>Backstage & Process</span>
+          <span>Set Reel / Video</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Photo 4: Backlit Portrait -->
-    <div class="grid-item col-6">
-      <div class="img-wrap">
-        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80" alt="Warm Portrait">
+      <!-- 03 Brand Collaborations -->
+      <div class="grid-item col-6" data-category="brands" data-type="image" data-src="My portfolio/03_Brand_Collaborations/@tisou.official/sample.jpg">
+        <div class="img-wrap">
+          <img src="My portfolio/03_Brand_Collaborations/@tisou.official/sample.jpg" alt="Brand Collab" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80'">
+        </div>
+        <div class="item-meta">
+          <span>Brand Collab</span>
+          <span>@tisou.official</span>
+        </div>
       </div>
-    </div>
 
-  </main>
+      <!-- 04 Art & Personal -->
+      <div class="grid-item col-6" data-category="art" data-type="image" data-src="My portfolio/04_Art_And_Personal/sample_art.jpg">
+        <div class="img-wrap">
+          <img src="My portfolio/04_Art_And_Personal/sample_art.jpg" alt="Personal Project" ondragstart="return false;" onerror="this.src='https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1400&q=80'">
+        </div>
+        <div class="item-meta">
+          <span>Art & Personal</span>
+          <span>Visual Storytelling</span>
+        </div>
+      </div>
 
-  <!-- Rates Section (USD) -->
+    </main>
+  </section>
+
+  <!-- Rates Section -->
   <section class="rates" id="rates">
-    
     <div class="rate-card">
       <div>
         <h3 class="rate-title">Single Session</h3>
@@ -223,13 +388,86 @@
       </div>
       <a href="https://ig.me/m/kkkorlan" target="_blank" class="btn-book">Book Brand Package &rarr;</a>
     </div>
-
   </section>
 
+  <!-- Footer -->
   <footer>
     <span>&copy; KORLAN</span>
     <span>Direct Message: <a href="https://ig.me/m/kkkorlan" target="_blank">@kkkorlan</a></span>
   </footer>
 
+  <!-- Lightbox Viewer Modal -->
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <div class="lightbox-content" id="lightboxContent"></div>
+  </div>
+
+  <!-- JavaScript Filter & Protection Logic -->
+  <script>
+    // Filtering Logic
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const gridItems = document.querySelectorAll('.grid-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        gridItems.forEach(item => {
+          if (filter === 'all' || item.getAttribute('data-category') === filter) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Lightbox & Media Viewer Logic
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = document.getElementById('lightboxContent');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    gridItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const type = item.getAttribute('data-type');
+        const src = item.getAttribute('data-src');
+
+        lightboxContent.innerHTML = '';
+
+        if (type === 'image') {
+          const img = document.createElement('img');
+          img.src = src;
+          img.setAttribute('ondragstart', 'return false;');
+          lightboxContent.appendChild(img);
+        } else if (type === 'video') {
+          const video = document.createElement('video');
+          video.src = src;
+          video.controls = true;
+          video.autoplay = true;
+          video.setAttribute('controlsList', 'nodownload noremoteplayback');
+          video.setAttribute('disablepictureinpicture', 'true');
+          video.setAttribute('ondragstart', 'return false;');
+          lightboxContent.appendChild(video);
+        }
+
+        lightbox.classList.add('active');
+      });
+    });
+
+    lightboxClose.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+      lightboxContent.innerHTML = '';
+    });
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('active');
+        lightboxContent.innerHTML = '';
+      }
+    });
+  </script>
 </body>
 </html>
