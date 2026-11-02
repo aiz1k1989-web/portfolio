@@ -437,22 +437,22 @@
         });
 
         function checkAdminToken() {
-            let token = localStorage.getItem('gh_pat_token');
+            let token = sessionStorage.getItem('gh_pat_token');
             if (!token) {
-                token = prompt("🔒 Команда /admin принята. Введите GitHub Personal Access Token (ghp_...):");
-                if (token) localStorage.setItem('gh_pat_token', token.trim());
+                token = prompt("Введите Fine-grained GitHub token с доступом только к репозиторию aiz1k1989-web/portfolio и правом Contents: Read and write. Не используйте токен с доступом ко всем репозиториям.");
+                if (token && token.trim()) sessionStorage.setItem('gh_pat_token', token.trim());
             }
-            if (localStorage.getItem('gh_pat_token')) {
+            if (sessionStorage.getItem('gh_pat_token')) {
                 document.body.classList.add('admin-mode');
                 initSortable();
             }
         }
 
         function logoutAdmin() {
-            localStorage.removeItem('gh_pat_token');
+            sessionStorage.removeItem('gh_pat_token');
             document.body.classList.remove('admin-mode');
             window.location.hash = '';
-            alert("🔒 Вы вышли из админки.");
+            alert("Вы вышли из админки. Токен удален из текущей сессии.");
         }
 
         function switchTab(tab, btnEl) {
@@ -655,47 +655,50 @@
 
         // Сохранение прямо в GitHub через API
         async function saveToGitHub() {
-            const token = localStorage.getItem('gh_pat_token');
+            const token = sessionStorage.getItem('gh_pat_token');
             if (!token) {
-                alert("Ошибка: токен GitHub не найден. Зайдите через команду /admin.");
+                alert("Токен не найден. Откройте сайт с ?admin и войдите снова.");
                 return;
             }
 
-            const repoOwner = prompt("Имя пользователя GitHub (username):");
-            const repoName = prompt("Имя репозитория (repository name):");
-            if (!repoOwner || !repoName) return;
+            const owner = "aiz1k1989-web";
+            const repo = "portfolio";
+            const apiHeaders = {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28"
+            };
 
             try {
-                const getUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/index.html`;
-                const res = await fetch(getUrl, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-                const fileData = await res.json();
+                // Embed the current editor data into the committed HTML so it survives a fresh visit.
+                let updatedCode = document.documentElement.outerHTML;
+                const safeJson = value => JSON.stringify(value).replace(/</g, "\\u003c");
+                updatedCode = updatedCode.replace(/let portfolioItems = [\\s\\S]*?;\\s*let blogPosts = [\\s\\S]*?;/,
+                    `let portfolioItems = ${safeJson(portfolioItems)};\\n\\n        let blogPosts = ${safeJson(blogPosts)};`);
+                updatedCode = "<!DOCTYPE html>\\n" + updatedCode;
 
-                let currentHtml = document.documentElement.outerHTML;
-                let updatedCode = "<!DOCTYPE html>\n" + currentHtml;
+                const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+                const currentResponse = await fetch(fileUrl, { headers: apiHeaders });
+                const currentFile = await currentResponse.json();
+                if (!currentResponse.ok || !currentFile.sha) {
+                    throw new Error(currentFile.message || "Не удалось прочитать index.html из GitHub.");
+                }
 
-                const putRes = await fetch(getUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                const saveResponse = await fetch(fileUrl, {
+                    method: "PUT",
+                    headers: { ...apiHeaders, "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        message: "Korlan Portfolio GitHub Commit",
+                        message: "Update Korlan portfolio content",
                         content: btoa(unescape(encodeURIComponent(updatedCode))),
-                        sha: fileData.sha
+                        sha: currentFile.sha
                     })
                 });
+                const result = await saveResponse.json();
+                if (!saveResponse.ok) throw new Error(result.message || "GitHub не принял изменения.");
 
-                if (putRes.ok) {
-                    alert("🚀 Закоммичено на GitHub! Изменения применятся на сайте.");
-                } else {
-                    const err = await putRes.json();
-                    alert("Ошибка GitHub: " + err.message);
-                }
-            } catch (e) {
-                alert("Ошибка соединения: " + e.message);
+                alert("Изменения сохранены в репозитории. GitHub Pages может обновиться через несколько минут.");
+            } catch (error) {
+                alert("Не удалось сохранить: " + error.message + "\\nПроверьте срок действия токена и права Contents: Read and write для репозитория portfolio.");
             }
         }
     </script>
