@@ -272,7 +272,18 @@
         .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
         .picker-item { background: #1a1a1a; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #222; transition: 0.2s; }
         .picker-item:hover { border-color: #fff; }
-        .picker-item img, .picker-item video { width: 100%; height: 130px; object-fit: cover; }
+        .picker-item img, .picker-item video { width: 100%; height: auto; max-height: 220px; object-fit: contain; display: block; background: #080808; }
+        .hashtag { background: transparent; border: 0; padding: 0; font: inherit; color: #9bbcff; cursor: pointer; }
+        .hashtag:hover { text-decoration: underline; }
+        .card img, .card video { max-height: none; }
+        @media (max-width: 700px) {
+            body { padding: 24px 14px; }
+            .portfolio-grid { columns: 2 150px; column-gap: 14px; }
+            .card { margin-bottom: 14px; }
+            .profile-left { gap: 14px; }
+            .avatar { width: 58px; height: 58px; }
+            .tab-btn { padding: 7px 13px; }
+        }
 
         .sortable-ghost { opacity: 0.3; }
     </style>
@@ -361,54 +372,1710 @@
 
     <script>
         // Раскрытая и полная медиатека со всеми медиафайлами
-        const FOLDERS = {
-            "Art & Personal": [
-                {"path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-                {"path": "01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-                {"path": "04_Art_And_Personal/2026-07-04_06-33-31_UTC.mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-                {"path": "04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4", "type": "video", "category": "art", "stars": "★★★★☆"}
-            ],
-            "Brands & Collaborations (@titre_3)": [
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2025-12-22_17-12-46_UTC_1.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
-                {"path": "03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_10.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_12.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_16.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_2.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_13.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_8.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_17.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_7.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_14.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_11.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_5.mp4", "type": "video", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_3.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_9.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_4.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_6.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_15.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"}
-            ],
-            "Brands (@atelierbar.almaty)": [
-                {"path": "03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"}
-            ],
-            "Fashion & Commercial": [
-                {"path": "03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4", "type": "video", "category": "fashion", "stars": "★★★★★"}
-            ],
-            "Backstage": [
-                {"path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4", "type": "video", "category": "backstage", "stars": "★★★★★"}
-            ]
-        };
+        const FOLDERS = {};
 
         let portfolioItems = [
-            {"path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-            {"path": "01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-            {"path": "04_Art_And_Personal/2026-07-04_06-33-31_UTC.mp4", "type": "video", "category": "art", "stars": "★★★★★"},
-            {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
-            {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2025-12-22_17-12-46_UTC_1.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
-            {"path": "03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4", "type": "video", "category": "fashion", "stars": "★★★★★"}
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4",
+                            "path": "01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4",
+                            "type": "video",
+                            "category": "art",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4",
+                            "path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4",
+                            "type": "video",
+                            "category": "art",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@offbeatkz/2026-07-04_06-33-31_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@offbeatkz/2026-07-04_06-33-31_UTC.mp4",
+                            "type": "video",
+                            "category": "art",
+                            "stars": "★★★★★"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-02-27_09-31-51_UTC.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-02_13-06-37_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-02_13-06-37_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-04_14-32-18_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-05_14-14-49_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-05_14-14-49_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-03-28_13-00-25_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-04-20_14-53-23_UTC.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-04-20_14-53-23_UTC.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-04-23_14-23-56_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@aimaq_kz/2026-07-14_15-50-26_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_14.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_14.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_15.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_15.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_16.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_16.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_17.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_17.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_18.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_18.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_19.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_19.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/1/2026-05-06_17-20-41_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_14.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_14.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_15.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_15.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_16.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_16.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_17.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_17.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_18.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_18.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_19.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_19.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_20.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_20.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2/2026-05-09_12-03-59_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@chocolatebeautysalon /2026-09-14_15-39-20_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@chocolatebeautysalon /2026-09-14_15-39-20_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@offbeatkz/2026-07-17_13-27-40_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@offbeatkz/2026-07-17_13-27-40_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_14.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_14.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-10_11-49-47_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@thesix.kz/2026-05-11_12-19-45_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/1/2024-12-16_12-57-14_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/10/2025-07-13_12-19-07_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_07-14-21_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_07-14-21_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_09-19-56_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_09-19-56_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_13-17-00_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-07_13-17-00_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_08-00-00_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_12-16-27_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/12/2025-08-08_12-16-27_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/13/2025-07-31_10-10-00_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/13/2025-07-31_10-10-00_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-01_07-57-43_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-03_06-57-53_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-04_10-31-03_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/14/2025-12-22_17-12-46_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-07_10-00-00_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-08_04-58-07_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/15/2026-01-09_05-00-08_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/16/2026-02-13_12-45-58_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/2/2025-01-22_12-58-33_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/3/2025-01-23_06-06-39_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/4/2025-02-04_05-20-55_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/5/2025-03-27_11-28-38_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/6/2025-03-06_11-44-50_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_5.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_5.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/7/2025-06-16_07-53-33_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@tisou.official/8/2025-06-19_12-08-08_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@tisou.official/9/2025-08-04_12-57-48_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@tisou.official/9/2025-08-04_12-57-48_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4",
+                            "path": "03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_10.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_10.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_11.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_11.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_12.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_12.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_13.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_13.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_14.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_14.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_15.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_15.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_16.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_16.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_17.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_17.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_2.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_2.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_3.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_3.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_4.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_4.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_5.mp4",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_5.mp4",
+                            "type": "video",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_6.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_6.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_7.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_7.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_8.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_8.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_9.jpg",
+                            "path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_9.jpg",
+                            "type": "image",
+                            "category": "brands",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4",
+                            "path": "04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4",
+                            "type": "video",
+                            "category": "art",
+                            "stars": "★★★☆☆"
+                  },
+                  {
+                            "id": "portfolio my photo.png",
+                            "path": "portfolio my photo.png",
+                            "type": "image",
+                            "category": "art",
+                            "stars": "★★★☆☆"
+                  }
         ];
 
         let blogPosts = [
@@ -417,24 +2084,34 @@
 
         let currentTab = 'all';
         let selectedFileForPost = null;
+        let activeBlogTag = '';
+        let lazyVideoObserver = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const savedPort = localStorage.getItem('korlan_portfolio_data');
-            if (savedPort) portfolioItems = JSON.parse(savedPort);
-
-            const savedBlog = localStorage.getItem('korlan_blog_data');
-            if (savedBlog) blogPosts = JSON.parse(savedBlog);
-
+            rebuildMediaFolders();
             renderPortfolio('all');
             renderBlog();
             renderMediaPickerFolders();
 
-            // Команда входа через /admin в URL (например: сайт.com/#admin или ?admin)
             const params = new URLSearchParams(window.location.search);
-            if (params.has('admin') || window.location.hash === '#admin') {
-                checkAdminToken();
-            }
+            if (params.has('admin') || window.location.hash === '#admin') checkAdminToken();
         });
+
+        function rebuildMediaFolders() {
+            Object.keys(FOLDERS).forEach(key => delete FOLDERS[key]);
+            portfolioItems.forEach(item => {
+                const path = item.path || '';
+                const folder = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : 'Uploads';
+                if (!FOLDERS[folder]) FOLDERS[folder] = [];
+                FOLDERS[folder].push(item);
+            });
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[char]);
+        }
 
         function checkAdminToken() {
             let token = sessionStorage.getItem('gh_pat_token');
@@ -478,63 +2155,115 @@
             }
         }
 
+        function folderOf(item) {
+            const path = item.path || '';
+            return path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : 'Uploads';
+        }
+
+        function mixByCollection(items) {
+            const pools = new Map();
+            items.slice(6).forEach(item => {
+                const key = folderOf(item);
+                if (!pools.has(key)) pools.set(key, []);
+                pools.get(key).push(item);
+            });
+            const keys = [...pools.keys()];
+            const mixed = [];
+            while (keys.length) {
+                const keyIndex = Math.floor(Math.random() * keys.length);
+                const key = keys[keyIndex];
+                const pool = pools.get(key);
+                const take = Math.min(pool.length, 2 + Math.floor(Math.random() * 2));
+                mixed.push(...pool.splice(0, take));
+                if (!pool.length) {
+                    pools.delete(key);
+                    keys.splice(keyIndex, 1);
+                }
+            }
+            return [...items.slice(0, 6), ...mixed];
+        }
+
         function renderPortfolio(filter) {
             const grid = document.getElementById('portfolio-grid');
             grid.innerHTML = '';
 
             let itemsToDisplay = [...portfolioItems];
-
             if (filter !== 'all') {
                 itemsToDisplay = itemsToDisplay.filter(item => item.category === filter);
-            } else {
-                // Алгоритм ленты ALL: Первые 6 карточек точечный выбор, далее подмешиваются случайные по 2-3
-                if (itemsToDisplay.length > 6) {
-                    let topPart = itemsToDisplay.slice(0, 6);
-                    let restPart = itemsToDisplay.slice(6).sort(() => Math.random() - 0.5);
-                    itemsToDisplay = [...topPart, ...restPart];
-                }
+            } else if (!document.body.classList.contains('admin-mode')) {
+                itemsToDisplay = mixByCollection(itemsToDisplay);
             }
 
-            itemsToDisplay.forEach((item, idx) => {
+            itemsToDisplay.forEach(item => {
+                const originalIndex = portfolioItems.indexOf(item);
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.dataset.index = idx;
+                card.dataset.index = originalIndex;
 
-                let mediaEl = item.type === 'video'
-                    ? `<video src="${item.path}" autoplay muted loop playsinline></video>`
-                    : `<img src="${item.path}" loading="lazy">`;
+                const safePath = escapeHTML(item.path);
+                const mediaEl = item.type === 'video'
+                    ? `<video data-src="${safePath}" autoplay muted loop playsinline preload="none" aria-label="Portfolio video"></video>`
+                    : `<img src="${safePath}" loading="lazy" alt="Korlan portfolio work">`;
 
                 card.innerHTML = `
-                    <button class="del-card-btn" onclick="deleteCard(${idx})">✕</button>
+                    <button class="del-card-btn" onclick="deleteCard(${originalIndex})" aria-label="Delete post">✕</button>
                     ${mediaEl}
                     <div class="card-meta">
-                        <span class="tag-badge">#${item.category}</span>
-                        <span class="admin-stars">${item.stars}</span>
+                        <span class="tag-badge">#${escapeHTML(item.category)}</span>
+                        <span class="admin-stars">${escapeHTML(item.stars || '★★★☆☆')}</span>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+
+            setupLazyVideos();
+        }
+
+        function setupLazyVideos() {
+            if (lazyVideoObserver) lazyVideoObserver.disconnect();
+            const videos = document.querySelectorAll('#portfolio-grid video[data-src]');
+            if (!('IntersectionObserver' in window)) {
+                videos.forEach(video => { video.src = video.dataset.src; video.load(); });
+                return;
+            }
+            lazyVideoObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const video = entry.target;
+                    video.src = video.dataset.src;
+                    video.load();
+                    video.play().catch(() => {});
+                    video.removeAttribute('data-src');
+                    lazyVideoObserver.unobserve(video);
+                });
+            }, { rootMargin: '350px 0px' });
+            videos.forEach(video => lazyVideoObserver.observe(video));
         }
 
         function deleteCard(idx) {
-            if (!confirm("Удалить карточку?")) return;
-            portfolioItems.splice(idx, 1);
-            saveLocal();
+            if (!confirm("Удалить эту карточку из портфолио?")) return;
+            portfolioItems.splice(Number(idx), 1);
+            rebuildMediaFolders();
+            renderMediaPickerFolders();
             renderPortfolio(currentTab);
         }
 
         function initSortable() {
             const grid = document.getElementById('portfolio-grid');
+            if (grid.dataset.sortableReady === 'true') return;
+            grid.dataset.sortableReady = 'true';
             Sortable.create(grid, {
-                animation: 150,
+                animation: 180,
                 ghostClass: 'sortable-ghost',
                 onEnd: function () {
-                    const newOrder = [];
-                    grid.querySelectorAll('.card').forEach(c => {
-                        newOrder.push(portfolioItems[c.dataset.index]);
-                    });
-                    portfolioItems = newOrder;
-                    saveLocal();
+                    const cards = [...grid.querySelectorAll('.card')];
+                    const originalIndices = cards.map(card => Number(card.dataset.index));
+                    const reorderedVisible = originalIndices.map(index => portfolioItems[index]);
+                    const slots = [...originalIndices].sort((a, b) => a - b);
+                    const nextItems = [...portfolioItems];
+                    slots.forEach((slot, position) => { nextItems[slot] = reorderedVisible[position]; });
+                    portfolioItems = nextItems;
+                    renderPortfolio(currentTab);
                 }
             });
         }
@@ -584,73 +2313,166 @@
         function handleDrop(e) {
             e.preventDefault();
             e.currentTarget.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                const file = files[0];
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    selectedFileForPost = {
-                        path: evt.target.result,
-                        type: file.type.startsWith('video') ? 'video' : 'image',
-                        category: document.getElementById('post-category').value,
-                        stars: document.getElementById('post-stars').value
-                    };
-                    document.getElementById('dropzone').innerText = `✅ Загружен файл: ${file.name}`;
-                };
-                reader.readAsDataURL(file);
+            const files = [...(e.dataTransfer?.files || [])].filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
+            if (!files.length) {
+                alert('Перетащите изображения или видео.');
+                return;
             }
+            selectedFileForPost = { files, type: 'upload' };
+            const totalMb = files.reduce((sum, file) => sum + file.size, 0) / (1024 * 1024);
+            document.getElementById('dropzone').innerText = `Выбрано файлов: ${files.length} · ${totalMb.toFixed(1)} MB. Нажмите «Добавить», чтобы загрузить в GitHub.`;
         }
 
-        function publishPost() {
-            const text = document.getElementById('post-text').value;
+        function uploadFolderForCategory(category) {
+            if (category === 'fashion') return '01_Main_Fashion_Commercial';
+            if (category === 'backstage') return '02_Backstage_And_Process';
+            if (category === 'brands') return '03_Brand_Collaborations/@kkkorlan';
+            return '04_Art_And_Personal';
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+                reader.onerror = () => reject(new Error('Не удалось прочитать файл: ' + file.name));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function uploadMediaFile(file, category, token) {
+            if (file.size > 25 * 1024 * 1024) {
+                throw new Error(`Файл «${file.name}» больше 25 MB. Для стабильной загрузки уменьшите его размер.`);
+            }
+            const safeName = file.name.normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu, '_').replace(/^\.+/, '').slice(-150) || ('upload-' + Date.now());
+            const path = uploadFolderForCategory(category) + '/' + Date.now() + '-' + safeName;
+            const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+            const url = `https://api.github.com/repos/aiz1k1989-web/portfolio/contents/${encodedPath}`;
+            const content = await readFileAsBase64(file);
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Add portfolio media: ' + safeName,
+                    content
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || ('GitHub upload failed: ' + file.name));
+            return path;
+        }
+
+        async function publishPost() {
+            const text = document.getElementById('post-text').value.trim();
             const category = document.getElementById('post-category').value;
             const stars = document.getElementById('post-stars').value;
-
-            if (selectedFileForPost) {
-                portfolioItems.unshift({
-                    path: selectedFileForPost.path,
-                    type: selectedFileForPost.type,
-                    category: category,
-                    stars: stars
-                });
+            const token = sessionStorage.getItem('gh_pat_token');
+            const addButton = document.querySelector('.post-creator .btn:not(.save-gh):not(.danger)');
+            if (selectedFileForPost?.files?.length && !token) {
+                alert('Для загрузки новых файлов сначала откройте админку через ?admin и введите GitHub token.');
+                return;
+            }
+            if (!selectedFileForPost && !text) {
+                alert('Добавьте текст поста или выберите медиафайл.');
+                return;
             }
 
-            if (text) {
-                blogPosts.unshift({
-                    text: text,
-                    media: selectedFileForPost ? selectedFileForPost.path : '',
-                    date: new Date().toLocaleDateString()
-                });
+            if (addButton) { addButton.disabled = true; addButton.textContent = 'Загрузка...'; }
+            try {
+                const mediaPaths = [];
+                if (selectedFileForPost?.files?.length) {
+                    for (const file of selectedFileForPost.files) {
+                        const path = await uploadMediaFile(file, category, token);
+                        const item = {
+                            id: path, path,
+                            type: file.type.startsWith('video/') ? 'video' : 'image',
+                            category, stars
+                        };
+                        portfolioItems.unshift(item);
+                        mediaPaths.push(path);
+                    }
+                } else if (selectedFileForPost?.path) {
+                    const item = { ...selectedFileForPost, category, stars };
+                    item.id = item.id || item.path;
+                    if (!portfolioItems.some(existing => existing.path === item.path)) portfolioItems.unshift(item);
+                    mediaPaths.push(item.path);
+                }
+
+                if (text) {
+                    blogPosts.unshift({
+                        text,
+                        media: mediaPaths[0] || '',
+                        date: new Date().toLocaleDateString()
+                    });
+                }
+                rebuildMediaFolders();
+                renderMediaPickerFolders();
+                renderPortfolio(currentTab);
                 renderBlog();
+                document.getElementById('post-text').value = '';
+                document.getElementById('dropzone').innerText = 'Перетащите изображения или видео сюда либо выберите файл из медиатеки.';
+                document.getElementById('dropzone').style.borderColor = '#444';
+                selectedFileForPost = null;
+                alert('Добавлено в редактор. Нажмите «Сохранить и закоммитить на GitHub», чтобы опубликовать изменения.');
+            } catch (error) {
+                alert('Не удалось добавить медиа: ' + error.message);
+            } finally {
+                if (addButton) { addButton.disabled = false; addButton.textContent = '+ Добавить'; }
             }
-
-            saveLocal();
-            renderPortfolio(currentTab);
-            
-            document.getElementById('post-text').value = '';
-            document.getElementById('dropzone').innerText = "📎 Перетащите файлы сюда или кликните для выбора из полных папок медиатеки";
-            document.getElementById('dropzone').style.borderColor = '#444';
-            selectedFileForPost = null;
-
-            alert("Добавлено! Нажмите «Сохранить и закоммитить на GitHub», чтобы зафиксировать в сети.");
         }
 
         function renderBlog() {
             const feed = document.getElementById('blog-feed');
             feed.innerHTML = '';
-            blogPosts.forEach(p => {
-                let txt = p.text.replace(/(#\w+)/g, '<span class="hashtag">$1</span>');
-                let media = p.media ? `<img src="${p.media}" style="width:100%; height:auto; object-fit:contain; border-radius:8px; margin-top:14px;">` : '';
-                let div = document.createElement('div');
+            if (activeBlogTag) {
+                const reset = document.createElement('button');
+                reset.className = 'btn secondary';
+                reset.style.marginBottom = '8px';
+                reset.textContent = 'Фильтр ' + activeBlogTag + ' ×';
+                reset.onclick = () => filterBlogByTag('');
+                feed.appendChild(reset);
+            }
+            blogPosts.forEach((post, index) => {
+                if (activeBlogTag && !String(post.text).toLowerCase().includes(activeBlogTag.toLowerCase())) return;
+                const escaped = escapeHTML(post.text);
+                const linkedText = escaped.replace(/(#[\p{L}\p{N}_]+)/gu, '<button class="hashtag" type="button" data-tag="$1">$1</button>');
+                const media = post.media
+                    ? `<img src="${escapeHTML(post.media)}" loading="lazy" alt="Feed media" style="width:100%;height:auto;object-fit:contain;border-radius:8px;margin-top:14px;">`
+                    : '';
+                const div = document.createElement('div');
                 div.className = 'blog-post';
-                div.innerHTML = `<div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">${p.date}</div><div class="blog-text">${txt}</div>${media}`;
+                div.innerHTML = `<div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">${escapeHTML(post.date || '')}</div><div class="blog-text">${linkedText}</div>${media}${document.body.classList.contains('admin-mode') ? `<button class="btn danger" style="margin-top:14px" onclick="deleteBlogPost(${index})">Удалить пост</button>` : ''}`;
                 feed.appendChild(div);
             });
         }
 
+        function filterBlogByTag(tag) {
+            activeBlogTag = tag || '';
+            renderBlog();
+        }
+
+        document.addEventListener('click', event => {
+            const tagButton = event.target.closest('.hashtag[data-tag]');
+            if (tagButton) {
+                event.preventDefault();
+                activeBlogTag = tagButton.dataset.tag;
+                switchTab('blog', document.querySelector('[onclick="switchTab(\'blog\', this)"]'));
+                renderBlog();
+            }
+        });
+
+        function deleteBlogPost(index) {
+            if (!confirm('Удалить этот пост из Feed?')) return;
+            blogPosts.splice(Number(index), 1);
+            renderBlog();
+        }
+
         function saveLocal() {
-            localStorage.setItem('korlan_portfolio_data', JSON.stringify(portfolioItems));
-            localStorage.setItem('korlan_blog_data', JSON.stringify(blogPosts));
+            // Изменения хранятся в памяти до нажатия кнопки коммита на GitHub.
         }
 
         // Сохранение прямо в GitHub через API
