@@ -833,7 +833,7 @@ PORTFOLIO_MODULES.forEach(mod => {
 });
 
 function getItemCategories(item) {
-    const values = Array.isArray(item && item.categories) ? item.categories : [];
+    const values = Array.isArray(item && item.categories) ? item.categories.slice() : [];
     if (item && item.category && !values.includes(item.category)) values.unshift(item.category);
     return [...new Set(values.filter(v => ['fashion','event','brands','art'].includes(v)))];
 }
@@ -1635,11 +1635,12 @@ function confirmPickerSelection() {
     pickerSelection.forEach(file => {
         const existing = portfolioItems.find(item => item.path === file.path);
         if (existing) {
-            existing.categories = [...new Set(getItemCategories(existing).concat(selectedCategories))];
-            existing.category = existing.category || existing.categories[0];
-            existing.hashtags = [...new Set((existing.hashtags || []).concat(selectedCategories.map(categoryHashtag)))];
+            existing.categories = selectedCategories.slice();
+            existing.category = selectedCategories[0];
+            const sectionTags = ['#fashion','#event','#brands','#art'];
+            existing.hashtags = [...new Set((existing.hashtags || []).filter(tag => !sectionTags.includes(tag)).concat(selectedCategories.map(categoryHashtag)))];
         } else {
-            const categories = [...new Set(getItemCategories(file).concat(selectedCategories))];
+            const categories = selectedCategories.slice();
             portfolioItems.unshift({
                 path: file.path, type: file.type, category: categories[0], categories,
                 album: file.album || getDefaultAlbumForPath(file.path), stars: file.stars || 2,
