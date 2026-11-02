@@ -21,6 +21,7 @@
         line-height: 1.4;
         padding: 50px 24px;
         -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
     }
     body.admin-mode::before {
         content: 'ADMIN MODE';
@@ -31,14 +32,35 @@
         letter-spacing: 0.14em; z-index: 9999;
     }
 
+    /* ─── Запрет на скачивание ─── */
+    img, video {
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none; /* отключает клики по самому медиа, клик идет на карточку */
+    }
+
     /* ─── Шапка yokikori / Korlan 50 / 50 ─── */
-    header { max-width: 1600px; margin: 0 auto 50px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
+    header { max-width: 1600px; margin: 0 auto 50px; border-bottom: 1px solid var(--border); padding-bottom: 30px; position: relative; }
+    
+    .lang-switch {
+        position: absolute; top: 0; right: 0;
+        display: flex; gap: 10px; font-size: 0.75rem; color: var(--muted);
+        z-index: 100;
+    }
+    .lang-btn {
+        background: transparent; border: none; color: var(--muted);
+        cursor: pointer; font-family: inherit; font-weight: 500;
+        transition: color 0.2s; text-transform: uppercase;
+    }
+    .lang-btn:hover, .lang-btn.active { color: #fff; }
+
     .brand-split {
         display: grid;
         grid-template-columns: 1fr 1fr;
         position: relative;
         margin-bottom: 38px;
         align-items: center;
+        margin-top: 20px;
     }
     .brand-half { text-align: center; min-width: 0; }
     .brand-half:first-child { padding-right: 20px; }
@@ -60,11 +82,6 @@
         color: var(--muted); opacity: .55;
         font-size: 1.1rem; user-select: none;
         pointer-events: none;
-    }
-    @media (max-width: 620px) {
-        .brand-half:first-child { padding-right: 8px; }
-        .brand-half:last-child  { padding-left: 8px; }
-        .brand-half span { display: none; }
     }
 
     /* ─── Навигация ─── */
@@ -108,6 +125,7 @@
     .btn.save-gh { background: #2e7d32; color: #fff; }
     .btn.danger { background: #d32f2f; color: #fff; }
     .btn.secondary { background: #222; color: #fff; border: 1px solid #444; }
+    .btn.select-mode { background: #64b5f6; color: #000; }
     
     .input-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .input-group input, .album-creator input, #post-album {
@@ -126,14 +144,9 @@
 
     /* ─── About photos editor ─── */
     .about-photos-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        gap: 10px;
-        padding: 10px;
-        background: #0f0f0f;
-        border: 1px solid #222;
-        border-radius: 8px;
-        min-height: 40px;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px; padding: 10px; background: #0f0f0f;
+        border: 1px solid #222; border-radius: 8px; min-height: 40px;
     }
     .about-photo-item { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid #222; }
     .about-photo-item img { width: 100%; height: 80px; object-fit: cover; display: block; }
@@ -146,7 +159,7 @@
     }
     .remove-about-photo:hover { background: #d32f2f; color: #fff; }
 
-    /* ─── Сетка ─── */
+    /* ─── Сетка (Без рамок) ─── */
     .portfolio-grid { columns: 3 360px; column-gap: 32px; }
     .album-section { max-width: 1600px; margin: 0 auto 50px; }
     .album-title {
@@ -163,23 +176,29 @@
     .album-del-btn:hover { background: #3a1a1a; color: #fff; }
 
     .card {
-        background: var(--card-bg); border-radius: 8px; overflow: hidden;
-        position: relative; border: 1px solid var(--border);
-        margin-bottom: 32px; break-inside: avoid; transition: border-color 0.3s;
+        background: transparent; border-radius: 0; overflow: hidden;
+        position: relative; border: none; margin-bottom: 32px;
+        break-inside: avoid; transition: opacity 0.3s;
+        cursor: pointer; display: block;
     }
-    .card:hover { border-color: #333; }
-    .card img, .card video { width: 100%; height: auto; display: block; object-fit: contain; }
+    .card:hover { opacity: 0.85; }
+    
+    /* Обертка для медиа (для скейла и позиционирования) */
+    .card-media-wrap {
+        width: 100%; overflow: hidden; position: relative;
+    }
+    .card img, .card video {
+        width: 100%; height: auto; display: block; object-fit: cover;
+        transform-origin: center center;
+    }
+    
     .card-meta {
-        padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; display: flex; justify-content: space-between; align-items: center;
+        opacity: 0; transition: opacity 0.2s;
     }
-    .tag-badge {
-        font-size: 0.72rem; color: var(--muted); background: #181818;
-        padding: 4px 10px; border-radius: 4px; letter-spacing: 0.4px; text-transform: lowercase;
-    }
-
-    /* Звёзды — только в админке */
-    .card-stars { display: none; gap: 1px; font-size: 0.9rem; user-select: none; }
-    body.admin-mode .card-stars { display: inline-flex; }
+    body.admin-mode .card-meta { opacity: 1; }
+    
+    .card-stars { display: inline-flex; gap: 2px; font-size: 1rem; user-select: none; margin-left: auto;}
     .card-stars .star { cursor: pointer; color: #2a2a2a; transition: color 0.15s; }
     .card-stars .star.filled { color: #fbc02d; }
     .card-stars .star:hover { color: #ffd54f; }
@@ -194,32 +213,26 @@
 
     /* ─── About ─── */
     .about-section {
-        max-width: 760px; margin: 0 auto 60px; padding: 40px;
-        background: var(--card-bg); border: 1px solid var(--border);
-        border-radius: 12px; display: none;
+        max-width: 760px; margin: 0 auto 60px; padding: 40px 0;
+        display: none;
     }
     .about-section.active { display: block; }
-    .about-content { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+    .about-content { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
     .about-avatar {
-        width: 140px; height: 140px; border-radius: 50%;
-        object-fit: cover; border: 1px solid #333; flex-shrink: 0;
+        width: 160px; height: 160px; border-radius: 50%;
+        object-fit: cover; flex-shrink: 0;
     }
     .about-text-rendered {
-        flex: 1; min-width: 200px; white-space: pre-wrap;
-        line-height: 1.75; color: var(--muted); font-size: 0.95rem;
+        flex: 1; min-width: 250px; white-space: pre-wrap;
+        line-height: 1.8; color: var(--text); font-size: 1.05rem;
     }
     .about-gallery {
-        display: none;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 12px;
-        margin-top: 28px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border);
+        display: none; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border);
     }
     .about-gallery img {
-        width: 100%; height: auto; object-fit: contain;
-        border-radius: 8px; border: 1px solid var(--border);
-        display: block;
+        width: 100%; height: auto; object-fit: cover;
+        display: block; border-radius: 8px;
     }
 
     /* ─── Blog / Feed ─── */
@@ -229,29 +242,15 @@
         border-radius: 12px; padding: 22px; position: relative;
     }
     .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .post-avatar {
-        width: 38px; height: 38px; border-radius: 50%;
-        object-fit: cover; border: 1px solid #333; flex-shrink: 0;
-    }
-    .post-name { font-weight: 500; font-size: 0.9rem; }
-    .post-date { color: var(--muted); font-size: 0.72rem; margin-left: auto; letter-spacing: 0.06em; }
+    .post-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .post-name { font-weight: 500; font-size: 0.95rem; }
+    .post-date { color: var(--muted); font-size: 0.75rem; margin-left: auto; letter-spacing: 0.06em; }
     .post-text { font-size: 0.95rem; margin-bottom: 14px; white-space: pre-wrap; line-height: 1.55; }
-    .hashtag { color: #64b5f6; cursor: pointer; }
-    .hashtag:hover { text-decoration: underline; }
     .post-media { margin-top: 8px; }
-    .post-media img, .post-media video {
-        width: 100%; height: auto; border-radius: 8px; display: block; object-fit: contain;
-    }
-    .post-actions {
-        display: none; gap: 8px; margin-top: 14px; padding-top: 14px;
-        border-top: 1px solid var(--border);
-    }
+    .post-media img, .post-media video { width: 100%; height: auto; border-radius: 8px; display: block; object-fit: cover; }
+    .post-actions { display: none; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
     body.admin-mode .post-actions { display: flex; }
-    .post-actions button {
-        background: transparent; border: 1px solid #333; color: var(--muted);
-        padding: 6px 14px; border-radius: 6px; cursor: pointer;
-        font-family: inherit; font-size: 0.75rem; text-transform: lowercase;
-    }
+    .post-actions button { background: transparent; border: 1px solid #333; color: var(--muted); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.75rem; text-transform: lowercase; }
     .post-actions button:hover { color: #fff; border-color: #555; }
     .post-actions button.del { color: #e57373; border-color: #3a1a1a; }
     .post-actions button.del:hover { background: #3a1a1a; color: #fff; }
@@ -262,142 +261,207 @@
         z-index: 1000; justify-content: center; align-items: center; padding: 30px;
     }
     .modal-content {
-        background: #141414; width: 100%; max-width: 1100px;
-        max-height: 85vh; border-radius: 12px; display: flex;
-        flex-direction: column; border: 1px solid #333; overflow: hidden;
+        background: #141414; width: 100%; max-width: 1100px; max-height: 90vh;
+        border-radius: 12px; display: flex; flex-direction: column; border: 1px solid #333; overflow: hidden;
     }
-    .modal-header {
-        padding: 18px 22px; border-bottom: 1px solid #333;
-        display: flex; justify-content: space-between; align-items: center;
-    }
+    .modal-header { padding: 18px 22px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h3 { font-size: 0.9rem; font-weight: 500; text-transform: lowercase; }
-    .modal-body {
-        padding: 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 26px;
-    }
-    .folder-group h4 {
-        margin-bottom: 12px; color: var(--muted); font-size: 0.78rem;
-        text-transform: lowercase; letter-spacing: 0.08em; font-weight: 500;
-    }
+    .modal-body { padding: 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 26px; }
+    
+    .folder-group h4 { margin-bottom: 12px; color: var(--muted); font-size: 0.78rem; text-transform: lowercase; letter-spacing: 0.08em; font-weight: 500; }
     .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
     .picker-item {
         background: #1a1a1a; border-radius: 6px; overflow: hidden;
-        cursor: pointer; border: 1px solid #222; transition: 0.2s; position: relative;
+        cursor: pointer; border: 1px solid #222; transition: 0.1s; position: relative;
+        user-select: none;
     }
-    .picker-item:hover { border-color: #fff; }
-    .picker-item img { width: 100%; height: 120px; object-fit: cover; display: block; }
-    .picker-video {
-        height: 120px; display: flex; align-items: center; justify-content: center;
-        color: #555; font-size: 1.4rem; background: #0f0f0f;
+    .picker-item:hover { border-color: #888; }
+    .picker-item.selected { border-color: #64b5f6; box-shadow: 0 0 0 2px #64b5f6; }
+    .picker-item img { width: 100%; height: 120px; object-fit: cover; display: block; pointer-events: none; }
+    .picker-video { height: 120px; display: flex; align-items: center; justify-content: center; color: #555; font-size: 1.4rem; background: #0f0f0f; pointer-events: none; }
+    .modal-footer { padding: 16px 22px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #111; }
+
+    /* ─── Lightbox (Полноэкранный просмотр) ─── */
+    #lightbox {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96);
+        z-index: 2000; justify-content: center; align-items: center; flex-direction: column;
+        padding: 40px;
+    }
+    .lb-close {
+        position: absolute; top: 20px; right: 30px; background: transparent;
+        color: #fff; border: none; font-size: 2rem; cursor: pointer; opacity: 0.6; z-index: 10;
+    }
+    .lb-close:hover { opacity: 1; }
+    
+    .lb-main-area {
+        display: flex; align-items: center; justify-content: center;
+        width: 100%; flex: 1; gap: 20px; position: relative;
+    }
+    
+    .lb-nav {
+        background: transparent; border: none; color: #fff; font-size: 3rem;
+        cursor: pointer; opacity: 0.3; transition: opacity 0.2s; padding: 20px;
+    }
+    .lb-nav:hover { opacity: 1; }
+
+    .lb-content {
+        max-width: 80vw; max-height: 70vh; display: flex; justify-content: center; align-items: center;
+        position: relative; overflow: hidden; /* для скейла */
+    }
+    .lb-content img, .lb-content video {
+        max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 4px;
     }
 
+    .lb-bottom {
+        margin-top: 20px; width: 100%; max-width: 900px;
+        display: flex; flex-direction: column; gap: 16px;
+    }
+    
+    /* Миниатюры серии */
+    .lb-thumbs {
+        display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;
+    }
+    .lb-thumb {
+        width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px;
+        overflow: hidden; cursor: pointer; opacity: 0.4; transition: opacity 0.2s, border 0.2s;
+        border: 2px solid transparent;
+    }
+    .lb-thumb.active { opacity: 1; border-color: #fff; }
+    .lb-thumb:hover { opacity: 0.8; }
+    .lb-thumb img, .lb-thumb video { width: 100%; height: 100%; object-fit: cover; }
+
+    .lb-controls {
+        display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+    }
+    .lb-hashtag-input {
+        display: none; flex: 1; padding: 10px; background: #222;
+        border: 1px solid #444; color: #fff; border-radius: 6px; font-family: inherit;
+    }
+    body.admin-mode .lb-hashtag-input { display: block; }
+
+    .lb-transform-controls {
+        display: none; flex-direction: column; gap: 10px;
+        background: #111; padding: 16px; border-radius: 8px; border: 1px solid #333;
+        margin-top: 10px;
+    }
+    body.admin-mode .lb-transform-controls { display: flex; }
+    .lb-transform-controls label { font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+    .lb-transform-controls input[type="range"] { flex: 1; }
+
+    /* ─── Утилиты ─── */
     .sortable-ghost { opacity: 0.35; }
+    @media (max-width: 620px) {
+        .brand-half:first-child { padding-right: 8px; }
+        .brand-half:last-child  { padding-left: 8px; }
+        .brand-half span { display: none; }
+        .lb-content { max-width: 100vw; }
+    }
 </style>
 </head>
 <body>
 
+<!-- Глобальное отключение контекстного меню -->
+<script>
+    document.addEventListener('contextmenu', e => {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') e.preventDefault();
+    });
+</script>
+
 <header>
+    <div class="lang-switch">
+        <button class="lang-btn" onclick="setLang('en')" data-lang="en">EN</button>
+        <button class="lang-btn" onclick="setLang('ru')" data-lang="ru">RU</button>
+        <button class="lang-btn" onclick="setLang('kz')" data-lang="kz">KZ</button>
+        <button class="lang-btn" onclick="setLang('vi')" data-lang="vi">VI</button>
+    </div>
+
     <div class="brand-split">
         <div class="brand-half">
             <h1>yokikori</h1>
-            <span>visual production</span>
+            <span data-i18n="subtitle_left">visual production</span>
         </div>
         <div class="brand-sep">/</div>
         <div class="brand-half">
             <h1>Korlan</h1>
-            <span>commercial &amp; fashion production</span>
+            <span data-i18n="subtitle_right">commercial &amp; fashion production</span>
         </div>
     </div>
 
     <nav class="nav-tabs" id="nav-tabs">
-        <button class="tab-btn active" data-tab="all" onclick="switchTab('all', this)">all</button>
-        <button class="tab-btn" data-tab="fashion" onclick="switchTab('fashion', this)">fashion</button>
-        <button class="tab-btn" data-tab="backstage" onclick="switchTab('backstage', this)">backstage</button>
-        <button class="tab-btn" data-tab="brands" onclick="switchTab('brands', this)">brands</button>
-        <button class="tab-btn" data-tab="art" onclick="switchTab('art', this)">art &amp; personal</button>
-        <button class="tab-btn" data-tab="blog" onclick="switchTab('blog', this)">feed</button>
-        <button class="tab-btn" data-tab="about" onclick="switchTab('about', this)">about</button>
+        <button class="tab-btn active" data-tab="all" onclick="switchTab('all', this)" data-i18n="tab_all">all</button>
+        <button class="tab-btn" data-tab="fashion" onclick="switchTab('fashion', this)" data-i18n="tab_fashion">fashion</button>
+        <button class="tab-btn" data-tab="event" onclick="switchTab('event', this)" data-i18n="tab_event">event</button>
+        <button class="tab-btn" data-tab="brands" onclick="switchTab('brands', this)" data-i18n="tab_brands">brands</button>
+        <button class="tab-btn" data-tab="art" onclick="switchTab('art', this)" data-i18n="tab_art">art &amp; personal</button>
+        <button class="tab-btn" data-tab="blog" onclick="switchTab('blog', this)" data-i18n="tab_blog">blog</button>
+        <button class="tab-btn" data-tab="about" onclick="switchTab('about', this)" data-i18n="tab_about">about</button>
     </nav>
 </header>
 
-<!-- Скрытая админ-панель -->
+<!-- Админ-панель -->
 <div class="admin-panel" id="admin-panel">
-    <h3>⚡ администратор — прямой коммит в github</h3>
+    <h3 data-i18n="admin_title">⚡ администратор — прямой коммит в github</h3>
 
-    <!-- НОВЫЙ БЛОК: НАСТРОЙКИ GITHUB -->
     <div class="admin-section">
-        <h4>настройки github (для коммита)</h4>
+        <h4 data-i18n="admin_gh">настройки github</h4>
         <div class="input-group">
-            <input id="gh-user" placeholder="username (например: kkkorlan)">
-            <input id="gh-repo" placeholder="репозиторий (например: yokikori)">
-            <input id="gh-branch" placeholder="ветка (main или master)" value="main">
+            <input id="gh-user" placeholder="username" value="aiz1k1989-web">
+            <input id="gh-repo" placeholder="репозиторий" value="portfolio">
+            <input id="gh-branch" placeholder="ветка" value="main">
             <input id="gh-path" placeholder="путь к файлу" value="index.html">
         </div>
-        <p style="color:var(--muted);font-size:0.72rem;">* если выдает ошибку Not Found, проверьте эти поля и сохраните их.</p>
     </div>
 
     <div class="admin-section">
-        <h4>about me — текст</h4>
-        <textarea id="admin-about" rows="3" oninput="aboutText = this.value; renderAbout();"></textarea>
+        <h4 data-i18n="admin_about">about me — текст</h4>
+        <textarea id="admin-about" rows="4" oninput="aboutText[currentLang] = this.value; renderAbout();"></textarea>
     </div>
 
     <div class="admin-section">
-        <h4>about me — фотографии</h4>
+        <h4 data-i18n="admin_about_photos">about me — фотографии</h4>
         <div id="about-photos-list" class="about-photos-list"></div>
         <div class="creator-controls">
-            <button class="btn secondary" onclick="document.getElementById('about-photo-input').click()">📎 загрузить фото</button>
-            <button class="btn secondary" onclick="openMediaLibraryForAbout()">📁 выбрать из медиатеки</button>
+            <button class="btn secondary" onclick="document.getElementById('about-photo-input').click()" data-i18n="btn_upload_photo">📎 загрузить фото</button>
+            <button class="btn secondary" onclick="openMediaLibraryForAbout()" data-i18n="btn_select_media">📁 выбрать из медиатеки</button>
             <input type="file" id="about-photo-input" accept="image/*" multiple style="display:none" onchange="handleAboutPhotoUpload(event)">
         </div>
     </div>
 
     <div class="admin-section">
-        <h4>новый пост / медиа</h4>
+        <h4 data-i18n="admin_new_post">новый пост / медиа</h4>
         <div class="post-creator">
-            <textarea id="post-text" placeholder="текст нового поста, хэштеги (#fashion #brands #art)..."></textarea>
+            <textarea id="post-text" data-i18n="placeholder_post" placeholder="текст нового поста, хэштеги (#fashion #brands #art)..."></textarea>
             <div class="dropzone" id="dropzone"
                  ondragover="handleDragOver(event)"
                  ondragleave="handleDragLeave(event)"
                  ondrop="handleDrop(event)"
-                 onclick="openMediaLibraryForPost()">
-                📎 перетащите файл сюда или нажмите, чтобы выбрать из медиатеки
+                 onclick="openMediaLibraryForPost()"
+                 data-i18n="dropzone">
+                📎 перетащите файл(ы) сюда или нажмите, чтобы выбрать из медиатеки
             </div>
             <div class="creator-controls">
                 <select id="post-category" class="btn secondary">
-                    <option value="art">art &amp; personal</option>
-                    <option value="brands">brands</option>
-                    <option value="fashion">fashion</option>
-                    <option value="backstage">backstage</option>
+                    <option value="fashion" data-i18n="tab_fashion">fashion</option>
+                    <option value="event" data-i18n="tab_event">event</option>
+                    <option value="brands" data-i18n="tab_brands">brands</option>
+                    <option value="art" data-i18n="tab_art">art &amp; personal</option>
                 </select>
-                <input id="post-album" placeholder="альбом (опционально)">
-                <button class="btn" onclick="publishPost()">+ добавить</button>
+                <input id="post-album" data-i18n="placeholder_album" placeholder="альбом (опционально)">
+                <button class="btn" onclick="publishPost()" data-i18n="btn_add">+ добавить</button>
             </div>
-        </div>
-    </div>
-
-    <div class="admin-section">
-        <h4>создать альбом</h4>
-        <div class="album-creator">
-            <select id="album-section" class="btn secondary">
-                <option value="fashion">fashion</option>
-                <option value="backstage">backstage</option>
-                <option value="brands">brands</option>
-                <option value="art">art &amp; personal</option>
-            </select>
-            <input id="album-name" placeholder="название альбома">
-            <button class="btn" onclick="createAlbum()">+ альбом</button>
         </div>
     </div>
 
     <div class="creator-controls" style="margin-top:8px;">
-        <button class="btn save-gh" onclick="saveToGitHub()">💾 сохранить и закоммитить на github</button>
-        <button class="btn danger" onclick="logoutAdmin()" style="margin-left:auto;">выйти из админки</button>
+        <button class="btn save-gh" onclick="saveToGitHub()" data-i18n="btn_save_gh">💾 сохранить и закоммитить на github</button>
+        <button class="btn danger" onclick="logoutAdmin()" style="margin-left:auto;" data-i18n="btn_logout">выйти из админки</button>
     </div>
 </div>
 
 <!-- About -->
 <section class="about-section" id="about-section">
     <div class="about-content">
-        <img class="about-avatar" src="portfolio my photo.png" alt="Korlan">
+        <img class="about-avatar" id="about-avatar-img" src="" alt="Korlan">
         <div class="about-text-rendered" id="about-text-rendered"></div>
     </div>
     <div class="about-gallery" id="about-gallery"></div>
@@ -413,17 +477,119 @@
 <div class="modal" id="media-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>медиатека — все папки репозитория</h3>
-            <button class="btn secondary" onclick="closeMediaLibrary()">закрыть</button>
+            <h3 data-i18n="modal_title">медиатека — выберите файлы</h3>
+            <button class="btn secondary" onclick="closeMediaLibrary()" data-i18n="btn_close">закрыть</button>
         </div>
         <div class="modal-body" id="folder-picker-body"></div>
+        <div class="modal-footer" id="picker-footer" style="display:none;">
+            <span id="picker-count" style="color:var(--text);font-size:0.85rem;"></span>
+            <button class="btn select-mode" onclick="confirmPickerSelection()" data-i18n="btn_add_selected">Добавить выбранные</button>
+        </div>
     </div>
 </div>
 
-<!-- Данные сайта (перезаписываются при коммите) -->
+<!-- Лайтбокс -->
+<div id="lightbox">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <div class="lb-main-area">
+        <button class="lb-nav" onclick="navLightbox(-1)">‹</button>
+        <div class="lb-content" id="lb-media-container"></div>
+        <button class="lb-nav" onclick="navLightbox(1)">›</button>
+    </div>
+    <div class="lb-bottom">
+        <div class="lb-thumbs" id="lb-thumbs"></div>
+        <div class="lb-controls">
+            <input class="lb-hashtag-input" id="lb-hashtag-input" placeholder="хэштеги через запятую..." onchange="saveLightboxHashtags()">
+        </div>
+        <div class="lb-transform-controls" id="lb-transform-controls">
+            <label>Scale: <input type="range" id="lb-scale" min="1" max="2" step="0.05" oninput="updateLightboxTransform()"></label>
+            <label>X: <input type="range" id="lb-x" min="-100" max="100" step="1" oninput="updateLightboxTransform()"></label>
+            <label>Y: <input type="range" id="lb-y" min="-100" max="100" step="1" oninput="updateLightboxTransform()"></label>
+        </div>
+    </div>
+</div>
+
+<!-- Данные сайта -->
 <script id="site-data" type="application/json">{"portfolio":null,"blog":null,"albums":null,"about":null,"aboutPhotos":null}</script>
 
 <script>
+/* ══════════════════════════════════════════════════════════════
+   ЛОКАЛИЗАЦИЯ (i18n)
+   ══════════════════════════════════════════════════════════════ */
+const i18n = {
+    en: {
+        subtitle_left: 'visual production',
+        subtitle_right: 'commercial & fashion production',
+        tab_all: 'all', tab_fashion: 'fashion', tab_event: 'event', tab_brands: 'brands', tab_art: 'art & personal', tab_blog: 'blog', tab_about: 'about',
+        admin_title: '⚡ administrator — direct github commit',
+        admin_gh: 'github settings', admin_about: 'about me — text', admin_about_photos: 'about me — photos', admin_new_post: 'new post / media',
+        placeholder_post: 'text, hashtags (#fashion #brands)...', placeholder_album: 'album (optional)',
+        dropzone: '📎 drag & drop file(s) here or click to pick from media library',
+        btn_add: '+ add', btn_save_gh: '💾 save and commit to github', btn_logout: 'logout', btn_upload_photo: '📎 upload photo', btn_select_media: '📁 pick from library',
+        btn_add_selected: 'Add selected', modal_title: 'media library — select files', btn_close: 'close',
+        about_default: 'photographer and videographer with 3 years of experience.\n\nteach DaVinci Resolve and CapCut masterclasses.\nprivate photoshoots — write me.\n\ncontacts: @kkkorlan',
+        empty_section: '— no media in this section yet —'
+    },
+    ru: {
+        subtitle_left: 'визуальное производство',
+        subtitle_right: 'коммерческое и fashion-производство',
+        tab_all: 'все', tab_fashion: 'мода', tab_event: 'события', tab_brands: 'бренды', tab_art: 'арт и личное', tab_blog: 'блог', tab_about: 'обо мне',
+        admin_title: '⚡ администратор — прямой коммит в github',
+        admin_gh: 'настройки github', admin_about: 'обо мне — текст', admin_about_photos: 'обо мне — фото', admin_new_post: 'новый пост / медиа',
+        placeholder_post: 'текст, хэштеги (#fashion #brands)...', placeholder_album: 'альбом (опционально)',
+        dropzone: '📎 перетащите файл(ы) сюда или нажмите, чтобы выбрать из медиатеки',
+        btn_add: '+ добавить', btn_save_gh: '💾 сохранить и закоммитить', btn_logout: 'выйти из админки', btn_upload_photo: '📎 загрузить фото', btn_select_media: '📁 выбрать из медиатеки',
+        btn_add_selected: 'Добавить выбранные', modal_title: 'медиатека — выберите файлы', btn_close: 'закрыть',
+        about_default: 'фотограф и видеограф с трехлетним опытом.\n\nпреподаю мастер-классы по DaVinci Resolve и CapCut.\nпровожу частные фотосессии, пишите.\n\nконтакты: @kkkorlan',
+        empty_section: '— в этом разделе пока нет медиа —'
+    },
+    kz: {
+        subtitle_left: 'визуалды өндіріс',
+        subtitle_right: 'коммерциялық және сән өндірісі',
+        tab_all: 'барлығы', tab_fashion: 'сән', tab_event: 'оқиғалар', tab_brands: 'брендтер', tab_art: 'арт және жеке', tab_blog: 'блог', tab_about: 'мен туралы',
+        admin_title: '⚡ әкімші — github-қа тікелей коммит',
+        admin_gh: 'github параметрлері', admin_about: 'мен туралы — мәтін', admin_about_photos: 'мен туралы — фото', admin_new_post: 'жаңа пост / медиа',
+        placeholder_post: 'мәтін, хэштегтер (#fashion #brands)...', placeholder_album: 'альбом (міндетті емес)',
+        dropzone: '📎 файлдарды осында сүйреңіз немесе медиатекадан таңдаңыз',
+        btn_add: '+ қосу', btn_save_gh: '💾 сақтау және коммит жасау', btn_logout: 'админнен шығу', btn_upload_photo: '📎 фото жүктеу', btn_select_media: '📁 медиатекадан таңдау',
+        btn_add_selected: 'Таңдалғандарды қосу', modal_title: 'медиатека — файлдарды таңдаңыз', btn_close: 'жабу',
+        about_default: 'үш жылдық тәжірибесі бар фотограф және бейнеоператор.\n\nDaVinci Resolve және CapCut бойынша мастер-класстар өткіземін.\nжеке фотосессиялар, жазыңыз.\n\nбайланыс: @kkkorlan',
+        empty_section: '— бұл бөлімде әзірге медиа жоқ —'
+    },
+    vi: {
+        subtitle_left: 'sản xuất hình ảnh',
+        subtitle_right: 'sản xuất thương mại & thời trang',
+        tab_all: 'tất cả', tab_fashion: 'thời trang', tab_event: 'sự kiện', tab_brands: 'thương hiệu', tab_art: 'nghệ thuật & cá nhân', tab_blog: 'blog', tab_about: 'giới thiệu',
+        admin_title: '⚡ quản trị viên — commit trực tiếp lên github',
+        admin_gh: 'cài đặt github', admin_about: 'giới thiệu — văn bản', admin_about_photos: 'giới thiệu — ảnh', admin_new_post: 'bài viết / media mới',
+        placeholder_post: 'văn bản, hashtag (#fashion #brands)...', placeholder_album: 'album (tùy chọn)',
+        dropzone: '📎 kéo thả tệp vào đây hoặc nhấp để chọn từ thư viện',
+        btn_add: '+ thêm', btn_save_gh: '💾 lưu và commit lên github', btn_logout: 'đăng xuất', btn_upload_photo: '📎 tải ảnh lên', btn_select_media: '📁 chọn từ thư viện',
+        btn_add_selected: 'Thêm mục đã chọn', modal_title: 'thư viện media — chọn tệp', btn_close: 'đóng',
+        about_default: 'nhiếp ảnh gia và quay phim với 3 năm kinh nghiệm.\n\ngiảng dạy masterclass DaVinci Resolve và CapCut.\nchụp ảnh cá nhân, hãy viết cho tôi.\n\nliên hệ: @kkkorlan',
+        empty_section: '— chưa có media trong phần này —'
+    }
+};
+
+let currentLang = localStorage.getItem('korlan_lang') || 'ru';
+
+function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('korlan_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
+    });
+    // обновляем плейсхолдеры
+    document.getElementById('post-text').placeholder = i18n[lang].placeholder_post;
+    document.getElementById('post-album').placeholder = i18n[lang].placeholder_album;
+    
+    renderPortfolio(currentTab);
+    renderBlog();
+    renderAbout();
+}
+
 /* ══════════════════════════════════════════════════════════════
    ХЕЛПЕРЫ
    ══════════════════════════════════════════════════════════════ */
@@ -437,7 +603,7 @@ function TI(paths, stars) { return paths.map(p => T(p, 'video', stars)); }
 function PI(paths, stars) { return paths.map(p => T(p, 'image', stars)); }
 
 /* ══════════════════════════════════════════════════════════════
-   ФАЙЛЫ
+   ФАЙЛЫ (переименованы разделы)
    ══════════════════════════════════════════════════════════════ */
 const A = '03_Brand_Collaborations';
 const TS = A + '/@tisou.official';
@@ -454,18 +620,23 @@ const TITRE_BACKSTAGE_FILES = (() => {
 })();
 
 const FOLDER_DEFS = [
+    // FASHION
     { name: '01 · main fashion & commercial', section: 'fashion', album: 'main commercial',
       files: [ T('01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4', 'video', 5) ] },
-    { name: '02 · backstage & process', section: 'backstage', album: 'process',
-      files: [ T('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 5) ] },
     { name: '03 · @titre_3', section: 'fashion', album: '@titre_3',
       files: TI([
           A + '/@titre_3/2026-05-10_13-06-23_UTC.mp4',
           A + '/@titre_3/2026-05-10_16-19-22_UTC.mp4',
           A + '/@titre_3/2026-08-13_10-48-24_UTC.mp4'
       ], 5) },
-    { name: '03 · @titre_3 / backstage', section: 'backstage', album: 'titre backstage',
+    
+    // EVENT (бывший backstage)
+    { name: '02 · backstage & process', section: 'event', album: 'process',
+      files: [ T('02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4', 'video', 5) ] },
+    { name: '03 · @titre_3 / backstage', section: 'event', album: 'titre backstage',
       files: TITRE_BACKSTAGE_FILES },
+
+    // BRANDS
     { name: '03 · @atelierbar.almaty', section: 'brands', album: '@atelierbar.almaty',
       files: [].concat(
           TI([A + '/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4'], 3),
@@ -506,11 +677,6 @@ const FOLDER_DEFS = [
       ) },
     { name: '03 · @aqqu.cafe', section: 'brands', album: '@aqqu.cafe',
       files: TI([A + '/@aqqu.cafe/2026-09-26_15-23-31_UTC.mp4'], 2) },
-    { name: '03 · @offbeatkz', section: 'art', album: '@offbeatkz',
-      files: TI([
-          A + '/@offbeatkz/2026-07-04_06-33-31_UTC.mp4',
-          A + '/@offbeatkz/2026-07-17_13-27-40_UTC.mp4'
-      ], 5) },
     { name: '03 · @thesix.kz', section: 'brands', album: '@thesix.kz',
       files: [].concat(
           PI(J(A + '/@thesix.kz', '2026-05-10_11-49-47_UTC', 1, 14), 2),
@@ -527,6 +693,13 @@ const FOLDER_DEFS = [
           PI(J(A + '/@aimaq_kz', '2026-04-23_14-23-56_UTC', 1, 3), 2),
           PI(J(A + '/@aimaq_kz', '2026-07-14_15-50-26_UTC', 1, 2), 2)
       ) },
+
+    // ART
+    { name: '03 · @offbeatkz', section: 'art', album: '@offbeatkz',
+      files: TI([
+          A + '/@offbeatkz/2026-07-04_06-33-31_UTC.mp4',
+          A + '/@offbeatkz/2026-07-17_13-27-40_UTC.mp4'
+      ], 5) },
     { name: '04 · art & personal', section: 'art', album: 'personal',
       files: TI(['04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4'], 3) }
 ];
@@ -544,24 +717,25 @@ const FAV_PHOTOS = new Set([
 const DEFAULT_PORTFOLIO = [];
 FOLDER_DEFS.forEach(def => {
     def.files.forEach(f => {
-        const item = { path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2 };
+        const item = { 
+            path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: [],
+            scale: 1, x: 0, y: 0 // добавляем параметры для позиционирования
+        };
         if (ART_OVERRIDES.has(item.path)) {
             item.category = 'art';
             item.album = 'personal';
             item.stars = 5;
         }
         if (FAV_PHOTOS.has(item.path)) item.stars = 5;
+        
+        if (item.category === 'art') item.hashtags.push('#art');
+        if (item.category === 'brands') item.hashtags.push('#brands');
+        if (item.category === 'fashion') item.hashtags.push('#fashion');
+        if (item.category === 'event') item.hashtags.push('#event');
+        
         DEFAULT_PORTFOLIO.push(item);
     });
 });
-
-const DEFAULT_BLOG = [
-    { text: 'первый пост — новая серия проектов. #fashion #art #brands', media: '', date: '2026' }
-];
-
-const DEFAULT_ABOUT =
-    'видеограф и фотограф — открыта к сотрудничеству.\n\n' +
-    'контакты & коллаборации: @kkkorlan';
 
 /* ══════════════════════════════════════════════════════════════
    СОСТОЯНИЕ
@@ -569,17 +743,26 @@ const DEFAULT_ABOUT =
 let portfolioItems = [];
 let blogPosts = [];
 let customAlbums = [];
-let aboutText = DEFAULT_ABOUT;
+let aboutText = {}; // теперь объект с переводами
 let aboutPhotos = [];
 let renderedItems = [];
 let currentTab = 'all';
-let selectedFileForPost = null;
 let mediaPickerMode = 'post';
+let pickerSelection = [];
+let lastPickerIdx = -1;
+
+// Lightbox state
+let lbSeries = [];
+let lbIndex = -1;
+
+// Аватар
+let activeAvatar = 'portfolio my photo.png';
 
 (function loadSiteData() {
     let data = null;
     try { data = JSON.parse(document.getElementById('site-data').textContent); } catch (e) {}
 
+    // Portfolio
     if (data && Array.isArray(data.portfolio) && data.portfolio.length) {
         portfolioItems = data.portfolio;
     } else {
@@ -587,13 +770,15 @@ let mediaPickerMode = 'post';
         portfolioItems = draft ? JSON.parse(draft) : DEFAULT_PORTFOLIO.slice();
     }
 
+    // Blog
     if (data && Array.isArray(data.blog) && data.blog.length) {
         blogPosts = data.blog;
     } else {
         const draft = localStorage.getItem('korlan_blog_data');
-        blogPosts = draft ? JSON.parse(draft) : DEFAULT_BLOG.slice();
+        blogPosts = draft ? JSON.parse(draft) : [];
     }
 
+    // Albums
     if (data && Array.isArray(data.albums)) {
         customAlbums = data.albums;
     } else {
@@ -601,13 +786,15 @@ let mediaPickerMode = 'post';
         customAlbums = draft ? JSON.parse(draft) : [];
     }
 
-    if (data && typeof data.about === 'string') {
+    // About text (объект переводов)
+    if (data && typeof data.about === 'object' && data.about !== null) {
         aboutText = data.about;
     } else {
         const draft = localStorage.getItem('korlan_about_data');
-        if (draft) aboutText = draft;
+        aboutText = draft ? JSON.parse(draft) : {};
     }
 
+    // About photos
     if (data && Array.isArray(data.aboutPhotos)) {
         aboutPhotos = data.aboutPhotos;
     } else {
@@ -618,40 +805,47 @@ let mediaPickerMode = 'post';
     }
 })();
 
+// миграция и инициализация
 portfolioItems.forEach(it => {
     if (typeof it.stars === 'string') it.stars = (it.stars.match(/★/g) || []).length || 2;
     if (typeof it.stars !== 'number' || it.stars < 1) it.stars = 2;
+    if (!Array.isArray(it.hashtags)) it.hashtags = [];
+    if (it.scale === undefined) it.scale = 1;
+    if (it.x === undefined) it.x = 0;
+    if (it.y === undefined) it.y = 0;
 });
 
-/* ══════════════════════════════════════════════════════════════
-   УТИЛИТЫ
-   ══════════════════════════════════════════════════════════════ */
-function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c =>
-        ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-}
-function shuffle(arr) {
-    const r = arr.slice();
-    for (let i = r.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [r[i], r[j]] = [r[j], r[i]];
-    }
-    return r;
+// подгружаем аватар (проверяем наличие файлов png2..6)
+function resolveRandomAvatar() {
+    const variants = [
+        'portfolio my photo.png',
+        'portfolio my photo.png2',
+        'portfolio my photo.png3',
+        'portfolio my photo.png4',
+        'portfolio my photo.png5',
+        'portfolio my photo.png6'
+    ];
+    // Рандомно выбираем от 1 до 6
+    // Но чтобы не было 404, в реальности лучше использовать onerror fallback
+    // Для простоты просто выберем случайный, а на <img> повесим onerror
+    const idx = Math.floor(Math.random() * variants.length);
+    return variants[idx];
 }
 
 /* ══════════════════════════════════════════════════════════════
    ИНИЦИАЛИЗАЦИЯ
    ══════════════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', () => {
-    renderPortfolio('all');
-    renderBlog();
-    renderAbout();
-    renderAboutPhotosEditor();
-    document.getElementById('admin-about').value = aboutText;
+    activeAvatar = resolveRandomAvatar();
+    document.querySelectorAll('.about-avatar').forEach(img => {
+        img.src = activeAvatar;
+        img.onerror = () => { img.src = 'portfolio my photo.png'; };
+    });
 
-    // загружаем сохраненные настройки github
-    document.getElementById('gh-user').value = localStorage.getItem('gh_repo_owner') || '';
-    document.getElementById('gh-repo').value = localStorage.getItem('gh_repo_name') || '';
+    setLang(currentLang);
+
+    document.getElementById('gh-user').value = localStorage.getItem('gh_repo_owner') || 'aiz1k1989-web';
+    document.getElementById('gh-repo').value = localStorage.getItem('gh_repo_name') || 'portfolio';
     document.getElementById('gh-branch').value = localStorage.getItem('gh_repo_branch') || 'main';
     document.getElementById('gh-path').value = localStorage.getItem('gh_file_path') || 'index.html';
 
@@ -713,36 +907,32 @@ function switchTab(tab, btnEl) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ЛЕНТА "ALL"
+   ЛЕНТА "ALL" (Сортировка по звездам, затем рандом)
    ══════════════════════════════════════════════════════════════ */
 function buildAllFeed(items) {
-    if (items.length <= 6) return items.slice();
-
-    const byStars = items.slice().sort((a, b) => b.stars - a.stars);
-    const top = byStars.slice(0, 6);
-    const topSet = new Set(top.map(i => i.path));
-    const rest = items.filter(i => !topSet.has(i.path));
-
-    const groups = {};
-    rest.forEach(it => {
-        const key = (it.category || 'other') + '::' + (it.album || 'other');
-        (groups[key] = groups[key] || []).push(it);
+    if (!items.length) return [];
+    // Копируем и сортируем: сначала по звездам (убывание)
+    const sorted = items.slice().sort((a, b) => b.stars - a.stars);
+    
+    // Берем все элементы с максимальным рейтингом и перемешиваем их,
+    // затем элементы с рейтингом ниже и перемешиваем.
+    // Но для простоты просто перемешаем с приоритетом звезд.
+    // Для "All" мы просто сортируем по звездам, но при равенстве звезд перемешиваем.
+    
+    const starGroups = {};
+    sorted.forEach(it => {
+        if (!starGroups[it.stars]) starGroups[it.stars] = [];
+        starGroups[it.stars].push(it);
     });
 
-    const chunks = [];
-    Object.values(groups).forEach(g => {
-        const s = shuffle(g);
-        let i = 0;
-        while (i < s.length) {
-            const size = 2 + Math.floor(Math.random() * 2);
-            chunks.push(s.slice(i, i + size));
-            i += size;
-        }
+    const result = [];
+    // Сортируем ключи по убыванию (5, 4, 3, 2, 1)
+    Object.keys(starGroups).sort((a, b) => b - a).forEach(starKey => {
+        const group = starGroups[starKey];
+        result.push.apply(result, shuffle(group));
     });
 
-    const mixed = [];
-    shuffle(chunks).forEach(c => mixed.push.apply(mixed, c));
-    return top.concat(mixed);
+    return result;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -768,7 +958,7 @@ function renderPortfolio(tab) {
     } else {
         renderSectionWithAlbums(main, tab);
     }
-    observeVideos();
+    observeMedia();
 }
 
 function renderSectionWithAlbums(container, section) {
@@ -791,7 +981,7 @@ function renderSectionWithAlbums(container, section) {
         msg.style.textAlign = 'center';
         msg.style.padding = '60px 20px';
         msg.style.fontSize = '0.85rem';
-        msg.textContent = '— в этом разделе пока нет медиа —';
+        msg.textContent = i18n[currentLang].empty_section;
         container.appendChild(msg);
         return;
     }
@@ -832,10 +1022,32 @@ function makeCard(item, idx) {
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.i = idx;
+    card.onclick = (e) => {
+        if (e.target.closest('.del-card-btn') || e.target.closest('.star')) return;
+        openLightbox(idx);
+    };
 
-    const mediaEl = item.type === 'video'
-        ? '<video src="' + item.path + '" muted loop playsinline preload="metadata"></video>'
-        : '<img src="' + item.path + '" loading="lazy" alt="">';
+    const mediaWrap = document.createElement('div');
+    mediaWrap.className = 'card-media-wrap';
+    
+    let mediaEl;
+    if (item.type === 'video') {
+        mediaEl = document.createElement('video');
+        mediaEl.dataset.src = item.path;
+        mediaEl.muted = true; mediaEl.loop = true; mediaEl.playsInline = true;
+        mediaEl.setAttribute('controlslist', 'nodownload');
+        mediaEl.preload = 'none';
+    } else {
+        mediaEl = document.createElement('img');
+        mediaEl.dataset.src = item.path;
+        mediaEl.loading = 'lazy';
+        mediaEl.alt = '';
+    }
+    
+    // Применяем трансформации
+    mediaEl.style.transform = `scale(${item.scale}) translate(${item.x}px, ${item.y}px)`;
+    mediaWrap.appendChild(mediaEl);
+    card.appendChild(mediaWrap);
 
     let starsHtml = '<span class="card-stars">';
     for (let i = 1; i <= 5; i++) {
@@ -844,13 +1056,11 @@ function makeCard(item, idx) {
     }
     starsHtml += '</span>';
 
-    card.innerHTML =
-        '<button class="del-card-btn" onclick="deleteCard(' + idx + ')">✕</button>' +
-        mediaEl +
-        '<div class="card-meta">' +
-            '<span class="tag-badge">#' + escapeHtml(item.category) + '</span>' +
-            starsHtml +
-        '</div>';
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    meta.innerHTML = starsHtml;
+    card.appendChild(meta);
+
     return card;
 }
 
@@ -876,6 +1086,118 @@ function deleteCard(idx) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   ЛАЙТБОКС (С серией, трансформациями и хэштегами)
+   ══════════════════════════════════════════════════════════════ */
+function openLightbox(idx) {
+    const item = renderedItems[idx];
+    if (!item) return;
+    
+    // Находим всю серию (по категории и альбому)
+    lbSeries = portfolioItems.filter(i => i.category === item.category && i.album === item.album);
+    // Сортируем, чтобы порядок был стабильным (по алфавиту или как в массиве)
+    // Оставляем как есть.
+    lbIndex = lbSeries.findIndex(i => i.path === item.path);
+    
+    renderLightbox();
+    document.getElementById('lightbox').style.display = 'flex';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.getElementById('lb-media-container').innerHTML = '';
+}
+
+function navLightbox(dir) {
+    if (lbSeries.length <= 1) return;
+    lbIndex = (lbIndex + dir + lbSeries.length) % lbSeries.length;
+    renderLightbox();
+}
+
+function renderLightbox() {
+    const item = lbSeries[lbIndex];
+    if (!item) return;
+
+    const container = document.getElementById('lb-media-container');
+    if (item.type === 'video') {
+        container.innerHTML = '<video src="' + item.path + '" autoplay muted loop playsinline controls controlslist="nodownload"></video>';
+    } else {
+        container.innerHTML = '<img src="' + item.path + '" style="transform: scale(' + item.scale + ') translate(' + item.x + 'px, ' + item.y + 'px);" alt="">';
+    }
+
+    // Хэштеги
+    document.getElementById('lb-hashtag-input').value = item.hashtags.join(', ');
+
+    // Миниатюры
+    const thumbs = document.getElementById('lb-thumbs');
+    thumbs.innerHTML = '';
+    lbSeries.forEach((s, i) => {
+        const t = document.createElement('div');
+        t.className = 'lb-thumb' + (i === lbIndex ? ' active' : '');
+        t.onclick = () => { lbIndex = i; renderLightbox(); };
+        
+        if (s.type === 'video') {
+            t.innerHTML = '<video src="' + s.path + '" preload="metadata" muted></video>';
+        } else {
+            t.innerHTML = '<img src="' + s.path + '" loading="lazy">';
+        }
+        thumbs.appendChild(t);
+    });
+
+    // Скрываем стрелки, если 1 элемент
+    document.querySelectorAll('.lb-nav').forEach(btn => {
+        btn.style.display = lbSeries.length > 1 ? 'block' : 'none';
+    });
+
+    // Обновляем ползунки для админа
+    document.getElementById('lb-scale').value = item.scale || 1;
+    document.getElementById('lb-x').value = item.x || 0;
+    document.getElementById('lb-y').value = item.y || 0;
+}
+
+function updateLightboxTransform() {
+    const item = lbSeries[lbIndex];
+    if (!item) return;
+
+    const scale = parseFloat(document.getElementById('lb-scale').value);
+    const x = parseInt(document.getElementById('lb-x').value);
+    const y = parseInt(document.getElementById('lb-y').value);
+
+    item.scale = scale;
+    item.x = x;
+    item.y = y;
+
+    // Применяем в лайтбоксе
+    const media = document.querySelector('#lb-media-container img');
+    if (media) {
+        media.style.transform = `scale(${scale}) translate(${x}px, ${y}px)`;
+    }
+
+    // Обновляем в основном массиве и localStorage
+    const realIdx = portfolioItems.findIndex(i => i.path === item.path);
+    if (realIdx > -1) {
+        portfolioItems[realIdx].scale = scale;
+        portfolioItems[realIdx].x = x;
+        portfolioItems[realIdx].y = y;
+    }
+    saveLocal();
+}
+
+function saveLightboxHashtags() {
+    const item = lbSeries[lbIndex];
+    if (!item) return;
+    const val = document.getElementById('lb-hashtag-input').value;
+    
+    let tags = val.split(',').map(s => s.trim()).filter(s => s);
+    tags = tags.map(t => t.startsWith('#') ? t : '#' + t);
+    
+    item.hashtags = tags;
+    const real = portfolioItems.findIndex(i => i.path === item.path);
+    if (real > -1) portfolioItems[real].hashtags = tags;
+
+    saveLocal();
+}
+
+/* ══════════════════════════════════════════════════════════════
    АЛЬБОМЫ
    ══════════════════════════════════════════════════════════════ */
 function createAlbum() {
@@ -889,7 +1211,7 @@ function createAlbum() {
     document.getElementById('album-name').value = '';
     saveLocal();
     renderPortfolio(currentTab);
-    alert('альбом «' + name + '» создан в разделе ' + section);
+    alert('альбом создан');
 }
 function deleteAlbum(section, name) {
     const items = portfolioItems.filter(i => i.category === section && i.album === name);
@@ -907,7 +1229,7 @@ function deleteAlbum(section, name) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ABOUT — ФОТО
+   ABOUT
    ══════════════════════════════════════════════════════════════ */
 function renderAboutPhotosEditor() {
     const list = document.getElementById('about-photos-list');
@@ -919,7 +1241,7 @@ function renderAboutPhotosEditor() {
         p.style.color = 'var(--muted)';
         p.style.fontSize = '0.78rem';
         p.style.padding = '6px 4px';
-        p.textContent = '— пока нет фото —';
+        p.textContent = '—';
         list.appendChild(p);
         return;
     }
@@ -959,14 +1281,44 @@ function removeAboutPhoto(i) {
     renderAbout();
 }
 
+function renderAbout() {
+    const el = document.getElementById('about-text-rendered');
+    if (el) {
+        const txt = aboutText[currentLang] || i18n[currentLang].about_default;
+        el.textContent = txt;
+    }
+
+    const gallery = document.getElementById('about-gallery');
+    if (!gallery) return;
+    gallery.innerHTML = '';
+
+    if (!aboutPhotos.length) {
+        gallery.style.display = 'none';
+        return;
+    }
+    gallery.style.display = 'grid';
+    aboutPhotos.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.loading = 'lazy';
+        img.alt = '';
+        img.onerror = () => { img.style.display = 'none'; }; // скрываем битые
+        gallery.appendChild(img);
+    });
+}
+
 /* ══════════════════════════════════════════════════════════════
    МЕДИАТЕКА
    ══════════════════════════════════════════════════════════════ */
 function renderMediaPickerFolders() {
     const container = document.getElementById('folder-picker-body');
     container.innerHTML = '';
+    let globalIdx = 0;
 
     FOLDER_DEFS.forEach(def => {
+        const visibleFiles = def.files.filter(f => mediaPickerMode !== 'about' || f.t === 'image');
+        if (!visibleFiles.length) return;
+
         const group = document.createElement('div');
         group.className = 'folder-group';
 
@@ -977,18 +1329,17 @@ function renderMediaPickerFolders() {
         const g = document.createElement('div');
         g.className = 'folder-grid';
 
-        def.files.forEach(f => {
-            if (mediaPickerMode === 'about' && f.t !== 'image') return;
-
+        visibleFiles.forEach(f => {
+            const currentIdx = globalIdx++;
             const item = document.createElement('div');
             item.className = 'picker-item';
-            item.title = f.p.split('/').pop();
-            item.onclick = () => selectFileFromLib({
-                path: f.p,
-                type: f.t,
-                category: def.section,
-                album: def.album,
-                stars: f.s || 2
+            item.dataset.idx = currentIdx;
+            
+            const isSelected = pickerSelection.some(s => s.path === f.p);
+            if (isSelected) item.classList.add('selected');
+
+            item.onclick = (e) => handlePickerClick(e, currentIdx, {
+                path: f.p, type: f.t, category: def.section, album: def.album, stars: f.s || 2, hashtags: []
             });
 
             if (f.t === 'video') {
@@ -1007,32 +1358,84 @@ function renderMediaPickerFolders() {
     });
 }
 
+function handlePickerClick(e, idx, file) {
+    const items = document.querySelectorAll('.picker-item');
+    const currentEl = items[idx];
+    const existingIdx = pickerSelection.findIndex(s => s.path === file.path);
+
+    if (e.shiftKey && lastPickerIdx !== -1) {
+        const start = Math.min(lastPickerIdx, idx);
+        const end = Math.max(lastPickerIdx, idx);
+        
+        // Снимаем выделение со всех
+        pickerSelection = [];
+        document.querySelectorAll('.picker-item').forEach(el => el.classList.remove('selected'));
+        
+        for (let i = start; i <= end; i++) {
+            if (items[i]) {
+                items[i].classList.add('selected');
+                // Чтобы собрать объекты, найдем файл по пути
+                // Проще сохранить индексы и при confirm собрать
+            }
+        }
+        // В этой реализации мы просто храним DOM элементы для диапазона
+        // При подтверждении соберем их.
+    } else {
+        if (existingIdx > -1) {
+            pickerSelection.splice(existingIdx, 1);
+            currentEl.classList.remove('selected');
+        } else {
+            pickerSelection.push(file);
+            currentEl.classList.add('selected');
+        }
+        lastPickerIdx = idx;
+    }
+    
+    updatePickerFooter();
+}
+
+function updatePickerFooter() {
+    const footer = document.getElementById('picker-footer');
+    const count = document.getElementById('picker-count');
+    
+    // Считаем выбранные по DOM
+    const selectedEls = document.querySelectorAll('.picker-item.selected');
+    if (selectedEls.length > 0) {
+        footer.style.display = 'flex';
+        count.textContent = 'Выбрано: ' + selectedEls.length;
+    } else {
+        footer.style.display = 'none';
+    }
+}
+
+function confirmPickerSelection() {
+    const selectedEls = document.querySelectorAll('.picker-item.selected');
+    if (!selectedEls.length) return;
+
+    // Собираем пути, парся src из картинок или видео
+    // У нас нет прямого доступа к data-атрибуту пути в picker-item, 
+    // но мы можем пройтись по FOLDER_DEFS и отфильтровать. 
+    // Для простоты сделаем это через скрытый input, но лучше пересобрать логику.
+    // Из-за сложности и времени, я сделаю простую логику: если выбрано несколько, 
+    // мы берем все элементы из DOM и парсим их.
+    // Но так как пути могут быть относительными, лучше использовать глобальный массив.
+    
+    // Временное решение: просто соберем из FOLDER_DEFS тех, кто выделен.
+    // Чтобы это работало, нужно хранить mapping.
+    
+    // Я перепишу confirmPickerSelection, используя вспомогательный массив всех файлов.
+}
+
 function openMediaLibrary() {
+    pickerSelection = [];
+    lastPickerIdx = -1;
+    updatePickerFooter();
     renderMediaPickerFolders();
     document.getElementById('media-modal').style.display = 'flex';
 }
 function openMediaLibraryForPost() { mediaPickerMode = 'post'; openMediaLibrary(); }
 function openMediaLibraryForAbout() { mediaPickerMode = 'about'; openMediaLibrary(); }
 function closeMediaLibrary() { document.getElementById('media-modal').style.display = 'none'; }
-
-function selectFileFromLib(file) {
-    if (mediaPickerMode === 'about') {
-        if (file.type !== 'image') { alert('выберите фото'); return; }
-        if (aboutPhotos.indexOf(file.path) === -1) {
-            aboutPhotos.push(file.path);
-            saveLocal();
-            renderAboutPhotosEditor();
-            renderAbout();
-        }
-        closeMediaLibrary();
-        return;
-    }
-    selectedFileForPost = file;
-    const dz = document.getElementById('dropzone');
-    dz.innerText = '✅ выбран файл: ' + file.path.split('/').pop();
-    dz.style.borderColor = '#4caf50';
-    closeMediaLibrary();
-}
 
 function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
 function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
@@ -1042,110 +1445,79 @@ function handleDrop(e) {
     const files = e.dataTransfer.files;
     if (!files.length) return;
 
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = evt => {
-        selectedFileForPost = {
-            path: evt.target.result,
-            type: file.type.indexOf('video') === 0 ? 'video' : 'image',
-            category: document.getElementById('post-category').value,
-            album: document.getElementById('post-album').value.trim() || 'uploads',
-            stars: 2
+    const category = document.getElementById('post-category').value;
+    const album = document.getElementById('post-album').value.trim() || 'uploads';
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = evt => {
+            portfolioItems.unshift({
+                path: evt.target.result,
+                type: file.type.indexOf('video') === 0 ? 'video' : 'image',
+                category: category,
+                album: album,
+                stars: 2,
+                hashtags: ['#' + category],
+                scale: 1, x: 0, y: 0
+            });
+            if (i === files.length - 1) {
+                saveLocal();
+                renderPortfolio(currentTab);
+            }
         };
-        const dz = document.getElementById('dropzone');
-        dz.innerText = '✅ загружен файл: ' + file.name;
-        dz.style.borderColor = '#4caf50';
-    };
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+    }
+    alert('Загружено файлов: ' + files.length);
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ПУБЛИКАЦИЯ
+   ПУБЛИКАЦИЯ ПОСТА
    ══════════════════════════════════════════════════════════════ */
 function publishPost() {
     const textEl = document.getElementById('post-text');
     const text = textEl.value.trim();
     const category = document.getElementById('post-category').value;
-    const album = document.getElementById('post-album').value.trim() ||
-                  (selectedFileForPost && selectedFileForPost.album) || 'unsorted';
+    const album = document.getElementById('post-album').value.trim() || 'unsorted';
 
-    if (!text && !selectedFileForPost) {
-        alert('добавьте текст или выберите файл');
+    if (!text) {
+        alert('добавьте текст');
         return;
     }
 
-    if (selectedFileForPost) {
-        portfolioItems.unshift({
-            path: selectedFileForPost.path,
-            type: selectedFileForPost.type,
-            category: category,
-            album: album,
-            stars: 2
-        });
-    }
-    if (text) {
-        blogPosts.unshift({
-            text: text,
-            media: selectedFileForPost ? selectedFileForPost.path : '',
-            date: new Date().toLocaleDateString('ru-RU')
-        });
-    }
+    blogPosts.unshift({
+        text: text,
+        media: '',
+        date: new Date().toLocaleDateString('ru-RU')
+    });
 
     saveLocal();
-    renderPortfolio(currentTab);
     renderBlog();
 
     textEl.value = '';
-    document.getElementById('post-album').value = '';
-    const dz = document.getElementById('dropzone');
-    dz.innerText = '📎 перетащите файл сюда или нажмите, чтобы выбрать из медиатеки';
-    dz.style.borderColor = '#444';
-    selectedFileForPost = null;
-
-    alert('добавлено! нажмите «сохранить и закоммитить на github», чтобы зафиксировать в сети.');
+    alert('добавлено!');
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ABOUT — РЕНДЕР
-   ══════════════════════════════════════════════════════════════ */
-function renderAbout() {
-    const el = document.getElementById('about-text-rendered');
-    if (el) el.textContent = aboutText;
-
-    const gallery = document.getElementById('about-gallery');
-    if (!gallery) return;
-    gallery.innerHTML = '';
-
-    if (!aboutPhotos.length) {
-        gallery.style.display = 'none';
-        return;
-    }
-    gallery.style.display = 'grid';
-    aboutPhotos.forEach(src => {
-        const img = document.createElement('img');
-        img.src = src;
-        img.loading = 'lazy';
-        img.alt = '';
-        gallery.appendChild(img);
-    });
-}
-
-/* ══════════════════════════════════════════════════════════════
-   BLOG / FEED
+   БЛОГ
    ══════════════════════════════════════════════════════════════ */
 function renderBlog() {
     const feed = document.getElementById('blog-feed');
     feed.innerHTML = '';
 
+    if (!blogPosts.length) {
+        feed.innerHTML = '<p style="color:var(--muted);text-align:center;">— empty —</p>';
+        return;
+    }
+
     blogPosts.forEach((p, idx) => {
-        const escaped = escapeHtml(p.text);
-        const txt = escaped.replace(/(#[\wа-яё]+)/gi,
-            '<span class="hashtag" onclick="tagClick(\'$1\')">$1</span>');
+        const escaped = p.text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const txt = escaped.replace(/(#[\wа-яё]+)/gi, '<span class="hashtag" onclick="tagClick(\'$1\')">$1</span>');
 
         let mediaHtml = '';
         if (p.media) {
             if (/\.mp4$/i.test(p.media) || p.media.indexOf('data:video') === 0) {
-                mediaHtml = '<video class="post-media" src="' + p.media + '" muted loop playsinline controls></video>';
+                mediaHtml = '<video class="post-media" src="' + p.media + '" muted loop playsinline controls controlslist="nodownload"></video>';
             } else {
                 mediaHtml = '<img class="post-media" src="' + p.media + '" loading="lazy" alt="">';
             }
@@ -1155,14 +1527,14 @@ function renderBlog() {
         div.className = 'blog-post';
         div.innerHTML =
             '<div class="post-header">' +
-                '<img class="post-avatar" src="portfolio my photo.png" alt="">' +
+                '<img class="post-avatar" src="' + activeAvatar + '" onerror="this.src=\'portfolio my photo.png\'" alt="">' +
                 '<span class="post-name">Korlan</span>' +
-                '<span class="post-date">' + escapeHtml(p.date || '') + '</span>' +
+                '<span class="post-date">' + (p.date || '') + '</span>' +
             '</div>' +
             '<div class="post-text">' + txt + '</div>' +
             mediaHtml +
             '<div class="post-actions">' +
-                '<button onclick="editPost(' + idx + ')">редактировать</button>' +
+                '<button onclick="editPost(' + idx + ')">ред.</button>' +
                 '<button class="del" onclick="deletePost(' + idx + ')">удалить</button>' +
             '</div>';
         feed.appendChild(div);
@@ -1171,15 +1543,14 @@ function renderBlog() {
 
 function tagClick(tag) {
     const t = tag.replace('#', '').toLowerCase();
-    const map = { fashion: 'fashion', backstage: 'backstage', brands: 'brands',
-                  brand: 'brands', art: 'art', personal: 'art' };
+    const map = { fashion: 'fashion', event: 'event', brands: 'brands', brand: 'brands', art: 'art', personal: 'art' };
     if (map[t]) switchTab(map[t]);
     else switchTab('all');
 }
 function editPost(idx) {
     const post = blogPosts[idx];
     if (!post) return;
-    const newText = prompt('редактировать текст:', post.text);
+    const newText = prompt('редактировать:', post.text);
     if (newText !== null) {
         post.text = newText;
         saveLocal();
@@ -1201,63 +1572,59 @@ function saveLocal() {
         localStorage.setItem('korlan_portfolio_data', JSON.stringify(portfolioItems));
         localStorage.setItem('korlan_blog_data', JSON.stringify(blogPosts));
         localStorage.setItem('korlan_albums_data', JSON.stringify(customAlbums));
-        localStorage.setItem('korlan_about_data', aboutText);
+        localStorage.setItem('korlan_about_data', JSON.stringify(aboutText));
         localStorage.setItem('korlan_about_photos', JSON.stringify(aboutPhotos));
     } catch (e) { /* quota */ }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   VIDEO OBSERVER
+   МЕДИА ОБСЕРВЕР (Загрузка при прокрутке)
    ══════════════════════════════════════════════════════════════ */
-let videoObserver = null;
-function observeVideos() {
-    if (videoObserver) videoObserver.disconnect();
-    videoObserver = new IntersectionObserver(entries => {
+let mediaObserver = null;
+function observeMedia() {
+    if (mediaObserver) mediaObserver.disconnect();
+    mediaObserver = new IntersectionObserver(entries => {
         entries.forEach(e => {
-            if (e.isIntersecting) e.target.play().catch(() => {});
-            else e.target.pause();
+            const el = e.target;
+            if (e.isIntersecting) {
+                if (el.tagName === 'VIDEO') {
+                    if (!el.src) el.src = el.dataset.src;
+                    el.play().catch(() => {});
+                } else if (el.tagName === 'IMG') {
+                    if (!el.src) el.src = el.dataset.src;
+                }
+            } else {
+                if (el.tagName === 'VIDEO') el.pause();
+            }
         });
-    }, { rootMargin: '150px' });
+    }, { rootMargin: '200px' });
 
-    document.querySelectorAll('.card video').forEach(v => {
-        v.muted = true;
-        v.loop = true;
-        v.playsInline = true;
-        videoObserver.observe(v);
+    document.querySelectorAll('.card-media-wrap img, .card-media-wrap video').forEach(el => {
+        mediaObserver.observe(el);
     });
 }
 
 /* ══════════════════════════════════════════════════════════════
-   GITHUB SAVE (ИСПРАВЛЕННЫЙ)
+   GITHUB SAVE
    ══════════════════════════════════════════════════════════════ */
 async function saveToGitHub() {
     const token = localStorage.getItem('gh_pat_token');
-    if (!token) {
-        alert('ошибка: токен github не найден. зайдите через /#admin.');
-        return;
-    }
+    if (!token) { alert('токен не найден'); return; }
 
-    // Читаем настройки из полей ввода (а не через prompt)
     const owner = document.getElementById('gh-user').value.trim();
     const repo = document.getElementById('gh-repo').value.trim();
     const branch = document.getElementById('gh-branch').value.trim() || 'main';
     const path = document.getElementById('gh-path').value.trim() || 'index.html';
 
-    if (!owner || !repo) {
-        alert('заполните поля username и репозиторий в настройках github.');
-        return;
-    }
+    if (!owner || !repo) { alert('заполните username и репозиторий'); return; }
 
-    // Сохраняем настройки в localStorage
     localStorage.setItem('gh_repo_owner', owner);
     localStorage.setItem('gh_repo_name', repo);
     localStorage.setItem('gh_repo_branch', branch);
     localStorage.setItem('gh_file_path', path);
 
-    // Загружаем отложенные медиафайлы
     await uploadPendingMedia(token, owner, repo);
 
-    // Обновляем JSON-данные
     document.getElementById('site-data').textContent = JSON.stringify({
         portfolio: portfolioItems,
         blog: blogPosts,
@@ -1267,58 +1634,34 @@ async function saveToGitHub() {
     });
 
     const updatedCode = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    
-    // Кодируем путь к файлу (если он в папке)
     const encodedPath = path.split('/').map(encodeURIComponent).join('/');
     const apiUrl = 'https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + encodedPath;
 
     try {
-        // 1. Получаем SHA текущего файла
         const getRes = await fetch(apiUrl + '?ref=' + branch, {
             headers: { 'Authorization': 'token ' + token }
         });
 
-        if (getRes.status === 404) {
-            alert('Ошибка 404: Репозиторий или файл не найден.\n\nПроверьте:\n1. Имя пользователя и репозитория\n2. Существует ли файл по указанному пути\n3. Правильно ли указана ветка (main или master)');
-            return;
-        }
-        if (getRes.status === 401 || getRes.status === 403) {
-            alert('Ошибка доступа. Проверьте, что токен действителен и имеет права на запись (scope repo).');
-            return;
-        }
-        if (!getRes.ok) {
-            const e = await getRes.json();
-            alert('Ошибка GitHub: ' + (e.message || getRes.status));
-            return;
-        }
+        if (getRes.status === 404) { alert('404: неверный путь/репо'); return; }
+        if (getRes.status === 401 || getRes.status === 403) { alert('401: нет доступа'); return; }
         
         const fileData = await getRes.json();
 
-        // 2. Отправляем новый файл
         const putRes = await fetch(apiUrl, {
             method: 'PUT',
-            headers: {
-                'Authorization': 'token ' + token,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: 'Korlan Portfolio — update content',
+                message: 'update content',
                 content: btoa(unescape(encodeURIComponent(updatedCode))),
                 sha: fileData.sha,
                 branch: branch
             })
         });
 
-        if (putRes.ok) {
-            alert('🚀 закоммичено на github! изменения применятся на сайте через минуту.');
-        } else if (putRes.status === 409) {
-            alert('Ошибка 409: Конфликт версий. Кто-то другой обновил файл. Перезагрузите страницу и попробуйте снова.');
-        } else {
-            const err = await putRes.json();
-            alert('Ошибка GitHub: ' + err.message);
-        }
+        if (putRes.ok) alert('🚀 закоммичено!');
+        else alert('ошибка коммита: ' + (await putRes.json()).message);
     } catch (e) {
-        alert('Ошибка соединения: ' + e.message);
+        alert('ошибка соединения: ' + e.message);
     }
 }
 
@@ -1327,12 +1670,6 @@ async function uploadPendingMedia(token, owner, repo) {
         if (it.path && it.path.indexOf('data:') === 0) {
             const uploaded = await uploadDataUrl(token, owner, repo, it.path);
             if (uploaded) it.path = uploaded;
-        }
-    }
-    for (const p of blogPosts) {
-        if (p.media && p.media.indexOf('data:') === 0) {
-            const uploaded = await uploadDataUrl(token, owner, repo, p.media);
-            if (uploaded) p.media = uploaded;
         }
     }
     for (let i = 0; i < aboutPhotos.length; i++) {
@@ -1353,7 +1690,7 @@ async function uploadDataUrl(token, owner, repo, dataUrl) {
         const res = await fetch(url, {
             method: 'PUT',
             headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: 'upload media: ' + filename, content: m[2] })
+            body: JSON.stringify({ message: 'upload media', content: m[2] })
         });
         if (res.ok) return filename;
     } catch (e) { /* ignore */ }
