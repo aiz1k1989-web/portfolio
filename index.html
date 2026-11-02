@@ -59,18 +59,22 @@
         position: absolute; top: 50px; right: 0;
         z-index: 100;
     }
+    .lang-switch-container::after { content: ''; position: absolute; left: -12px; right: -12px; top: 100%; height: 14px; }
+    .lang-switch-container:focus-within .lang-dropdown { display: flex; }
+    .lang-switch-container.open .lang-dropdown { display: flex; }
     .lang-trigger {
+        background:none; border:0; padding:0; font-family:inherit;
         font-size: 0.75rem; color: var(--muted); cursor: pointer;
         text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500;
     }
     .lang-trigger:hover { color: #fff; }
     .lang-dropdown {
-        display: none; position: absolute; right: 0; top: 100%;
+        display: none; position: absolute; right: 0; top: calc(100% + 10px);
         background: #111; border: 1px solid #333; border-radius: 6px;
-        padding: 8px; flex-direction: column; gap: 4px; margin-top: 8px;
+        padding: 8px; flex-direction: column; gap: 4px; margin-top: 0;
         min-width: 70px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-    .lang-switch-container:hover .lang-dropdown { display: flex; }
+    @media (hover: hover) and (pointer: fine) { .lang-switch-container:hover .lang-dropdown { display: flex; } }
     .lang-btn {
         background: none; border: none; color: var(--muted);
         cursor: pointer; font-size: 0.75rem; text-align: left;
@@ -140,6 +144,22 @@
         padding: 14px; border-radius: 8px; font-family: inherit; font-size: 0.9rem;
         resize: vertical; min-height: 80px; line-height: 1.5;
     }
+    .brand-accordion { border-bottom:1px solid var(--border); }
+    .brand-accordion-title,.campaign-title { display:flex; align-items:center; justify-content:space-between; gap:16px; list-style:none; cursor:pointer; }
+    .brand-accordion-title::-webkit-details-marker,.campaign-title::-webkit-details-marker { display:none; }
+    .brand-accordion-title { padding:20px 4px; font-size:clamp(1rem,2.8vw,1.35rem); letter-spacing:-0.025em; }
+    .brand-accordion-title::before { content:'+'; color:var(--muted); margin-right:8px; }
+    .brand-accordion[open] > .brand-accordion-title::before { content:'−'; }
+    .brand-accordion-title > span:first-of-type { margin-right:auto; }
+    .brand-accordion-count { color:var(--muted); font-size:0.72rem; font-weight:400; letter-spacing:0.03em; }
+    .brand-campaigns { padding:0 0 22px 16px; }
+    .campaign-accordion { border-top:1px solid var(--border); }
+    .campaign-title { padding:14px 4px; font-size:0.88rem; color:var(--muted); }
+    .campaign-title::before { content:'↳'; color:var(--muted); margin-right:6px; }
+    .campaign-title > span:first-of-type { margin-right:auto; }
+    .campaign-accordion > .portfolio-grid { padding-bottom:24px; }
+    @media (max-width:680px) { .brand-accordion-title { padding:17px 2px; } .brand-campaigns { padding-left:8px; } .campaign-title { font-size:0.82rem; } }
+
     .category-checkboxes { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; padding:8px 10px; border:1px solid var(--border); border-radius:6px; }
     .category-checkboxes label { display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:var(--text); cursor:pointer; white-space:nowrap; }
     .category-checkboxes input { accent-color:#64b5f6; }
@@ -255,6 +275,10 @@
     }
     .about-section.active { display: block; }
     .about-content { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
+    .about-section { padding-top: 18px; }
+    .about-avatar { box-shadow: 0 0 0 8px rgba(255,255,255,0.025); }
+    .about-text-rendered { max-width: 620px; font-weight: 300; letter-spacing: 0.005em; }
+    @media (max-width: 680px) { .about-content { gap: 24px; align-items: flex-start; } .about-avatar { width:112px; height:112px; } .about-text-rendered { min-width:0; width:100%; font-size:0.98rem; line-height:1.85; } .lang-switch-container { top:18px; right:4px; } .brand-main { margin-top:22px; margin-bottom:28px; } }
     .about-avatar {
         width: 160px; height: 160px; border-radius: 50%;
         object-fit: cover; flex-shrink: 0;
@@ -426,9 +450,9 @@
 </script>
 
 <header>
-    <div class="lang-switch-container">
-        <div class="lang-trigger" id="current-lang-label">EN</div>
-        <div class="lang-dropdown">
+    <div class="lang-switch-container" id="lang-switch-container">
+        <button type="button" class="lang-trigger" id="current-lang-label" aria-haspopup="true" aria-expanded="false" onclick="toggleLangMenu(event)">EN</button>
+        <div class="lang-dropdown" id="lang-dropdown">
             <button class="lang-btn" onclick="setLang('en')" data-lang="en">EN</button>
             <button class="lang-btn" onclick="setLang('ru')" data-lang="ru">RU</button>
             <button class="lang-btn" onclick="setLang('kz')" data-lang="kz">KZ</button>
@@ -644,7 +668,23 @@ const i18n = {
 
 let currentLang = localStorage.getItem('korlan_lang') || 'en';
 
+function toggleLangMenu(event) {
+    if (event) event.stopPropagation();
+    const wrap = document.getElementById('lang-switch-container');
+    const trigger = document.getElementById('current-lang-label');
+    const open = wrap.classList.toggle('open');
+    trigger.setAttribute('aria-expanded', String(open));
+}
+document.addEventListener('click', event => {
+    const wrap = document.getElementById('lang-switch-container');
+    if (wrap && !wrap.contains(event.target)) {
+        wrap.classList.remove('open');
+        document.getElementById('current-lang-label').setAttribute('aria-expanded', 'false');
+    }
+});
 function setLang(lang) {
+    const wrap = document.getElementById('lang-switch-container');
+    if (wrap) { wrap.classList.remove('open'); document.getElementById('current-lang-label').setAttribute('aria-expanded', 'false'); }
     currentLang = lang;
     localStorage.setItem('korlan_lang', lang);
     document.getElementById('current-lang-label').textContent = lang.toUpperCase();
@@ -872,14 +912,18 @@ let portfolioItems = [];
 let blogPosts = [];
 let customAlbums = [];
 let aboutText = {
-    en: 'photographer and videographer with 3 years of experience.\n\nteach DaVinci Resolve and CapCut masterclasses.\nprivate photoshoots — write me.\n\ncontacts: @kkkorlan',
-    ru: 'фотограф и видеограф с трехлетним опытом.\n\nпреподаю мастер-классы по DaVinci Resolve и CapCut.\nпровожу частные фотосессии, пишите.\n\nконтакты: @kkkorlan',
-    kz: 'үш жылдық тәжірибесі бар фотограф және бейнеоператор.\n\nDaVinci Resolve және CapCut бойынша мастер-класстар өткіземін.\nжеке фотосессиялар, жазыңыз.\n\nбайланыс: @kkkorlan',
-    vi: 'nhiếp ảnh gia và quay phim với 3 năm kinh nghiệm.\n\ngiảng dạy masterclass DaVinci Resolve và CapCut.\nchụp ảnh cá nhân, hãy viết cho tôi.\n\nliên hệ: @kkkorlan'
+    en: 'I am Korlan, a photographer and videographer drawn to people, quiet moments, and the little details that make a story feel personal.\n\nAvailable for creative projects, brand collaborations, and private photoshoots.\n\nSay hello: @kkkorlan',
+    ru: 'Я Кори, фотограф и видеограф. Люблю живые эмоции, тихие моменты и детали, из которых складывается история.\n\nОткрыта к творческим проектам, сотрудничеству с брендами и индивидуальным фотосессиям.\n\nБуду рада знакомству: @kkkorlan',
+    kz: 'Мен Кори, фотограф және видеографпын. Адамдардың шынайы эмоцияларын, тыныш сәттерді және оқиғаны ерекше ететін ұсақ бөлшектерді жақсы көремін.\n\nШығармашылық жобаларға, брендтермен ынтымақтастыққа және жеке фотосессияларға ашықпын.\n\nХабарласыңыз: @kkkorlan',
+    vi: 'Mình là Korlan, nhiếp ảnh gia và nhà quay phim. Mình yêu những cảm xúc chân thật, khoảnh khắc nhẹ nhàng và các chi tiết nhỏ tạo nên câu chuyện riêng.\n\nMình luôn sẵn sàng cho các dự án sáng tạo, hợp tác cùng thương hiệu và chụp ảnh cá nhân.\n\nRất vui được kết nối: @kkkorlan'
 };
 let aboutPhotos = [];
 let renderedItems = [];
 let currentTab = 'all';
+let allFeedItems = [];
+let allFeedIndex = 0;
+let allFeedObserver = null;
+const ALL_BATCH_SIZE = 24;
 let mediaPickerMode = 'post';
 let pickerSelection = [];
 let lastPickerIdx = -1;
@@ -1090,25 +1134,34 @@ function shuffle(arr) {
    ══════════════════════════════════════════════════════════════ */
 function renderPortfolio(tab) {
     const main = document.getElementById('portfolio-main');
+    if (allFeedObserver) { allFeedObserver.disconnect(); allFeedObserver = null; }
     main.innerHTML = '';
     renderedItems = [];
-
     if (tab === 'all') {
-        const items = buildAllFeed(portfolioItems);
-        const grid = document.createElement('div');
-        grid.className = 'portfolio-grid';
-        grid.style.maxWidth = '1600px';
-        grid.style.margin = '0 auto';
-        items.forEach(item => {
-            const idx = renderedItems.length;
-            renderedItems.push(item);
-            grid.appendChild(makeCard(item, idx));
-        });
-        main.appendChild(grid);
-    } else {
-        renderSectionWithAlbums(main, tab);
-    }
+        allFeedItems = buildAllFeed(portfolioItems);
+        allFeedIndex = 0;
+        const grid = document.createElement('div'); grid.className = 'portfolio-grid'; grid.id = 'all-feed-grid';
+        grid.style.maxWidth = '1600px'; grid.style.margin = '0 auto'; main.appendChild(grid);
+        const sentinel = document.createElement('div'); sentinel.id = 'all-feed-sentinel'; sentinel.style.cssText = 'height:1px;width:100%;'; main.appendChild(sentinel);
+        loadMoreAll();
+        if ('IntersectionObserver' in window) {
+            allFeedObserver = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) loadMoreAll(); }, { rootMargin:'900px 0px' });
+            allFeedObserver.observe(sentinel);
+        }
+    } else renderSectionWithAlbums(main, tab);
     observeMedia();
+}
+function loadMoreAll() {
+    const grid = document.getElementById('all-feed-grid');
+    if (!grid || allFeedIndex >= allFeedItems.length) return;
+    const fragment = document.createDocumentFragment();
+    const stop = Math.min(allFeedIndex + ALL_BATCH_SIZE, allFeedItems.length);
+    for (; allFeedIndex < stop; allFeedIndex++) {
+        const item = allFeedItems[allFeedIndex], idx = renderedItems.length;
+        renderedItems.push(item); fragment.appendChild(makeCard(item, idx));
+    }
+    grid.appendChild(fragment); observeMedia();
+    if (allFeedIndex >= allFeedItems.length && allFeedObserver) { allFeedObserver.disconnect(); allFeedObserver = null; const sentinel=document.getElementById('all-feed-sentinel'); if(sentinel) sentinel.remove(); }
 }
 
 function renderSectionWithAlbums(container, section) {
@@ -1126,68 +1179,25 @@ function renderSectionWithAlbums(container, section) {
     if (section === 'brands') {
         const brands = new Map();
         items.forEach(item => {
-            const parts = (item.album || 'other').split(' / ');
-            const brand = parts.shift() || 'other';
-            const subAlbum = parts.join(' / ');
-            if (!brands.has(brand)) brands.set(brand, new Map());
-            const albums = brands.get(brand);
-            const key = subAlbum || '';
-            if (!albums.has(key)) albums.set(key, []);
-            albums.get(key).push(item);
+            const parts=(item.album||'other').split(' / '), brand=(parts.shift()||'other').trim(), campaign=parts.join(' / ').trim()||'Other';
+            if(!brands.has(brand)) brands.set(brand,new Map()); if(!brands.get(brand).has(campaign)) brands.get(brand).set(campaign,[]); brands.get(brand).get(campaign).push(item);
         });
-        customAlbums.filter(a => a.section === section).forEach(a => {
-            const parts = (a.name || 'other').split(' / ');
-            const brand = parts.shift() || 'other';
-            const sub = parts.join(' / ');
-            if (!brands.has(brand)) brands.set(brand, new Map());
-            if (!brands.get(brand).has(sub)) brands.get(brand).set(sub, []);
-        });
-        if (!brands.size) {
-            const msg = document.createElement('p');
-            msg.style.cssText = 'color:var(--muted);text-align:center;padding:60px 20px;font-size:0.85rem;';
-            msg.textContent = i18n[currentLang].empty_section;
-            container.appendChild(msg);
-            return;
-        }
-        brands.forEach((albums, brand) => {
-            const brandSection = document.createElement('div');
-            brandSection.className = 'album-section';
-            const brandTitle = document.createElement('div');
-            brandTitle.className = 'album-title';
-            const brandText = document.createElement('span');
-            brandText.textContent = brand;
-            brandTitle.appendChild(brandText);
-            brandSection.appendChild(brandTitle);
-            const hasSubAlbums = [...albums.keys()].some(k => k !== '');
-            albums.forEach((list, albumName) => {
-                if (albumName) {
-                    const subTitle = document.createElement('div');
-                    subTitle.className = 'album-title';
-                    subTitle.style.marginLeft = '14px';
-                    subTitle.style.letterSpacing = '0.08em';
-                    const subText = document.createElement('span');
-                    subText.textContent = albumName;
-                    subTitle.appendChild(subText);
-                    if (document.body.classList.contains('admin-mode')) {
-                        const delBtn = document.createElement('button');
-                        delBtn.className = 'album-del-btn';
-                        delBtn.textContent = '✕ ' + i18n[currentLang].btn_delete_album;
-                        delBtn.onclick = () => deleteAlbum(section, brand + ' / ' + albumName);
-                        subTitle.appendChild(delBtn);
-                    }
-                    brandSection.appendChild(subTitle);
-                }
-                if (list.length) brandSection.appendChild(makeGrid(list));
-                else if (document.body.classList.contains('admin-mode') && !hasSubAlbums) {
-                    const empty = document.createElement('div');
-                    empty.style.cssText = 'color:var(--muted);font-size:0.75rem;padding:8px 0 18px;';
-                    empty.textContent = 'empty album';
-                    brandSection.appendChild(empty);
-                }
-            });
-            container.appendChild(brandSection);
-        });
-        return;
+        customAlbums.filter(a=>a.section===section).forEach(a=>{const parts=(a.name||'other').split(' / '),brand=(parts.shift()||'other').trim(),campaign=parts.join(' / ').trim()||'Other';if(!brands.has(brand))brands.set(brand,new Map());if(!brands.get(brand).has(campaign))brands.get(brand).set(campaign,[]);});
+        [...brands.keys()].sort((a,b)=>a.localeCompare(b)).forEach(brand=>{
+            const details=document.createElement('details');details.className='brand-accordion';
+            const summary=document.createElement('summary');summary.className='brand-accordion-title';
+            const name=document.createElement('span');name.textContent=brand;
+            const count=[...brands.get(brand).values()].reduce((n,list)=>n+list.length,0);
+            const meta=document.createElement('span');meta.className='brand-accordion-count';meta.textContent=count+(count===1?' work':' works');summary.append(name,meta);details.appendChild(summary);
+            const campaigns=document.createElement('div');campaigns.className='brand-campaigns';let built=false;
+            details.addEventListener('toggle',()=>{if(!details.open||built)return;built=true;
+                [...brands.get(brand).keys()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).forEach(campaign=>{
+                    const albumDetails=document.createElement('details');albumDetails.className='campaign-accordion';const albumSummary=document.createElement('summary');albumSummary.className='campaign-title';
+                    const albumName=document.createElement('span');albumName.textContent=campaign;const albumItems=brands.get(brand).get(campaign);const albumCount=document.createElement('span');albumCount.className='brand-accordion-count';albumCount.textContent=String(albumItems.length);albumSummary.append(albumName,albumCount);albumDetails.appendChild(albumSummary);let albumBuilt=false;
+                    albumDetails.addEventListener('toggle',()=>{if(!albumDetails.open||albumBuilt)return;albumBuilt=true;const grid=document.createElement('div');grid.className='portfolio-grid';albumItems.forEach(item=>{const idx=renderedItems.length;renderedItems.push(item);grid.appendChild(makeCard(item,idx));});albumDetails.appendChild(grid);observeMedia();});campaigns.appendChild(albumDetails);
+                });details.appendChild(campaigns);
+            });container.appendChild(details);
+        });return;
     }
     const albums = {};
     items.forEach(it => {
@@ -1814,7 +1824,7 @@ function observeMedia() {
             if (e.isIntersecting) {
                 if (el.tagName === 'VIDEO') {
                     if (!el.src && el.dataset.src) el.src = el.dataset.src;
-                    el.play().catch(() => {});
+                    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) el.play().catch(() => {});
                 } else if (el.tagName === 'IMG') {
                     if (!el.src && el.dataset.src) el.src = el.dataset.src;
                 }
