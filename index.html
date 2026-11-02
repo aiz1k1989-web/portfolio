@@ -1,18 +1,49 @@
+Конечно! Полностью обновленный `index.html` готов.
+
+### Что было переработано по вашему запросу:
+
+1. **Галерея и весь объем медиафайлов**: Возвращена и полностью раскрыта вся ваша богатая медиатека — все папки (`Fashion`, `Brands`, `Backstage`, `Art`) с полной структурой файлов бренда `@titre_3`, `@atelierbar.almaty`, снимков Қорлан и ваших личных артов. Больше ничего не ужимается!
+2. **Строгий минималистичный дизайн**:
+* Темный, модный портфолио-стиль для фотографов и видеомейкеров.
+* Шрифт **Helvetica Neue** с выверенной типографикой.
+* Просторные сетки без тесноты и тормозов при воспроизведении видео.
+
+
+3. **Оригинальные пропорции фото (`object-fit: contain` / Masonry-style)**:
+* Карточки больше **не обрезаются и не кадрируются принудительно** в одинаковые квадраты! Измерения и пропорции ваших ориганальных снимков (вертикальные 3:4, 9:16, горизонтальные 16:9) сохраняются полностью.
+
+
+4. **Звездочки рейтинга**:
+* Полностью **убраны с публичной страницы** портфолио!
+* Звездочки видны **только внутри админки** для удобства сортировки и присвоения приоритетов.
+
+
+5. **Секретный вход через `/admin**`:
+* Убрана кнопка/иконка входа из шапки сайта.
+* Админка вызывается командной строкой в URL: просто добавьте к адресу сайта `/#admin` или `/?admin` (например, `[yoursite.com/#admin](https://yoursite.com/#admin)`), либо введите токен прямо в консоль.
+
+
+
+---
+
+### Полный код `index.html` для сохранения в GitHub:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korlan // Portfolio & Feed</title>
-    <!-- Sortable.js для перетаскивания -->
+    <title>Korlan // Portfolio</title>
+    <!-- Sortable.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --bg: #0a0a0a;
-            --card-bg: #141414;
-            --border: #222;
-            --text: #f0f0f2;
-            --muted: #888;
+            --bg: #080808;
+            --card-bg: #121212;
+            --border: #1f1f1f;
+            --text: #f5f5f7;
+            --muted: #777;
             --accent: #fff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,16 +51,17 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            line-height: 1.5;
-            padding: 40px 20px;
+            line-height: 1.4;
+            padding: 50px 24px;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Шапка и Профиль Korlan */
         header {
-            max-width: 1400px;
-            margin: 0 auto 40px auto;
+            max-width: 1600px;
+            margin: 0 auto 50px auto;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 28px;
+            padding-bottom: 30px;
         }
         .profile-container {
             display: flex;
@@ -37,44 +69,34 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
-            margin-bottom: 28px;
+            margin-bottom: 35px;
         }
         .profile-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
         }
         .avatar {
-            width: 76px;
-            height: 76px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--border);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            filter: grayscale(20%);
         }
         .profile-info h1 {
-            font-size: 1.35rem;
+            font-size: 1.5rem;
             font-weight: 500;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
         }
         .profile-info p {
             color: var(--muted);
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-top: 3px;
-        }
-        .admin-login-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
             font-size: 0.8rem;
-            transition: 0.2s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
         }
-        .admin-login-btn:hover { border-color: var(--accent); color: var(--accent); }
 
         /* Навигация */
         .nav-bar {
@@ -86,34 +108,34 @@
         }
         .nav-tabs {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
         .tab-btn {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--muted);
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.85rem;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
         }
         .tab-btn:hover, .tab-btn.active {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.03);
         }
 
-        /* Панель администратора */
+        /* Скрытая панель администратора (вызывается по /admin) */
         .admin-panel {
             display: none;
-            background: #121212;
+            background: #111;
             border: 1px solid #333;
             padding: 24px;
             border-radius: 12px;
-            max-width: 1400px;
-            margin: 0 auto 35px auto;
+            max-width: 1600px;
+            margin: 0 auto 40px auto;
             gap: 18px;
             flex-direction: column;
         }
@@ -125,7 +147,7 @@
         }
         .post-creator textarea {
             width: 100%;
-            background: #1a1a1a;
+            background: #181818;
             border: 1px solid var(--border);
             color: #fff;
             padding: 14px;
@@ -136,7 +158,7 @@
         }
         .creator-controls {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -144,7 +166,7 @@
             background: #fff;
             color: #000;
             border: none;
-            padding: 9px 18px;
+            padding: 10px 20px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
@@ -164,41 +186,44 @@
             border-radius: 8px;
             color: var(--muted);
             cursor: pointer;
-            background: #161616;
+            background: #141414;
             transition: 0.2s;
         }
         .dropzone.dragover { border-color: #fff; background: #222; color: #fff; }
 
-        /* Сетка портфолио (Свободный просторный дизайн без солянки) */
+        /* Сетка портфолио с сохранением пропорций оригинальных фото */
         .portfolio-grid {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 40px;
+            columns: 3 360px;
+            column-gap: 32px;
         }
         .card {
             background: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             position: relative;
             border: 1px solid var(--border);
-            transition: transform 0.2s;
+            margin-bottom: 32px;
+            break-inside: avoid;
+            transition: border-color 0.3s ease;
         }
+        .card:hover { border-color: #333; }
         .card img, .card video {
             width: 100%;
-            height: 480px;
-            object-fit: cover;
+            height: auto;
             display: block;
+            object-fit: contain; /* Сохраняет оригинальные пропорции */
         }
         .card-meta {
-            padding: 16px 20px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .stars { color: #fbc02d; font-size: 0.95rem; letter-spacing: 2px; }
-        .tag-badge { font-size: 0.75rem; color: var(--muted); background: #1c1c1c; padding: 4px 10px; border-radius: 4px; }
+        .tag-badge { font-size: 0.75rem; color: var(--muted); background: #181818; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; }
+        .admin-stars { display: none; color: #fbc02d; font-size: 0.85rem; }
+        body.admin-mode .admin-stars { display: inline-block; }
         
         .del-card-btn {
             position: absolute;
@@ -207,56 +232,55 @@
             background: rgba(0,0,0,0.85);
             color: #fff;
             border: none;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            font-size: 16px;
         }
         body.admin-mode .del-card-btn { display: flex; }
 
-        /* Блог Лента */
+        /* Блог / Feed */
         .blog-feed {
             max-width: 800px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 32px;
         }
         .blog-post {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 26px;
+            padding: 28px;
         }
         .blog-text { font-size: 0.95rem; margin-bottom: 15px; white-space: pre-wrap; }
         .hashtag { color: #64b5f6; cursor: pointer; }
         .hashtag:hover { text-decoration: underline; }
 
-        /* Блок About Me */
+        /* About Me */
         .about-section {
             max-width: 800px;
             margin: 0 auto 40px auto;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            padding: 34px;
+            padding: 36px;
             border-radius: 12px;
             display: none;
         }
         .about-section.active { display: block; }
-        .about-content { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
-        .about-content img { width: 190px; height: 240px; object-fit: cover; border-radius: 8px; }
+        .about-content { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+        .about-content img { width: 200px; height: auto; border-radius: 8px; object-fit: contain; }
 
-        /* Модалка по папкам */
+        /* Модалка с папками медиатеки */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.88);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -265,7 +289,7 @@
         .modal-content {
             background: #141414;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             max-height: 85vh;
             border-radius: 12px;
             display: flex;
@@ -274,12 +298,12 @@
             overflow: hidden;
         }
         .modal-header { padding: 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-        .folder-group h4 { margin-bottom: 12px; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+        .modal-body { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 28px; }
+        .folder-group h4 { margin-bottom: 14px; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
         .picker-item { background: #1a1a1a; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #222; transition: 0.2s; }
         .picker-item:hover { border-color: #fff; }
-        .picker-item img, .picker-item video { width: 100%; height: 120px; object-fit: cover; }
+        .picker-item img, .picker-item video { width: 100%; height: 130px; object-fit: cover; }
 
         .sortable-ghost { opacity: 0.3; }
     </style>
@@ -289,13 +313,12 @@
     <header>
         <div class="profile-container">
             <div class="profile-left">
-                <img src="04_Art_And_Personal/2026-10-10_14-02-37_UTC_18.jpg" class="avatar" alt="Korlan">
+                <img src="03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg" class="avatar" alt="Korlan">
                 <div class="profile-info">
                     <h1>Korlan</h1>
                     <p>Commercial & Fashion Production</p>
                 </div>
             </div>
-            <button class="admin-login-btn" onclick="toggleAdmin()">🔐 Войти / Админ</button>
         </div>
 
         <div class="nav-bar">
@@ -305,62 +328,62 @@
                 <button class="tab-btn" onclick="switchTab('backstage', this)">Backstage</button>
                 <button class="tab-btn" onclick="switchTab('brands', this)">Brands</button>
                 <button class="tab-btn" onclick="switchTab('art', this)">Art & Personal</button>
-                <button class="tab-btn" onclick="switchTab('blog', this)">Блог / Feed</button>
-                <button class="tab-btn" onclick="switchTab('about', this)">About Me</button>
+                <button class="tab-btn" onclick="switchTab('blog', this)">Feed</button>
+                <button class="tab-btn" onclick="switchTab('about', this)">About</button>
             </nav>
         </div>
     </header>
 
-    <!-- Админ Панель -->
-    <div class="admin-panel">
-        <h3>⚡ Управление контентом (Прямой коммит в GitHub)</h3>
+    <!-- Скрытая админ-панель -->
+    <div class="admin-panel" id="admin-panel">
+        <h3>⚡ Администратор (Прямой коммит в GitHub)</h3>
         <div class="post-creator">
-            <textarea id="post-text" placeholder="Напишите пост, добавьте хэштеги (#fashion #brand #art)..."></textarea>
+            <textarea id="post-text" placeholder="Текст нового поста, хэштеги (#fashion #brand)..."></textarea>
             <div class="dropzone" id="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="openMediaLibrary()">
-                📎 Перетащите файлы сюда (Drag & Drop) или кликните для выбора из папок
+                📎 Перетащите файлы сюда (Drag & Drop) или нажми для выбора из полных папок медиатеки
             </div>
             <div class="creator-controls">
                 <select id="post-category" class="btn secondary">
                     <option value="art">Art & Personal</option>
+                    <option value="brands">Brands</option>
                     <option value="fashion">Fashion</option>
                     <option value="backstage">Backstage</option>
-                    <option value="brands">Brands</option>
                 </select>
                 <select id="post-stars" class="btn secondary">
-                    <option value="★★★★★">★★★★★ (ТОП)</option>
+                    <option value="★★★★★">★★★★★ (Приоритет)</option>
                     <option value="★★★★☆">★★★★☆</option>
                     <option value="★★★☆☆">★★★☆☆</option>
                 </select>
-                <button class="btn" onclick="publishPost()">+ Добавить в ленту</button>
+                <button class="btn" onclick="publishPost()">+ Добавить</button>
                 <button class="btn save-gh" onclick="saveToGitHub()">💾 Сохранить и закоммитить на GitHub</button>
-                <button class="btn danger" onclick="logoutAdmin()" style="margin-left: auto;">Выйти</button>
+                <button class="btn danger" onclick="logoutAdmin()" style="margin-left: auto;">Выйти из админки</button>
             </div>
         </div>
     </div>
 
-    <!-- About Me -->
+    <!-- About Section -->
     <section class="about-section" id="about-section">
         <div class="about-content">
             <img src="03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg" alt="Korlan">
             <div>
                 <h2 style="font-weight: 500; margin-bottom: 12px;">Korlan</h2>
-                <p style="color: var(--muted); margin-bottom: 16px;">Коммерческая и fashion-съемка, видеопроизводство, визуальный сторителлинг, работы с локальными и международными брендами.</p>
-                <p style="font-size: 0.85rem; color: #888;">Связь и коллаборации: @kkkorlan</p>
+                <p style="color: var(--muted); margin-bottom: 16px;">Коммерческое и арт-видеопроизводство, fashion-съемки, стилистическая работа с брендами и визуальные истории.</p>
+                <p style="font-size: 0.85rem; color: #888;">Контакты & Коллаборации: @kkkorlan</p>
             </div>
         </div>
     </section>
 
-    <!-- Сетка портфолио -->
+    <!-- Основная сетка портфолио -->
     <main class="portfolio-grid" id="portfolio-grid"></main>
 
-    <!-- Лента Блога -->
+    <!-- Лента блога -->
     <div class="blog-feed" id="blog-feed" style="display: none;"></div>
 
-    <!-- Модалка выбора по папкам -->
+    <!-- Модалка с полной галереей по папкам -->
     <div class="modal" id="media-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Медиатека по папкам</h3>
+                <h3>Полная медиатека брендов и проектов</h3>
                 <button class="btn secondary" onclick="closeMediaLibrary()">Закрыть</button>
             </div>
             <div class="modal-body" id="folder-picker-body"></div>
@@ -368,7 +391,7 @@
     </div>
 
     <script>
-        // Структурированная медиатека по папкам бренда и арта
+        // Раскрытая и полная медиатека со всеми медиафайлами
         const FOLDERS = {
             "Art & Personal": [
                 {"path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
@@ -376,11 +399,31 @@
                 {"path": "04_Art_And_Personal/2026-07-04_06-33-31_UTC.mp4", "type": "video", "category": "art", "stars": "★★★★★"},
                 {"path": "04_Art_And_Personal/2026-10-25_15-33-01_UTC.mp4", "type": "video", "category": "art", "stars": "★★★★☆"}
             ],
-            "Brands & Collaborations": [
+            "Brands & Collaborations (@titre_3)": [
                 {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_18.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
                 {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2025-12-22_17-12-46_UTC_1.jpg", "type": "image", "category": "brands", "stars": "★★★★★"},
                 {"path": "03_Brand_Collaborations/@titre_3/2026-05-10_13-06-23_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"},
-                {"path": "03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"}
+                {"path": "03_Brand_Collaborations/@titre_3/2026-05-10_16-19-22_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_10.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_12.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_16.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_2.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_13.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_8.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_17.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_7.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_14.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_11.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_5.mp4", "type": "video", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_3.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_9.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_4.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_6.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_15.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"},
+                {"path": "03_Brand_Collaborations/@titre_3/Titre backstage/2026-10-10_14-02-37_UTC_1.jpg", "type": "image", "category": "brands", "stars": "★★★☆☆"}
+            ],
+            "Brands (@atelierbar.almaty)": [
+                {"path": "03_Brand_Collaborations/@atelierbar.almaty/2025-10-24_11-37-51_UTC.mp4", "type": "video", "category": "brands", "stars": "★★★★☆"}
             ],
             "Fashion & Commercial": [
                 {"path": "03_Brand_Collaborations/@titre_3/2026-08-13_10-48-24_UTC.mp4", "type": "video", "category": "fashion", "stars": "★★★★★"}
@@ -390,7 +433,6 @@
             ]
         };
 
-        // Зафиксированные главные посты
         let portfolioItems = [
             {"path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
             {"path": "01_Main_Fashion_Commercial/Video by kkkorlan [DIJQLXFIGu1].mp4", "type": "video", "category": "art", "stars": "★★★★★"},
@@ -418,38 +460,30 @@
             renderBlog();
             renderMediaPickerFolders();
 
+            // Команда входа через /admin в URL (например: сайт.com/#admin или ?admin)
             const params = new URLSearchParams(window.location.search);
-            if (localStorage.getItem('gh_pat_token') || params.has('admin') || window.location.hash === '#admin') {
-                let token = localStorage.getItem('gh_pat_token');
-                if (!token) {
-                    token = prompt("Введите GitHub Personal Access Token (ghp_...):");
-                    if (token) localStorage.setItem('gh_pat_token', token.trim());
-                }
-                if (localStorage.getItem('gh_pat_token')) {
-                    document.body.classList.add('admin-mode');
-                    initSortable();
-                }
+            if (params.has('admin') || window.location.hash === '#admin') {
+                checkAdminToken();
             }
         });
 
-        function toggleAdmin() {
+        function checkAdminToken() {
             let token = localStorage.getItem('gh_pat_token');
             if (!token) {
-                token = prompt("Введите ваш личный GitHub Token (ghp_...):");
-                if (token && token.trim() !== "") {
-                    localStorage.setItem('gh_pat_token', token.trim());
-                    document.body.classList.add('admin-mode');
-                    initSortable();
-                }
-            } else {
-                logoutAdmin();
+                token = prompt("🔒 Команда /admin принята. Введите GitHub Personal Access Token (ghp_...):");
+                if (token) localStorage.setItem('gh_pat_token', token.trim());
+            }
+            if (localStorage.getItem('gh_pat_token')) {
+                document.body.classList.add('admin-mode');
+                initSortable();
             }
         }
 
         function logoutAdmin() {
             localStorage.removeItem('gh_pat_token');
             document.body.classList.remove('admin-mode');
-            alert("🔒 Вышли из панели админа.");
+            window.location.hash = '';
+            alert("🔒 Вы вышли из админки.");
         }
 
         function switchTab(tab, btnEl) {
@@ -470,7 +504,7 @@
             } else if (tab === 'about') {
                 about.classList.add('active');
             } else {
-                grid.style.display = 'grid';
+                grid.style.display = 'block'; // Для Masonry-сетки
                 renderPortfolio(tab);
             }
         }
@@ -484,7 +518,7 @@
             if (filter !== 'all') {
                 itemsToDisplay = itemsToDisplay.filter(item => item.category === filter);
             } else {
-                // Алгоритм ленты ALL: Первые 6 одинаковые (ТОП), далее с 7-го поста идут рандомные по 2-3 из папки
+                // Алгоритм ленты ALL: Первые 6 карточек точечный выбор, далее подмешиваются случайные по 2-3
                 if (itemsToDisplay.length > 6) {
                     let topPart = itemsToDisplay.slice(0, 6);
                     let restPart = itemsToDisplay.slice(6).sort(() => Math.random() - 0.5);
@@ -506,7 +540,7 @@
                     ${mediaEl}
                     <div class="card-meta">
                         <span class="tag-badge">#${item.category}</span>
-                        <span class="stars">${item.stars}</span>
+                        <span class="admin-stars">${item.stars}</span>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -625,11 +659,11 @@
             renderPortfolio(currentTab);
             
             document.getElementById('post-text').value = '';
-            document.getElementById('dropzone').innerText = "📎 Перетащите файлы сюда или кликните для выбора из папок";
+            document.getElementById('dropzone').innerText = "📎 Перетащите файлы сюда или кликните для выбора из полных папок медиатеки";
             document.getElementById('dropzone').style.borderColor = '#444';
             selectedFileForPost = null;
 
-            alert("Добавлено! Нажмите «Сохранить на GitHub», чтобы изменения закоммитились на сайт.");
+            alert("Добавлено! Нажмите «Сохранить и закоммитить на GitHub», чтобы зафиксировать в сети.");
         }
 
         function renderBlog() {
@@ -637,7 +671,7 @@
             feed.innerHTML = '';
             blogPosts.forEach(p => {
                 let txt = p.text.replace(/(#\w+)/g, '<span class="hashtag">$1</span>');
-                let media = p.media ? `<img src="${p.media}" style="width:100%; max-height:420px; object-fit:cover; border-radius:8px; margin-top:14px;">` : '';
+                let media = p.media ? `<img src="${p.media}" style="width:100%; height:auto; object-fit:contain; border-radius:8px; margin-top:14px;">` : '';
                 let div = document.createElement('div');
                 div.className = 'blog-post';
                 div.innerHTML = `<div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">${p.date}</div><div class="blog-text">${txt}</div>${media}`;
@@ -650,16 +684,16 @@
             localStorage.setItem('korlan_blog_data', JSON.stringify(blogPosts));
         }
 
-        // Сохранение изменений коммитом через GitHub API
+        // Сохранение прямо в GitHub через API
         async function saveToGitHub() {
             const token = localStorage.getItem('gh_pat_token');
             if (!token) {
-                alert("Токен GitHub не найден. Нажмите 'Войти / Админ'.");
+                alert("Ошибка: токен GitHub не найден. Зайдите через команду /admin.");
                 return;
             }
 
-            const repoOwner = prompt("Введите имя владельца репозитория (username):");
-            const repoName = prompt("Введите имя репозитория (repository name):");
+            const repoOwner = prompt("Имя пользователя GitHub (username):");
+            const repoName = prompt("Имя репозитория (repository name):");
             if (!repoOwner || !repoName) return;
 
             try {
@@ -679,22 +713,24 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: "Korlan Portfolio Update",
+                        message: "Korlan Portfolio GitHub Commit",
                         content: btoa(unescape(encodeURIComponent(updatedCode))),
                         sha: fileData.sha
                     })
                 });
 
                 if (putRes.ok) {
-                    alert("🚀 Успешно закоммичено на GitHub! Через пару минут сайт обновится.");
+                    alert("🚀 Закоммичено на GitHub! Изменения применятся на сайте.");
                 } else {
                     const err = await putRes.json();
-                    alert("Ошибка: " + err.message);
+                    alert("Ошибка GitHub: " + err.message);
                 }
             } catch (e) {
-                alert("Ошибка подключения: " + e.message);
+                alert("Ошибка соединения: " + e.message);
             }
         }
     </script>
 </body>
 </html>
+
+```
