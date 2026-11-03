@@ -434,6 +434,45 @@
     @media (max-width: 620px) {
         .lb-content { max-width: 100vw; }
     }
+    .mobile-home-intro { display:none; }
+    @media(max-width:680px) {
+        body { padding:0 15px; }
+        header { padding:34px 0 20px; min-height:0; }
+        .brand-main { margin:12px 0 24px; }
+        .brand-main h1 { font-size:clamp(3rem,15vw,4.4rem); letter-spacing:-.075em; }
+        .brand-main span { margin-top:9px; font-size:.68rem; letter-spacing:.28em; }
+        .lang-switch-container { top:12px; right:0; }
+        .lang-trigger { font-size:.72rem; padding:8px 4px; }
+        .nav-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; width:100%; min-height:0; }
+        .tab-btn { min-width:0; min-height:42px; padding:9px 5px; font-size:.78rem; border-radius:3px; white-space:normal; }
+        main { padding:18px 0 42px; }
+        .mobile-home-intro { display:grid; grid-template-columns:minmax(112px, .82fr) 1.18fr; gap:16px; align-items:center; padding:12px 0 24px; margin-bottom:22px; border-bottom:1px solid var(--border); }
+        .mobile-home-intro > img { width:100%; aspect-ratio:4/5; height:auto; object-fit:cover; border-radius:2px; }
+        .mobile-home-copy { min-width:0; }
+        .mobile-home-kicker { display:block; color:var(--muted); font-size:.54rem; letter-spacing:.12em; line-height:1.5; margin-bottom:10px; }
+        .mobile-home-copy h2 { font-size:clamp(1.55rem,7vw,2.1rem); line-height:1; letter-spacing:-.06em; font-weight:500; margin-bottom:10px; }
+        .mobile-home-copy p { color:#b9b9b9; font-size:.76rem; line-height:1.55; margin-bottom:14px; }
+        .mobile-home-copy button { display:inline-flex; align-items:center; gap:10px; background:#f5f5f7; color:#080808; border:0; padding:10px 12px; font:inherit; font-size:.72rem; border-radius:2px; }
+        .mobile-home-copy button span { font-size:1rem; }
+        .all-empty { margin:34px auto 48px; padding:0 12px; }
+        .portfolio-grid { columns:2 140px; column-gap:12px; }
+        .card { margin-bottom:17px; }
+        .album-section { margin-bottom:32px; }
+        .album-title { margin-bottom:14px; }
+        .blog-feed { width:100%; }
+        .blog-post { padding-bottom:22px; }
+        .brand-mosaic { columns:2 140px; column-gap:10px; }
+        .brand-mosaic .card { margin-bottom:14px; }
+        footer { padding-left:0; padding-right:0; }
+    }
+    @media(max-width:390px) {
+        body { padding:0 12px; }
+        .mobile-home-intro { grid-template-columns:108px minmax(0,1fr); gap:12px; }
+        .mobile-home-kicker { font-size:.49rem; }
+        .mobile-home-copy p { font-size:.72rem; }
+        .tab-btn { font-size:.72rem; }
+    }
+
     /* Editorial layout: original aspect ratios, zoom in place. */
     .card.is-zoomed { position:relative; z-index:20; }
     .card.is-zoomed img, .card.is-zoomed video { transform:scale(1.32) !important; transition:transform .22s ease; box-shadow:0 12px 50px rgba(0,0,0,.65); }
@@ -583,6 +622,15 @@
 
 <!-- Основной контент -->
 <main>
+    <section class="mobile-home-intro" id="mobile-home-intro">
+        <img src="portfolio my photo.png" alt="Korlan" loading="eager" decoding="async">
+        <div class="mobile-home-copy">
+            <span class="mobile-home-kicker">PHOTOGRAPHER · FILMMAKER · CENTRAL ASIA</span>
+            <h2>Hi, I'm Korlan.</h2>
+            <p>Photographer, videographer, director and model. Collecting stories, faces and moments along the way.</p>
+            <button type="button" onclick="switchTab('fashion')">Explore my work <span>↗</span></button>
+        </div>
+    </section>
     <section class="about-section" id="about-section">
         <div class="about-content">
             <img class="about-avatar" id="about-avatar-img" src="portfolio my photo.png" alt="avatar">
@@ -1181,6 +1229,8 @@ function switchTab(tab, btnEl) {
     const main = document.getElementById('portfolio-main');
     const feed = document.getElementById('blog-feed');
     const about = document.getElementById('about-section');
+    const mobileIntro = document.getElementById('mobile-home-intro');
+    if (mobileIntro) mobileIntro.style.display = (tab === 'blog' || tab === 'about') ? 'none' : '';
 
     main.style.display = 'none';
     feed.style.display = 'none';
