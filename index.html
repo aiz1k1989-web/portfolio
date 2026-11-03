@@ -1408,14 +1408,6 @@ function makeCard(item, idx) {
     return card;
 }
 
-function setRating(idx, rating) {
-    const item = renderedItems[idx];
-    if (!item) return;
-    const real = portfolioItems.indexOf(item);
-    if (real > -1) portfolioItems[real].stars = rating;
-    saveLocal();
-    renderPortfolio(currentTab);
-}
 function deleteCard(idx) {
     const item = renderedItems[idx];
     if (!item) return;
