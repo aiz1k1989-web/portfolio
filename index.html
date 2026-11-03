@@ -1363,6 +1363,11 @@ function makeCard(item, idx) {
     card.onclick = (e) => {
         if (e.target.closest('.del-card-btn') || e.target.closest('.all-feature-btn')) return;
         card.classList.toggle('is-zoomed');
+        const video = card.querySelector('video');
+        if (video) {
+            if (!video.src && video.dataset.src) { video.src = video.dataset.src; video.load(); }
+            if (video.paused) video.play().catch(() => {}); else video.pause();
+        }
     };
     card.ondblclick = (e) => { if (!e.target.closest('button')) openLightbox(idx); };
 
