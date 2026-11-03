@@ -420,7 +420,7 @@
     @media(max-width:760px) { .brand-mosaic { columns:1 100%; column-gap:0; max-width:680px; margin:0 auto; } .brand-accordion-title { min-height:210px; } }
 </style>
 </head>
-<body class="admin-mode">
+<body>
 
 <script>
     // Запрет на скачивание и ПКМ
@@ -1801,6 +1801,8 @@ async function saveToGitHub() {
     });
 
     const savedDoc = document.documentElement.cloneNode(true);
+    // Never publish the current browser's admin session into the public HTML.
+    savedDoc.body.classList.remove('admin-mode');
     ['portfolio-main', 'blog-feed', 'folder-picker-body'].forEach(id => {
         const node = savedDoc.querySelector('#' + id);
         if (node) node.innerHTML = '';
