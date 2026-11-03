@@ -977,8 +977,8 @@ let portfolioItems = [];
 let blogPosts = [];
 let customAlbums = [];
 let aboutText = {
-    en: 'I am Korlan, a photographer and videographer drawn to people, quiet moments, and the little details that make a story feel personal.\n\nAvailable for creative projects, brand collaborations, and private photoshoots.\n\nSay hello: @kkkorlan',
-    ru: 'Я Кори, фотограф и видеограф. Люблю живые эмоции, тихие моменты и детали, из которых складывается история.\n\nОткрыта к творческим проектам, сотрудничеству с брендами и индивидуальным фотосессиям.\n\nБуду рада знакомству: @kkkorlan',
+    en: 'Hi, I am Korlan. I am a young photographer, videographer, director and model. I have been doing photography for almost three years, and I genuinely love what I do.\n\nI am currently travelling around Central Asia. Maybe soon I will start sharing blogs and vlogs here too.\n\nSay hello: @kkkorlan',
+    ru: 'Всем привет, меня зовут Корлан.\n\nЯ молодая фотограф, видеограф, режиссер и модель. Занимаюсь фотографией почти три года, и мне действительно нравится моя работа.\n\nСейчас я путешествую по Центральной Азии. Возможно, скоро начну делиться здесь блогами и влогами.\n\nБуду рада знакомству: @kkkorlan',
     kz: 'Мен Кори, фотограф және видеографпын. Адамдардың шынайы эмоцияларын, тыныш сәттерді және оқиғаны ерекше ететін ұсақ бөлшектерді жақсы көремін.\n\nШығармашылық жобаларға, брендтермен ынтымақтастыққа және жеке фотосессияларға ашықпын.\n\nХабарласыңыз: @kkkorlan',
     vi: 'Mình là Korlan, nhiếp ảnh gia và nhà quay phim. Mình yêu những cảm xúc chân thật, khoảnh khắc nhẹ nhàng và các chi tiết nhỏ tạo nên câu chuyện riêng.\n\nMình luôn sẵn sàng cho các dự án sáng tạo, hợp tác cùng thương hiệu và chụp ảnh cá nhân.\n\nRất vui được kết nối: @kkkorlan'
 };
@@ -990,6 +990,7 @@ let allFeedIndex = 0;
 let allFeedObserver = null;
 const ALL_BATCH_SIZE = 12;
 let mediaPickerMode = 'post';
+let pendingPostMedia = '';
 let pickerSelection = [];
 let lastPickerIdx = -1;
 
@@ -1042,7 +1043,7 @@ let activeAvatar = 'portfolio my photo.png';
 })();
 
 // Replace outdated About drafts that mention CapCut classes with the current approved bio.
-if (Object.values(aboutText || {}).some(value => /capcut|masterclass|мастер-класс|мастер-клас/i.test(String(value)))) {
+if (Object.values(aboutText || {}).some(value => /capcut|masterclass|мастер-класс|мастер-клас/i.test(String(value))) || /Я Кори, фотограф и видеограф/.test(String(aboutText.ru || ''))) {
     aboutText = {
         en: 'I am Korlan, a photographer and videographer drawn to people, quiet moments, and the little details that make a story feel personal.\n\nAvailable for creative projects, brand collaborations, and private photoshoots.\n\nSay hello: @kkkorlan',
         ru: 'Я Кори, фотограф и видеограф. Люблю живые эмоции, тихие моменты и детали, из которых складывается история.\n\nОткрыта к творческим проектам, сотрудничеству с брендами и индивидуальным фотосессиям.\n\nБуду рада знакомству: @kkkorlan',
@@ -1208,7 +1209,7 @@ function switchTab(tab, btnEl) {
    ══════════════════════════════════════════════════════════════ */
 function buildAllFeed(items) {
     return items.filter(item => item.featuredAll === true)
-        .sort((a, b) => (a.allOrder || 0) - (b.allOrder || 0));
+        .sort((a, b) => (a.type === 'image' ? 0 : 1) - (b.type === 'image' ? 0 : 1) || (a.allOrder || 0) - (b.allOrder || 0));
 }
 function toggleFeaturedAll(idx) {
     const item = renderedItems[idx];
@@ -1766,6 +1767,15 @@ function confirmPickerSelection() {
         return;
     }
 
+    if (mediaPickerMode === 'post') {
+        const selected = pickerSelection.find(file => file.type === 'image') || pickerSelection[0];
+        pendingPostMedia = selected.path;
+        const zone = document.getElementById('dropzone');
+        if (zone) zone.textContent = 'Selected for blog post: ' + selected.path.split('/').pop();
+        closeMediaLibrary();
+        return;
+    }
+
     const selectedCategories = getSelectedCategories();
     if (!selectedCategories.length) return alert('select at least one section');
 
@@ -1848,14 +1858,14 @@ function publishPost() {
     const textEl = document.getElementById('post-text');
     const text = textEl.value.trim();
 
-    if (!text) {
-        alert('add text');
+    if (!text && !pendingPostMedia) {
+        alert('add a caption or choose a photo');
         return;
     }
 
     blogPosts.unshift({
         text: text,
-        media: '',
+        media: pendingPostMedia || '',
         date: new Date().toLocaleDateString('ru-RU')
     });
 
@@ -1863,6 +1873,9 @@ function publishPost() {
     renderBlog();
 
     textEl.value = '';
+    pendingPostMedia = '';
+    const dropzone = document.getElementById('dropzone');
+    if (dropzone) dropzone.textContent = i18n[currentLang].dropzone;
     alert('published!');
 }
 
@@ -2089,7 +2102,7 @@ window.openSplat = async function() {
       cameraUp: [0, -1, 0],
       initialCameraPosition: [0, 0, 5],
       initialCameraLookAt: [0, 0, 0],
-      sharedMemoryForWorkers: false,
+      sharedMemoryForWorkers: window.crossOriginIsolated && typeof SharedArrayBuffer !== 'undefined',
       ignoreDevicePixelRatio: window.innerWidth < 768,
       useBuiltInControls: true,
       gpuAcceleratedSort: false,
