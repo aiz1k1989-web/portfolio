@@ -266,10 +266,6 @@
     }
     body.admin-mode .card-meta { opacity: 1; }
     
-    .card-stars { display: inline-flex; gap: 2px; font-size: 1rem; user-select: none; margin-left: auto;}
-    .card-stars .star { cursor: pointer; color: #2a2a2a; transition: color 0.15s; }
-    .card-stars .star.filled { color: #fbc02d; }
-    .card-stars .star:hover { color: #ffd54f; }
 
     .del-card-btn {
         position: absolute; top: 14px; right: 14px;
@@ -440,7 +436,7 @@
     }
     /* Editorial layout: original aspect ratios, zoom in place. */
     .card.is-zoomed { position:relative; z-index:20; }
-    .card.is-zoomed img, .card.is-zoomed video { transform:scale(1.32); transition:transform .22s ease; box-shadow:0 12px 50px rgba(0,0,0,.65); }
+    .card.is-zoomed img, .card.is-zoomed video { transform:scale(1.32) !important; transition:transform .22s ease; box-shadow:0 12px 50px rgba(0,0,0,.65); }
     .brand-accordion { margin:0 0 24px; border:0; }
     .brand-accordion-title { position:relative; min-height:clamp(190px,26vw,360px); padding:0; overflow:hidden; border:1px solid #252525; background:#111; display:flex; align-items:flex-end; }
     .brand-accordion-title::before { display:none; }
@@ -961,11 +957,9 @@ const DEFAULT_PORTFOLIO = REPO_MEDIA_FILES.map(def => {
     const categories = def.categories.slice();
     const item = {
         path: def.path, type: def.type, category: def.category, categories,
-        album: def.album, stars: meta.stars || 2, hashtags: [...new Set(categories.map(categoryHashtag))],
+        album: def.album, hashtags: [...new Set(categories.map(categoryHashtag))],
         scale: 1, x: 0, y: 0
     };
-    if (ART_OVERRIDES.has(item.path)) item.stars = 5;
-    if (FAV_PHOTOS.has(item.path)) item.stars = 5;
     if (meta.hashtags && meta.hashtags.length) item.hashtags = [...new Set(item.hashtags.concat(meta.hashtags))];
     return item;
 });
@@ -1045,8 +1039,8 @@ let activeAvatar = 'portfolio my photo.png';
 // Replace outdated About drafts that mention CapCut classes with the current approved bio.
 if (Object.values(aboutText || {}).some(value => /capcut|masterclass|мастер-класс|мастер-клас/i.test(String(value))) || /Я Кори, фотограф и видеограф/.test(String(aboutText.ru || ''))) {
     aboutText = {
-        en: 'I am Korlan, a photographer and videographer drawn to people, quiet moments, and the little details that make a story feel personal.\n\nAvailable for creative projects, brand collaborations, and private photoshoots.\n\nSay hello: @kkkorlan',
-        ru: 'Я Кори, фотограф и видеограф. Люблю живые эмоции, тихие моменты и детали, из которых складывается история.\n\nОткрыта к творческим проектам, сотрудничеству с брендами и индивидуальным фотосессиям.\n\nБуду рада знакомству: @kkkorlan',
+        en: 'Hi, I am Korlan. I am a young photographer, videographer, director and model. I have been doing photography for almost three years, and I genuinely love what I do.\n\nI am currently travelling around Central Asia. Maybe soon I will start sharing blogs and vlogs here too.\n\nSay hello: @kkkorlan',
+        ru: 'Всем привет, меня зовут Корлан.\n\nЯ молодая фотограф, видеограф, режиссер и модель. Занимаюсь фотографией почти три года, и мне действительно нравится моя работа.\n\nСейчас я путешествую по Центральной Азии. Возможно, скоро начну делиться здесь блогами и влогами.\n\nБуду рада знакомству: @kkkorlan',
         kz: 'Мен Кори, фотограф және видеографпын. Адамдардың шынайы эмоцияларын, тыныш сәттерді және оқиғаны ерекше ететін ұсақ бөлшектерді жақсы көремін.\n\nШығармашылық жобаларға, брендтермен ынтымақтастыққа және жеке фотосессияларға ашықпын.\n\nХабарласыңыз: @kkkorlan',
         vi: 'Mình là Korlan, nhiếp ảnh gia và nhà quay phim. Mình yêu những cảm xúc chân thật, khoảnh khắc nhẹ nhàng và các chi tiết nhỏ tạo nên câu chuyện riêng.\n\nMình luôn sẵn sàng cho các dự án sáng tạo, hợp tác cùng thương hiệu và chụp ảnh cá nhân.\n\nRất vui được kết nối: @kkkorlan'
     };
@@ -1889,7 +1883,7 @@ function renderBlog() {
     }
 
     blogPosts.forEach((p, idx) => {
-        const escaped = p.text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const escaped = (p.text || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const txt = escaped.replace(/(#[\wа-яё]+)/gi, '<span class="hashtag" onclick="tagClick(\'$1\')">$1</span>');
 
         let mediaHtml = '';
@@ -2103,9 +2097,9 @@ window.openSplat = async function() {
       initialCameraPosition: [0, 0, 5],
       initialCameraLookAt: [0, 0, 0],
       sharedMemoryForWorkers: window.crossOriginIsolated && typeof SharedArrayBuffer !== 'undefined',
-      ignoreDevicePixelRatio: window.innerWidth < 768,
+      ignoreDevicePixelRatio: true,
       useBuiltInControls: true,
-      gpuAcceleratedSort: false,
+      gpuAcceleratedSort: true,
       sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant
     });
     await splatViewer.addSplatScene(splatFileUrl, {
