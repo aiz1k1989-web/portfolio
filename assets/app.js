@@ -388,6 +388,10 @@ let activeAvatar = 'portfolio my photo.png';
     }
 })();
  
+// Exclude portraits that do not work well in the circular About avatar.
+const EXCLUDED_ABOUT_PHOTOS = new Set(['me1.webp', 'me3.jpg', 'me5.jpg']);
+aboutPhotos = aboutPhotos.filter(photo => !EXCLUDED_ABOUT_PHOTOS.has(String(photo || '').split('/').pop().toLowerCase()));
+
 // Keep the Tisou brand selection consistent even when an older browser draft exists.
 const TISOU11_KEEP = new Set([
     '03_Brand_Collaborations/@tisou.official/11/2025-07-15_05-27-27_UTC_1.jpg',
@@ -643,7 +647,9 @@ function loadMoreAll() {
 }
 
 function renderSectionWithAlbums(container, section) {
-    const items = portfolioItems.filter(i => itemHasCategory(i, section)).sort((a,b) => (a.type === 'image' ? 0 : 1) - (b.type === 'image' ? 0 : 1));
+    const sortVideosFirst = (a, b) => Number(b.type === 'video') - Number(a.type === 'video');
+    const items = portfolioItems.filter(i => itemHasCategory(i, section));
+    if (section === 'fashion' || section === 'brands') items.sort(sortVideosFirst);
     const makeGrid = list => {
         const grid = document.createElement('div');
         grid.className = 'portfolio-grid';
@@ -655,37 +661,76 @@ function renderSectionWithAlbums(container, section) {
         return grid;
     };
     if (section === 'brands') {
-        const brands = new Map([
-            ['@aimaq_kz', new Map()], ['@aqqu.cafe', new Map()],
-            ['@atelierbar.almaty', new Map()], ['@chocolatebeautysalon', new Map()],
-            ['@fujifilmkazakhstan', new Map()], ['@vfwalmaty', new Map()], ['Mardan', new Map()],
-            ['@offbeatkz', new Map()], ['@thesix.kz', new Map()],
-            ['@tisou.official', new Map()], ['@titre_3', new Map()]
-        ]);
-        brands.forEach(campaigns => campaigns.set('Main campaign', []));
+        const brands = new Map();
         items.forEach(item => {
-            const parts=(item.album||'other').split(' / '), brand=(parts.shift()||'other').trim(), campaign=parts.join(' / ').trim()||'Main campaign';
-            if(!brands.has(brand)) brands.set(brand,new Map()); if(!brands.get(brand).has(campaign)) brands.get(brand).set(campaign,[]); brands.get(brand).get(campaign).push(item);
+            const parts = (item.album || 'other').split(' / ');
+            const brand = (parts.shift() || 'other').trim();
+            if (!brands.has(brand)) brands.set(brand, []);
+            brands.get(brand).push(item);
         });
-        customAlbums.filter(a=>a.section===section).forEach(a=>{const parts=(a.name||'other').split(' / '),brand=(parts.shift()||'other').trim(),campaign=parts.join(' / ').trim()||'Other';if(!brands.has(brand))brands.set(brand,new Map());if(!brands.get(brand).has(campaign))brands.get(brand).set(campaign,[]);});
-        [...brands.keys()].sort((a,b)=>a.localeCompare(b)).forEach(brand=>{
-            const details=document.createElement('details');details.className='brand-accordion';
-            const summary=document.createElement('summary');summary.className='brand-accordion-title';
-            const brandItems=[...brands.get(brand).values()].flat();
-            const coverItem=brandItems.find(item=>item.type==='image') || brandItems[0];
-            if(coverItem){const cover=document.createElement('img');cover.className='brand-cover';cover.src=coverItem.path;cover.loading='lazy';cover.decoding='async';cover.alt='';summary.appendChild(cover);}
-            const name=document.createElement('span');name.textContent=brand;
-            const count=[...brands.get(brand).values()].reduce((n,list)=>n+list.length,0);
-            const meta=document.createElement('span');meta.className='brand-accordion-count';meta.textContent=count+(count===1?' work':' works');summary.append(name,meta);details.appendChild(summary);
-            const campaigns=document.createElement('div');campaigns.className='brand-campaigns';let built=false;
-            details.addEventListener('toggle',()=>{if(!details.open||built)return;built=true;
-                [...brands.get(brand).keys()].filter(campaign => campaign !== 'Main campaign' || brands.get(brand).get(campaign).length || brands.get(brand).size === 1).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).forEach(campaign=>{
-                    const albumDetails=document.createElement('details');albumDetails.className='campaign-accordion';const albumSummary=document.createElement('summary');albumSummary.className='campaign-title';
-                    const albumName=document.createElement('span');albumName.textContent=campaign;const albumItems=brands.get(brand).get(campaign);const albumCount=document.createElement('span');albumCount.className='brand-accordion-count';albumCount.textContent=String(albumItems.length);albumSummary.append(albumName,albumCount);albumDetails.appendChild(albumSummary);let albumBuilt=false;
-                    albumDetails.addEventListener('toggle',()=>{if(!albumDetails.open||albumBuilt)return;albumBuilt=true;const grid=document.createElement('div');grid.className='portfolio-grid brand-mosaic';albumItems.sort((a,b)=>(a.type==='image'?0:1)-(b.type==='image'?0:1)).forEach(item=>{const idx=renderedItems.length;renderedItems.push(item);grid.appendChild(makeCard(item,idx));});albumDetails.appendChild(grid);observeMedia();});campaigns.appendChild(albumDetails);
-                });details.appendChild(campaigns);
-            });container.appendChild(details);
-        });return;
+        customAlbums.filter(album => album.section === section).forEach(album => {
+            const parts = (album.name || 'other').split(' / ');
+            const brand = (parts.shift() || 'other').trim();
+            if (!brands.has(brand)) brands.set(brand, []);
+        });
+
+        const brandGrid = document.createElement('div');
+        brandGrid.className = 'brands-index-grid';
+        container.appendChild(brandGrid);
+
+        const brandNames = [...brands.keys()].sort((a, b) => {
+            const aTisou = a.toLowerCase() === '@tisou.official';
+            const bTisou = b.toLowerCase() === '@tisou.official';
+            if (aTisou !== bTisou) return aTisou ? 1 : -1;
+            const aVideos = brands.get(a).filter(item => item.type === 'video').length;
+            const bVideos = brands.get(b).filter(item => item.type === 'video').length;
+            if (aVideos !== bVideos) return bVideos - aVideos;
+            return a.localeCompare(b);
+        });
+
+        brandNames.forEach(brand => {
+            const brandItems = brands.get(brand).slice().sort(sortVideosFirst);
+            const details = document.createElement('details');
+            details.className = 'brand-accordion';
+            const summary = document.createElement('summary');
+            summary.className = 'brand-accordion-title';
+
+            const coverItem = brandItems.find(item => item.type === 'image') || brandItems[0];
+            if (coverItem) {
+                const cover = document.createElement('img');
+                cover.className = 'brand-cover';
+                cover.src = encodeMediaPath(coverItem.path);
+                cover.loading = 'lazy';
+                cover.decoding = 'async';
+                cover.alt = '';
+                summary.appendChild(cover);
+            }
+
+            const name = document.createElement('span');
+            name.textContent = brand;
+            const count = document.createElement('span');
+            count.className = 'brand-accordion-count';
+            count.textContent = brandItems.length + (brandItems.length === 1 ? ' work' : ' works');
+            summary.append(name, count);
+            details.appendChild(summary);
+
+            let built = false;
+            details.addEventListener('toggle', () => {
+                if (!details.open || built) return;
+                built = true;
+                const grid = document.createElement('div');
+                grid.className = 'portfolio-grid brand-mosaic';
+                brandItems.forEach(item => {
+                    const index = renderedItems.length;
+                    renderedItems.push(item);
+                    grid.appendChild(makeCard(item, index));
+                });
+                details.appendChild(grid);
+                observeMedia();
+            });
+            brandGrid.appendChild(details);
+        });
+        return;
     }
     const albums = {};
     items.forEach(it => {
@@ -695,7 +740,29 @@ function renderSectionWithAlbums(container, section) {
     customAlbums.filter(a => a.section === section).forEach(a => {
         if (!albums[a.name]) albums[a.name] = [];
     });
-    const albumNames = Object.keys(albums).sort((a,b) => { if (section === 'fashion') { const at = /tisou/i.test(a), bt = /tisou/i.test(b); if (at !== bt) return at ? 1 : -1; } return a.localeCompare(b, undefined, {numeric:true}); });
+    const albumNames = Object.keys(albums).sort((a, b) => {
+        if (section === 'fashion') {
+            const aTisou = a.toLowerCase().startsWith('@tisou.official / ');
+            const bTisou = b.toLowerCase().startsWith('@tisou.official / ');
+            if (aTisou !== bTisou) return aTisou ? 1 : -1;
+            if (aTisou && bTisou) {
+                const priority = ['16', '14', '12', '7', '1'];
+                const aGroup = a.split('/').pop().trim();
+                const bGroup = b.split('/').pop().trim();
+                const aRank = priority.indexOf(aGroup) === -1 ? 99 : priority.indexOf(aGroup);
+                const bRank = priority.indexOf(bGroup) === -1 ? 99 : priority.indexOf(bGroup);
+                if (aRank !== bRank) return aRank - bRank;
+                const aVideos = albums[a].filter(item => item.type === 'video').length;
+                const bVideos = albums[b].filter(item => item.type === 'video').length;
+                if (aVideos !== bVideos) return bVideos - aVideos;
+                return Number(aGroup) - Number(bGroup);
+            }
+            const aVideos = albums[a].filter(item => item.type === 'video').length;
+            const bVideos = albums[b].filter(item => item.type === 'video').length;
+            if (aVideos !== bVideos) return bVideos - aVideos;
+        }
+        return a.localeCompare(b, undefined, {numeric:true});
+    });
     if (!albumNames.length) {
         const msg = document.createElement('p');
         msg.style.cssText = 'color:var(--muted);text-align:center;padding:60px 20px;font-size:0.85rem;';
@@ -743,7 +810,7 @@ function makeCard(item, idx) {
         mediaEl.dataset.src = encodeMediaPath(item.path);
         mediaEl.muted = true; mediaEl.loop = true; mediaEl.playsInline = true; mediaEl.controls = true;
         mediaEl.setAttribute('controlslist', 'nodownload');
-        mediaEl.preload = 'metadata';
+        mediaEl.preload = 'none';
     } else {
         mediaEl = document.createElement('img');
         mediaEl.dataset.src = item.path;
@@ -876,7 +943,7 @@ function renderAbout() {
         gallery.style.display = 'none';
     }
     if (avatar) {
-        const candidates = aboutPhotos.filter(src => /\.(jpe?g|png|webp|avif)$/i.test(src));
+        const candidates = aboutPhotos.filter(src => /\.(jpe?g|png|webp|avif)$/i.test(src) && !EXCLUDED_ABOUT_PHOTOS.has(String(src || '').split('/').pop().toLowerCase()));
         const selected = candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : 'portfolio my photo.png';
         avatar.onerror = () => { avatar.onerror = null; avatar.src = 'portfolio my photo.png'; };
         avatar.src = encodeMediaPath(selected);
@@ -1203,24 +1270,37 @@ function saveLocal() {
 let mediaObserver = null;
 function observeMedia() {
     if (mediaObserver) mediaObserver.disconnect();
-    mediaObserver = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            const el = e.target;
-            if (e.isIntersecting) {
-                if (el.tagName === 'VIDEO') {
-                    if (!el.src && el.dataset.src) { el.src = el.dataset.src; el.load(); }
-                    if (e.intersectionRatio >= 0.55) el.play().catch(() => {});
-                    else el.pause();
-                } else if (el.tagName === 'IMG') {
-                    if (!el.src && el.dataset.src) el.src = el.dataset.src;
-                }
-            } else if (el.tagName === 'VIDEO') el.pause();
-        });
-    }, { threshold: [0, 0.55, 0.8], rootMargin: '80px 0px' });
+    const media = document.querySelectorAll('.card-media-wrap img, .card-media-wrap video');
 
-    document.querySelectorAll('.card-media-wrap img, .card-media-wrap video').forEach(el => {
-        mediaObserver.observe(el);
-    });
+    if (!('IntersectionObserver' in window)) {
+        media.forEach(el => {
+            if (!el.src && el.dataset.src) {
+                el.src = el.dataset.src;
+                if (el.tagName === 'VIDEO') el.load();
+            }
+        });
+        return;
+    }
+
+    mediaObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const el = entry.target;
+            if (entry.isIntersecting) {
+                if (!el.src && el.dataset.src) {
+                    el.src = el.dataset.src;
+                    if (el.tagName === 'VIDEO') el.load();
+                }
+                if (el.tagName === 'VIDEO') {
+                    if (entry.intersectionRatio >= 0.55) el.play().catch(() => {});
+                    else el.pause();
+                }
+            } else if (el.tagName === 'VIDEO') {
+                el.pause();
+            }
+        });
+    }, { threshold: [0, 0.55, 0.8], rootMargin: '180px 0px' });
+
+    media.forEach(el => mediaObserver.observe(el));
 }
 
 /* ══════════════════════════════════════════════════════════════
