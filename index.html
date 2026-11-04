@@ -39,6 +39,7 @@
         <button class="tab-btn" data-tab="brands" onclick="switchTab('brands', this)" data-i18n="tab_brands">brands</button>
         <button class="tab-btn" data-tab="art" onclick="switchTab('art', this)" data-i18n="tab_art">art &amp; personal</button>
         <button class="tab-btn" data-tab="film" onclick="switchTab('film', this)" data-i18n="tab_film">film</button>
+        <button class="tab-btn" data-tab="backstage" onclick="switchTab('backstage', this)" data-i18n="tab_backstage">backstage</button>
         <button class="tab-btn" data-tab="blog" onclick="switchTab('blog', this)" data-i18n="tab_blog">blog</button>
         <button class="tab-btn" data-tab="about" onclick="switchTab('about', this)" data-i18n="tab_about">about</button>
     </nav>
@@ -84,6 +85,8 @@
                     <label><input type="checkbox" value="event"> event</label>
                     <label><input type="checkbox" value="brands"> brands</label>
                     <label><input type="checkbox" value="art"> art &amp; personal</label>
+                    <label><input type="checkbox" value="film"> film</label>
+                    <label><input type="checkbox" value="backstage"> backstage</label>
                 </div>
                 <input id="post-album" data-i18n="placeholder_album" placeholder="album (optional)" __gcruniqueid="7">
                 <button class="btn" onclick="publishPost()" data-i18n="btn_add">+ add</button>
@@ -99,6 +102,8 @@
                 <option value="event" data-i18n="tab_event">event</option>
                 <option value="brands" data-i18n="tab_brands">brands</option>
                 <option value="art" data-i18n="tab_art">art &amp; personal</option>
+                <option value="film" data-i18n="tab_film">film</option>
+                <option value="backstage" data-i18n="tab_backstage">backstage</option>
             </select>
             <input id="album-name" data-i18n="placeholder_album_name" placeholder="album name" __gcruniqueid="9">
             <button class="btn" onclick="createAlbum()" data-i18n="btn_add_album">+ album</button>

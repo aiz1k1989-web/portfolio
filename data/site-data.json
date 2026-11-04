@@ -20,13 +20,14 @@
     {
       "path": "02_Backstage_And_Process/Video by kkkorlan [DPtGmaEiL_z].mp4",
       "type": "video",
-      "category": "art",
+      "category": "backstage",
       "categories": [
-        "art"
+        "backstage"
       ],
-      "album": "backstage & process",
+      "album": "Backstage",
       "hashtags": [
-        "#art"
+        "#art",
+        "#backstage"
       ],
       "scale": 1,
       "x": 0,
@@ -4193,11 +4194,13 @@
       "type": "image",
       "category": "brands",
       "categories": [
-        "brands"
+        "brands",
+        "film"
       ],
       "album": "Mardan",
       "hashtags": [
-        "#brands"
+        "#brands",
+        "#film"
       ],
       "scale": 1,
       "x": 0,
@@ -4274,13 +4277,13 @@
       "stars": 2
     },
     {
-      "path": "03_Brand_Collaborations/@vfwa/Visa photo.jpg",
+      "path": "03_Brand_Collaborations/@vfwalmaty/Visa photo.jpg",
       "type": "image",
       "category": "brands",
       "categories": [
         "brands"
       ],
-      "album": "@fwalmaty",
+      "album": "@vfwalmaty",
       "hashtags": [
         "#brands"
       ],
@@ -4291,13 +4294,13 @@
       "stars": 2
     },
     {
-      "path": "03_Brand_Collaborations/@vfwa/Visa vid.mp4",
+      "path": "03_Brand_Collaborations/@vfwalmaty/Visa vid.mp4",
       "type": "video",
       "category": "brands",
       "categories": [
         "brands"
       ],
-      "album": "@fwalmaty",
+      "album": "@vfwalmaty",
       "hashtags": [
         "#brands"
       ],
@@ -4470,6 +4473,40 @@
       "album": "Film",
       "hashtags": [
         "#film"
+      ],
+      "scale": 1,
+      "x": 0,
+      "y": 0,
+      "featuredAll": false,
+      "stars": 2
+    },
+    {
+      "path": "04_Art_And_Personal/blue hour.mp4",
+      "type": "video",
+      "category": "art",
+      "categories": [
+        "art"
+      ],
+      "album": "Personal",
+      "hashtags": [
+        "#art"
+      ],
+      "scale": 1,
+      "x": 0,
+      "y": 0,
+      "featuredAll": false,
+      "stars": 2
+    },
+    {
+      "path": "02_Backstage_And_Process/backstage_compressed.webm",
+      "type": "video",
+      "category": "backstage",
+      "categories": [
+        "backstage"
+      ],
+      "album": "Backstage",
+      "hashtags": [
+        "#backstage"
       ],
       "scale": 1,
       "x": 0,
