@@ -85,7 +85,37 @@ function renderBrands(){const map=new Map();items.filter(i=>cats(i).includes('br
 function openViewer(i){const box=$('#viewer-media');if(i.type==='video'){box.innerHTML='<video controls autoplay playsinline preload="metadata"></video>';const v=box.querySelector('video');v.src=asset(i.path);v.load();v.play().catch(()=>{})}else box.innerHTML=img(i);$('#viewer-kind').textContent=i.type==='video'?'Moving image':'Photography';$('#viewer-name').textContent=label(i);$('#viewer-date').textContent=date(i);$('#viewer').classList.add('open');document.body.style.overflow='hidden'}
 function closeViewer(){$('#viewer').classList.remove('open');$('#viewer-media').innerHTML='';document.body.style.overflow=''}
 async function loadAboutPhoto(){const image=$('#about-photo');image.src=fallback;try{const r=await fetch('https://api.github.com/repos/aiz1k1989-web/portfolio/contents/me?ref=main',{cache:'no-store'});if(!r.ok)return;const list=await r.json();const photos=list.filter(x=>x.type==='file'&&/\.(jpe?g|png|webp|avif)$/i.test(x.name)&&x.download_url);if(!photos.length)return;const selected=photos[Math.floor(Math.random()*photos.length)];image.onerror=()=>{image.onerror=null;image.src=fallback};image.src=selected.download_url;$('#about-photo-count').textContent='01 / '+String(photos.length).padStart(2,'0')}catch(e){image.src=fallback}}
-async function addNewRepositoryAssets(){try{const r=await fetch('https://api.github.com/repos/aiz1k1989-web/portfolio/git/trees/main?recursive=1',{cache:'no-store'});if(!r.ok)return;const tree=await r.json();const known=new Set(items.map(i=>i.path));for(const f of (tree.tree||[])){if(f.type!=='blob'||!f.path||known.has(f.path))continue;const path=f.path;if(!/\\.(jpe?g|png|webp|avif|gif|mp4|mov|webm)$/i.test(path))continue;if(path.startsWith('uploads/')||path.startsWith('me/')||path==='portfolio my photo.png')continue;if(/^03_Brand_Collaborations\\/@tisou\\.official\\/(10|11)\\//i.test(path))continue;const parts=path.split('/');let categories=['brands'],album='';if(parts[0]==='04_Art_And_Personal'){categories=['art'];album='personal'}else if(parts[0]==='02_Backstage_And_Process'){categories=['art'];album='backstage'}else if(parts[0]==='01_Main_Fashion_Commercial'){categories=['fashion'];album='commercial'}else if(parts[0]==='03_Brand_Collaborations'){const brand=(parts[1]||'brand').replace(/^@/,'');const nested=parts.slice(2,-1);album='@'+brand+(nested.length?' / '+nested.join(' / '):'');if(/fashion/i.test(path))categories=['brands','fashion']}else continue;const type=/\\.(mp4|mov|webm)$/i.test(path)?'video':'image';items.push({path,type,category:categories[0],categories,album,hashtags:categories.map(c=>'#'+c),scale:1,x:0,y:0,featuredAll:false,stars:2});known.add(path)}}catch(e){console.warn('Could not scan new repository media',e)}}
+async function addNewRepositoryAssets(){
+ try{
+  const r=await fetch('https://api.github.com/repos/aiz1k1989-web/portfolio/git/trees/main?recursive=1',{cache:'no-store'});
+  if(!r.ok)return;
+  const tree=await r.json();
+  const known=new Set(items.map(i=>i.path));
+  const imageExt=['jpg','jpeg','png','webp','avif','gif'];
+  const videoExt=['mp4','mov','webm'];
+  for(const f of (tree.tree||[])){
+   if(f.type!=='blob'||!f.path||known.has(f.path))continue;
+   const path=f.path,lower=path.toLowerCase(),ext=lower.split('.').pop();
+   if(!imageExt.includes(ext)&&!videoExt.includes(ext))continue;
+   if(path.startsWith('uploads/')||path.startsWith('me/')||path==='portfolio my photo.png')continue;
+   if(path.startsWith('03_Brand_Collaborations/@tisou.official/10/')||path.startsWith('03_Brand_Collaborations/@tisou.official/11/'))continue;
+   const parts=path.split('/');
+   let categories=['brands'],album='';
+   if(parts[0]==='04_Art_And_Personal'){categories=['art'];album='personal'}
+   else if(parts[0]==='02_Backstage_And_Process'){categories=['art'];album='backstage'}
+   else if(parts[0]==='01_Main_Fashion_Commercial'){categories=['fashion'];album='commercial'}
+   else if(parts[0]==='03_Brand_Collaborations'){
+    const brand=(parts[1]||'brand').replace(/^@/,'');
+    const nested=parts.slice(2,-1);
+    album='@'+brand+(nested.length?' / '+nested.join(' / '):'');
+    if(lower.includes('fashion'))categories=['brands','fashion'];
+   }else continue;
+   const type=videoExt.includes(ext)?'video':'image';
+   items.push({path,type,category:categories[0],categories,album,hashtags:categories.map(c=>'#'+c),scale:1,x:0,y:0,featuredAll:false,stars:2});
+   known.add(path);
+  }
+ }catch(e){console.warn('Could not scan new repository media',e)}
+}
 async function init(){try{const r=await fetch('../data/site-data.json');if(!r.ok)throw Error('Portfolio data is unavailable');const d=await r.json();items=(d.portfolio||[]).filter(i=>i.path);await addNewRepositoryAssets();featured=items.filter(i=>i.featuredAll).sort((a,b)=>(a.allOrder||999)-(b.allOrder||999));if(!featured.length)featured=items.filter(i=>i.type==='image').slice(0,12);archiveItems=items.filter(i=>!featured.includes(i));renderHero();renderGallery();renderArchive();renderBrands();loadAboutPhoto()}catch(e){$('#gallery').innerHTML='<div class="empty">Could not load portfolio data.</div>';console.error(e)}}
 $('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;shown=24;$('#filters').querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));renderGallery()});
 $('#more').addEventListener('click',()=>{shown+=24;renderGallery()});$('#archive-more').addEventListener('click',()=>{archiveShown+=24;renderArchive()});
