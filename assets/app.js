@@ -2,7 +2,7 @@ function whenDomReady(callback) {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', callback, { once: true });
     } else {
-        callback();
+        Promise.resolve().then(callback);
     }
 }
 
