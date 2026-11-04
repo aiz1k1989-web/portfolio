@@ -1,0 +1,1 @@
+Add your portrait images to this folder (JPG, JPEG, PNG, WebP or AVIF). Alternative 3 picks one image at random each time the page is opened. Keep the images directly inside /me so the page can find them.
