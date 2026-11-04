@@ -676,7 +676,10 @@ function renderSectionWithAlbums(container, section) {
 
         const brandGrid = document.createElement('div');
         brandGrid.className = 'brands-index-grid';
-        container.appendChild(brandGrid);
+
+        const expanded = document.createElement('section');
+        expanded.className = 'brand-expanded';
+        expanded.hidden = true;
 
         const brandNames = [...brands.keys()].sort((a, b) => {
             const aTisou = a.toLowerCase() === '@tisou.official';
@@ -688,14 +691,29 @@ function renderSectionWithAlbums(container, section) {
             return a.localeCompare(b);
         });
 
+        let activeBrand = '';
+        let activeTile = null;
+
+        const closeExpanded = () => {
+            expanded.hidden = true;
+            expanded.innerHTML = '';
+            if (activeTile) activeTile.classList.remove('active');
+            activeTile = null;
+            activeBrand = '';
+            renderedItems = [];
+        };
+
         brandNames.forEach(brand => {
             const brandItems = brands.get(brand).slice().sort(sortVideosFirst);
-            const details = document.createElement('details');
-            details.className = 'brand-accordion';
-            const summary = document.createElement('summary');
-            summary.className = 'brand-accordion-title';
+            const tile = document.createElement('button');
+            tile.type = 'button';
+            tile.className = 'brand-tile';
+            tile.setAttribute('aria-expanded', 'false');
 
-            const coverItem = brandItems.find(item => item.type === 'image') || brandItems[0];
+            const coverFrame = document.createElement('span');
+            coverFrame.className = 'brand-tile-media';
+            const coverItem = brandItems.find(item => item.type === 'image');
+
             if (coverItem) {
                 const cover = document.createElement('img');
                 cover.className = 'brand-cover';
@@ -703,36 +721,76 @@ function renderSectionWithAlbums(container, section) {
                 cover.loading = 'lazy';
                 cover.decoding = 'async';
                 cover.alt = '';
-                summary.appendChild(cover);
+                coverFrame.appendChild(cover);
+            } else {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'brand-video-placeholder';
+                placeholder.textContent = 'VIDEO';
+                coverFrame.appendChild(placeholder);
             }
 
+            const caption = document.createElement('span');
+            caption.className = 'brand-tile-caption';
             const name = document.createElement('span');
+            name.className = 'brand-tile-name';
             name.textContent = brand;
             const count = document.createElement('span');
-            count.className = 'brand-accordion-count';
-            count.textContent = brandItems.length + (brandItems.length === 1 ? ' work' : ' works');
-            summary.append(name, count);
-            details.appendChild(summary);
+            count.className = 'brand-tile-count';
+            count.textContent = String(brandItems.length);
+            caption.append(name, count);
+            tile.append(coverFrame, caption);
 
-            let built = false;
-            details.addEventListener('toggle', () => {
-                if (!details.open || built) return;
-                built = true;
-                const grid = document.createElement('div');
-                grid.className = 'portfolio-grid brand-mosaic';
+            tile.addEventListener('click', () => {
+                if (activeBrand === brand) {
+                    closeExpanded();
+                    tile.setAttribute('aria-expanded', 'false');
+                    return;
+                }
+
+                if (activeTile) {
+                    activeTile.classList.remove('active');
+                    activeTile.setAttribute('aria-expanded', 'false');
+                }
+                activeBrand = brand;
+                activeTile = tile;
+                tile.classList.add('active');
+                tile.setAttribute('aria-expanded', 'true');
+
+                expanded.innerHTML = '';
+                expanded.hidden = false;
+
+                const heading = document.createElement('div');
+                heading.className = 'brand-expanded-heading';
+                const title = document.createElement('h2');
+                title.textContent = brand;
+                const close = document.createElement('button');
+                close.type = 'button';
+                close.className = 'brand-expanded-close';
+                close.textContent = 'close';
+                close.addEventListener('click', closeExpanded);
+                heading.append(title, close);
+
+                const mediaGrid = document.createElement('div');
+                mediaGrid.className = 'brand-media-grid';
+                renderedItems = [];
                 brandItems.forEach(item => {
                     const index = renderedItems.length;
                     renderedItems.push(item);
-                    grid.appendChild(makeCard(item, index));
+                    mediaGrid.appendChild(makeCard(item, index));
                 });
-                details.appendChild(grid);
+
+                expanded.append(heading, mediaGrid);
                 observeMedia();
+                expanded.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
-            brandGrid.appendChild(details);
+
+            brandGrid.appendChild(tile);
         });
+
+        container.append(brandGrid, expanded);
         return;
     }
-    const albums = {};
+        const albums = {};
     items.forEach(it => {
         const key = it.album || 'other';
         (albums[key] = albums[key] || []).push(it);
