@@ -457,3 +457,98 @@
         animation-duration: 0.01ms !important;
     }
 }
+
+
+/* Brands index: compact cards with original image proportions. */
+.brands-index-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 18px;
+    align-items: start;
+}
+.brands-index-grid .brand-accordion { min-width: 0; margin: 0; border: 0; }
+.brands-index-grid .brand-accordion-title {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #252525;
+    background: #101010;
+}
+.brands-index-grid .brand-accordion-title::before { display: none; }
+.brands-index-grid .brand-cover {
+    position: static;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 360px;
+    aspect-ratio: auto;
+    object-fit: contain;
+    object-position: center;
+    opacity: 1;
+    background: #090909;
+    transition: opacity .2s ease;
+}
+.brands-index-grid .brand-accordion-title:hover .brand-cover { transform: none; opacity: .88; }
+.brands-index-grid .brand-accordion-title > span:first-of-type {
+    position: static;
+    z-index: auto;
+    margin: 0;
+    padding: 13px 14px 3px;
+    color: #fff;
+    font-size: clamp(.9rem, 1.4vw, 1.15rem);
+    line-height: 1.25;
+    text-shadow: none;
+}
+.brands-index-grid .brand-accordion-count {
+    position: static;
+    display: block;
+    padding: 0 14px 13px;
+    color: #858585;
+    font-size: .72rem;
+    text-shadow: none;
+}
+.brands-index-grid .brand-accordion[open] { grid-column: 1 / -1; }
+.brands-index-grid .brand-accordion[open] > .brand-accordion-title {
+    display: grid;
+    grid-template-columns: minmax(120px, 190px) 1fr;
+    column-gap: 18px;
+    align-items: end;
+}
+.brands-index-grid .brand-accordion[open] .brand-cover {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    max-height: 150px;
+    align-self: start;
+}
+.brands-index-grid .brand-accordion[open] .brand-accordion-title > span:first-of-type { padding: 8px 12px 2px; }
+.brands-index-grid .brand-accordion[open] .brand-accordion-count { padding: 0 12px 8px; }
+.brands-index-grid .brand-mosaic {
+    columns: 3 240px;
+    column-gap: 20px;
+    padding: 20px 0 30px;
+}
+.brands-index-grid .brand-mosaic .card { break-inside: avoid; margin: 0 0 20px; }
+.brands-index-grid .brand-mosaic .card:nth-child(5n+2),
+.brands-index-grid .brand-mosaic .card:nth-child(7n+4) { margin-top: 0; margin-bottom: 20px; }
+@media (max-width: 760px) {
+    .brands-index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 10px; }
+    .brands-index-grid .brand-cover { max-height: 250px; }
+    .brands-index-grid .brand-accordion[open] > .brand-accordion-title {
+        grid-template-columns: minmax(90px, 130px) 1fr;
+        column-gap: 12px;
+    }
+    .brands-index-grid .brand-accordion[open] .brand-cover { max-height: 120px; }
+    .brands-index-grid .brand-mosaic { columns: 2 140px; column-gap: 12px; }
+    .brands-index-grid .brand-mosaic .card { margin-bottom: 14px; }
+}
+@media (max-width: 380px) {
+    .brands-index-grid .brand-accordion-title > span:first-of-type { padding: 10px 10px 2px; }
+    .brands-index-grid .brand-accordion-count { padding: 0 10px 10px; }
+}
