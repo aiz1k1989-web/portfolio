@@ -1,7 +1,161 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0b0a"><meta name="description" content="Korlan - photographer and filmmaker. Selected visual work, campaigns and films."><title>Korlan</title><link rel="stylesheet" href="./assets/alternative.css"></head>
-<body><div class="shell">
-<header><div class="topline"><span>Photographer / Filmmaker</span><span>Bangkok · Available worldwide</span></div><div class="wordmark">Korlan</div><nav class="nav" id="nav" aria-label="Portfolio sections"></nav></header>
-<main id="content"><div class="empty">Loading selected work...</div></main>
-<footer><span>© Korlan</span><a href="https://www.instagram.com/kkkorlan/" target="_blank" rel="noopener noreferrer">@kkkorlan ↗</a><span>Photography · Film · Stories</span></footer>
-</div><script src="./assets/alternative.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="en" __gcrremoteframetoken="fdf6cb602c4ed5cb18b55bdf8bc913ee"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yokikori / portfolio</title>
+<link rel="stylesheet" href="./assets/styles.css">
+<meta name="description" content="Korlan (yokikori) - photographer and videographer. Fashion, commercial, brand collaborations and visual stories.">
+<meta name="theme-color" content="#080808">
+<meta property="og:title" content="yokikori / portfolio">
+<meta property="og:description" content="Photography, films and stories by Korlan.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.yokikori.online/">
+<script defer src="./assets/loader.js"></script>
+</head>
+<body>
+
+
+
+<header>
+    <div class="lang-switch-container" id="lang-switch-container">
+        <button type="button" class="lang-trigger" id="current-lang-label" aria-haspopup="true" aria-expanded="false" onclick="toggleLangMenu(event)">EN</button>
+        <div class="lang-dropdown" id="lang-dropdown">
+            <button class="lang-btn active" onclick="setLang('en')" data-lang="en">EN</button>
+            <button class="lang-btn" onclick="setLang('ru')" data-lang="ru">RU</button>
+            <button class="lang-btn" onclick="setLang('kz')" data-lang="kz">KZ</button>
+            <button class="lang-btn" onclick="setLang('vi')" data-lang="vi">VI</button>
+        </div>
+    </div>
+
+    <div class="brand-main">
+        <h1>yokikori</h1>
+        <span data-i18n="subtitle_main">portfolio</span>
+    </div>
+
+    <nav class="nav-tabs" id="nav-tabs">
+        <button class="tab-btn active" data-tab="all" onclick="switchTab('all', this)" data-i18n="tab_all">all</button>
+        <button class="tab-btn" data-tab="fashion" onclick="switchTab('fashion', this)" data-i18n="tab_fashion">fashion</button>
+        <button class="tab-btn" data-tab="event" onclick="switchTab('event', this)" data-i18n="tab_event">event</button>
+        <button class="tab-btn" data-tab="brands" onclick="switchTab('brands', this)" data-i18n="tab_brands">brands</button>
+        <button class="tab-btn" data-tab="art" onclick="switchTab('art', this)" data-i18n="tab_art">art &amp; personal</button>
+        <button class="tab-btn" data-tab="film" onclick="switchTab('film', this)" data-i18n="tab_film">film</button>
+        <button class="tab-btn" data-tab="backstage" onclick="switchTab('backstage', this)" data-i18n="tab_backstage">backstage</button>
+        <button class="tab-btn" data-tab="blog" onclick="switchTab('blog', this)" data-i18n="tab_blog">blog</button>
+        <button class="tab-btn" data-tab="about" onclick="switchTab('about', this)" data-i18n="tab_about">about</button>
+    </nav>
+</header>
+
+<!-- Админ-панель -->
+<div class="admin-panel" id="admin-panel">
+    <h3 data-i18n="admin_title">⚡ administrator — direct github commit</h3>
+
+    <div class="admin-section">
+        <h4 data-i18n="admin_gh">github settings</h4>
+        <div class="input-group">
+            <input id="gh-user" placeholder="username" value="aiz1k1989-web" __gcruniqueid="1">
+            <input id="gh-repo" placeholder="repository" value="portfolio" __gcruniqueid="2">
+            <input id="gh-branch" placeholder="branch" value="main" __gcruniqueid="3">
+            <input id="gh-path" placeholder="path" value="data/site-data.json" __gcruniqueid="4">
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h4 data-i18n="admin_about">about me — text</h4>
+        <textarea id="admin-about" rows="4" oninput="aboutText[currentLang] = this.value; renderAbout();" __gcruniqueid="5"></textarea>
+    </div>
+
+    <div class="admin-section">
+        <h4 data-i18n="admin_about_photos">about me — photos</h4>
+        <div id="about-photos-list" class="about-photos-list"><div class="about-photo-item"><img src="uploads/1793683337467_rhl7k2.jpg" alt="" loading="lazy"><button class="remove-about-photo" onclick="removeAboutPhoto(0)">✕</button></div></div>
+        <div class="creator-controls">
+            <button class="btn secondary" onclick="document.getElementById('about-photo-input').click()" data-i18n="btn_upload_photo">📎 upload photo</button>
+            <button class="btn secondary" onclick="openMediaLibraryForAbout()" data-i18n="btn_select_media">📁 pick from library</button>
+            <input type="file" id="about-photo-input" accept="image/*" multiple="" style="display:none" onchange="handleAboutPhotoUpload(event)">
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h4 data-i18n="admin_new_post">new post / media</h4>
+        <div class="post-creator">
+            <textarea id="post-text" data-i18n="placeholder_post" placeholder="text, hashtags (#fashion #brands)..." __gcruniqueid="6">text, hashtags (#fashion #brands)...</textarea>
+            <div class="dropzone" id="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="openMediaLibraryForPost()" data-i18n="dropzone">📎 drag &amp; drop file(s) here or click to pick from media library</div>
+            <div class="creator-controls">
+                <div id="post-categories" class="category-checkboxes" aria-label="media sections">
+                    <label><input type="checkbox" value="fashion" checked=""> fashion</label>
+                    <label><input type="checkbox" value="event"> event</label>
+                    <label><input type="checkbox" value="brands"> brands</label>
+                    <label><input type="checkbox" value="art"> art &amp; personal</label>
+                    <label><input type="checkbox" value="film"> film</label>
+                    <label><input type="checkbox" value="backstage"> backstage</label>
+                </div>
+                <input id="post-album" data-i18n="placeholder_album" placeholder="album (optional)" __gcruniqueid="7">
+                <button class="btn" onclick="publishPost()" data-i18n="btn_add">+ add</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h4 data-i18n="admin_create_album">create album</h4>
+        <div class="album-creator">
+            <select id="album-section" class="btn secondary" __gcruniqueid="8">
+                <option value="fashion" data-i18n="tab_fashion">fashion</option>
+                <option value="event" data-i18n="tab_event">event</option>
+                <option value="brands" data-i18n="tab_brands">brands</option>
+                <option value="art" data-i18n="tab_art">art &amp; personal</option>
+                <option value="film" data-i18n="tab_film">film</option>
+                <option value="backstage" data-i18n="tab_backstage">backstage</option>
+            </select>
+            <input id="album-name" data-i18n="placeholder_album_name" placeholder="album name" __gcruniqueid="9">
+            <button class="btn" onclick="createAlbum()" data-i18n="btn_add_album">+ album</button>
+        </div>
+    </div>
+
+    <div class="creator-controls" style="margin-top:8px;">
+        <button class="btn save-gh" onclick="saveToGitHub()" data-i18n="btn_save_gh">💾 save and commit to github</button>
+        <button class="btn danger" onclick="logoutAdmin()" style="margin-left:auto;" data-i18n="btn_logout">logout</button>
+    </div>
+</div>
+
+<!-- Основной контент -->
+<main>
+    <section class="about-section" id="about-section">
+        <div class="about-content">
+            <img class="about-avatar" id="about-avatar-img" src="portfolio my photo.png" alt="avatar" loading="lazy" decoding="async">
+            <div class="about-text-rendered" id="about-text-rendered">just chilling on the rooftop. my first post here. </div>
+        </div>
+        <div class="about-gallery" id="about-gallery" style="display: grid;"><img src="uploads/1793683337467_rhl7k2.jpg" loading="lazy" alt=""></div>
+    </section>
+
+    <div id="portfolio-main" style="display: block;"></div>
+    <div class="blog-feed" id="blog-feed" style="display: none;"></div>
+</main>
+
+<!-- Футер -->
+<footer>
+    <p>photography, films &amp; stories by Korlan</p>
+    <p class="footer-social"><a href="https://www.instagram.com/kkkorlan/" target="_blank" rel="noopener noreferrer">Instagram @kkkorlan</a> <span>#kkkorlan</span></p>
+</footer>
+
+<!-- Модалка медиатеки -->
+<div class="modal" id="media-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 data-i18n="modal_title">media library — select files</h3>
+            <button class="btn secondary" onclick="closeMediaLibrary()" data-i18n="btn_close">close</button>
+        </div>
+        <div class="modal-body" id="folder-picker-body"></div>
+        <div class="modal-footer" id="picker-footer" style="display:none;">
+            <span id="picker-count" style="color:var(--text);font-size:0.85rem;"></span>
+            <button class="btn select-mode" onclick="confirmPickerSelection()" data-i18n="btn_add_selected">Add selected</button>
+        </div>
+    </div>
+</div>
+
+<!-- Media is displayed inline in the portfolio feed. -->
+
+
+
+
+
+
+</body></html>
