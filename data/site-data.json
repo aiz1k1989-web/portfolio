@@ -4513,6 +4513,23 @@
       "y": 0,
       "featuredAll": false,
       "stars": 2
+    },
+    {
+      "path": "03_Brand_Collaborations/@Monkey Shoulder/Monkey Shoulder",
+      "type": "image",
+      "category": "brands",
+      "categories": [
+        "brands"
+      ],
+      "album": "@Monkey Shoulder",
+      "hashtags": [
+        "#brands"
+      ],
+      "scale": 1,
+      "x": 0,
+      "y": 0,
+      "featuredAll": false,
+      "stars": 2
     }
   ],
   "blog": [
