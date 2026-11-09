@@ -40,7 +40,7 @@ main{min-height:65vh}.hero{padding:74px 0 44px}.hero-overline{display:flex;justi
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Image preview"><button class="viewer-close" id="viewer-close" aria-label="Close preview">×</button><img id="viewer-image" alt=""></div>
 <script>
 (()=>{'use strict';
-const ROOT='../',DATA_URL=ROOT+'data/site-data.json';
+const ROOT='/',DATA_URL='/data/site-data.json';
 const $=s=>document.querySelector(s),view=$('#view'),nav=$('#nav');
 const langs=['en','ru','kz','vi'];let lang='en',db={portfolio:[],aboutPhotos:[],about:{}},section='all',brandKey=null,filter='all',visible=18,activeCampaign='all',videoIO=null;
 const copy={
@@ -82,7 +82,7 @@ function render(){navRender();visible=18;if(section==='all')renderAll();else if(
 function setLang(next){lang=next;$('#lang').textContent=lang.toUpperCase()+' ▾';render()}
 $('#lang').addEventListener('click',()=>{const i=langs.indexOf(lang);setLang(langs[(i+1)%langs.length])});
 $('#viewer-close').addEventListener('click',closeImage);$('#viewer').addEventListener('click',e=>{if(e.target===$('#viewer'))closeImage()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeImage()});
-fetch(DATA_URL,{cache:'force-cache'}).then(r=>{if(!r.ok)throw Error('Portfolio data could not be loaded');return r.json()}).then(d=>{db=d;db.portfolio=Array.isArray(d.portfolio)?d.portfolio.filter(x=>x.path):[];render()}).catch(err=>{view.innerHTML='<div class="error">The portfolio could not be loaded. Please refresh the page. '+esc(err.message)+'</div>'});
+fetch(DATA_URL,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Data request failed: '+r.status);return r.json()}).then(d=>{if(!d||!Array.isArray(d.portfolio))throw Error('Portfolio data format is invalid');db=d;db.portfolio=d.portfolio.filter(x=>x.path);render()}).catch(err=>{console.error('[Korlan portfolio]',err);view.innerHTML='<div class="error">Portfolio data could not load. Check your connection and refresh. <br><br>Details: '+esc(err.message)+'</div>'});
 })();
 </script>
 </body>
